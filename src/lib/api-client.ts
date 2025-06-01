@@ -35,38 +35,80 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error: AxiosError<ApiError>) => {
+    // Handle network errors
+    if (!error.response) {
+      // Network error or server is down
+      if (error.code === "ECONNABORTED") {
+        toast.error("Request timeout. Please try again.");
+      } else if (error.code === "ERR_NETWORK") {
+        toast.error("Network error. Please check your connection.");
+      } else {
+        console.error("Network error:", error.message);
+        toast.error("Connection failed. Please try again.");
+      }
+      return Promise.reject(error);
+    }
+
     const message =
       error.response?.data?.message || error.message || "An error occurred";
 
     if (error.response?.status) {
       // Handle specific error cases
-      if (error.response?.status === 401) {
-        // Unauthorized - clear token and redirect to login
-        Cookies.remove("auth_token");
-        Cookies.remove("user");
+      switch (error.response.status) {
+        case 401:
+          // Unauthorized - clear token and redirect to login
+          Cookies.remove("auth_token");
+          Cookies.remove("user");
 
-        // Don't show toast for auth endpoints
-        if (!error.config?.url?.includes("/auth/")) {
-          toast.error("Session expired. Please log in again.");
-          window.location.href = "/auth/login";
-        }
-      } else if (error.response?.status === 403) {
-        toast.error("Access denied");
-      } else if (error.response?.status === 404) {
-        toast.error("Resource not found");
-      } else if (error.response?.status >= 500) {
-        toast.error("Server error. Please try again later.");
-      } else {
-        // Don't show generic errors for auth endpoints as they're handled in forms
-        if (!error.config?.url?.includes("/auth/")) {
-          toast.error(message);
-        }
+          // Don't show toast for auth endpoints
+          if (!error.config?.url?.includes("/auth/")) {
+            toast.error("Session expired. Please log in again.");
+            // Only redirect in browser environment
+            if (typeof window !== "undefined") {
+              window.location.href = "/auth/login";
+            }
+          }
+          break;
+
+        case 403:
+          toast.error("Access denied");
+          break;
+
+        case 404:
+          // Don't show toast for 404 errors on auth endpoints or specific resources
+          if (
+            !error.config?.url?.includes("/auth/") &&
+            !error.config?.url?.includes("/products/") &&
+            !error.config?.url?.includes("/categories/")
+          ) {
+            toast.error("Resource not found");
+          }
+          break;
+
+        case 422:
+          // Validation errors - don't show generic toast, let forms handle it
+          break;
+
+        case 429:
+          toast.error("Too many requests. Please wait a moment.");
+          break;
+
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          toast.error("Server error. Please try again later.");
+          break;
+
+        default:
+          // Don't show generic errors for auth endpoints as they're handled in forms
+          if (!error.config?.url?.includes("/auth/")) {
+            toast.error(message);
+          }
       }
-
-      return Promise.reject(error);
-    } else {
-        console.log("wtf")
     }
+
+    return Promise.reject(error);
   }
 );
 
@@ -117,24 +159,34 @@ export const api = {
 // Auth token management
 export const authUtils = {
   setToken: (token: string) => {
-    Cookies.set("auth_token", token, {
-      expires: 7,
-      secure: true,
-      sameSite: "strict",
-    });
+    if (typeof window !== "undefined") {
+      Cookies.set("auth_token", token, {
+        expires: 7,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+      });
+    }
   },
 
   getToken: () => {
-    return Cookies.get("auth_token");
+    if (typeof window !== "undefined") {
+      return Cookies.get("auth_token");
+    }
+    return undefined;
   },
 
   removeToken: () => {
-    Cookies.remove("auth_token");
-    Cookies.remove("user");
+    if (typeof window !== "undefined") {
+      Cookies.remove("auth_token");
+      Cookies.remove("user");
+    }
   },
 
   isAuthenticated: () => {
-    return !!Cookies.get("auth_token");
+    if (typeof window !== "undefined") {
+      return !!Cookies.get("auth_token");
+    }
+    return false;
   },
 };
 
