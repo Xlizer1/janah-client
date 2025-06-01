@@ -37,7 +37,7 @@ import {
   ChevronRight,
 } from "@mui/icons-material";
 import { useAuth } from "@/store/auth.store";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 
 const drawerWidth = 260;
 

@@ -32,7 +32,7 @@ import { useAuth } from "@/store/auth.store";
 import { useCart } from "@/store/cart.store";
 import { useUI } from "@/store/ui.store";
 import { SearchBar } from "@/components/search/SearchBar";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 
 export function Header() {
   const theme = useTheme();

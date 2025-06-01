@@ -11,7 +11,7 @@ import {
   Alert,
 } from "@mui/material";
 import { Email, Send, CheckCircle } from "@mui/icons-material";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 
 export function NewsletterSection() {
   const [email, setEmail] = useState("");

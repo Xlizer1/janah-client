@@ -3,7 +3,7 @@
 import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { Toaster } from "react-hot-toast";
+import { Toaster } from "react-toastify";
 import { AuthInitializer } from "./AuthInitializer";
 import { ThemeRegistry } from "./ThemeRegistry";
 

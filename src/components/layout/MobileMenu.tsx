@@ -34,7 +34,7 @@ import {
 } from "@mui/icons-material";
 import { useAuth } from "@/store/auth.store";
 import { useUI } from "@/store/ui.store";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 
 export function MobileMenu() {
   const router = useRouter();

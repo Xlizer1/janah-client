@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import Cookies from "js-cookie";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 import type { ApiResponse, ApiError } from "@/types";
 
 const API_URL =

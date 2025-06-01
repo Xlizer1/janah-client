@@ -1,3 +1,4 @@
+// src/app/admin/products/page.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -37,41 +38,38 @@ import {
   DialogContent,
   DialogActions,
   Alert,
+  Fab,
 } from "@mui/material";
 import {
   Search,
   FilterList,
   MoreVert,
-  PersonAdd,
-  CheckCircle,
-  Cancel,
+  Add,
   Edit,
   Visibility,
-  People,
-  PersonOff,
-  Phone,
-  Email,
-  CalendarToday,
+  Delete,
+  ContentCopy,
+  Star,
+  StarBorder,
+  Inventory,
   Warning,
+  CheckCircle,
   Refresh,
+  GetApp,
+  CloudUpload,
+  ToggleOn,
+  ToggleOff,
 } from "@mui/icons-material";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import Image from "next/image";
 
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useAuth } from "@/store/auth.store";
-import { adminService } from "@/services/admin.service";
-
-// Types
-interface UserFilters {
-  page: number;
-  limit: number;
-  role?: "user" | "admin";
-  is_active?: boolean;
-  is_phone_verified?: boolean;
-  search?: string;
-}
+import { productsService } from "@/services/products.service";
+import { categoriesService } from "@/services/categories.service";
+import type { ProductFilters, Product } from "@/types";
 
 // Protect admin route
 function AdminGuard({ children }: { children: React.ReactNode }) {
@@ -97,82 +95,57 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-function UsersManagementContent() {
+function ProductsManagementContent() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [filters, setFilters] = useState<UserFilters>({
+
+  const [filters, setFilters] = useState<ProductFilters>({
     page: 1,
     limit: 10,
+    is_active: undefined,
   });
-  const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
+
+  const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
   const [actionMenuAnchor, setActionMenuAnchor] = useState<null | HTMLElement>(
     null
   );
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(
+    null
+  );
   const [bulkActionDialog, setBulkActionDialog] = useState<{
     open: boolean;
-    action: "activate" | "deactivate" | null;
+    action: "activate" | "deactivate" | "delete" | null;
   }>({ open: false, action: null });
 
-  // Fetch users
+  // Fetch products
   const {
-    data: usersData,
+    data: productsData,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["adminUsers", filters],
-    queryFn: () => adminService.users.getAllUsers(filters),
+    queryKey: ["adminProducts", filters],
+    queryFn: () => productsService.admin.getAllProducts(filters),
   });
 
-  // Get stats
-  const { data: statsData } = useQuery({
-    queryKey: ["adminStats"],
-    queryFn: () => adminService.getStats(),
+  // Fetch categories for filter
+  const { data: categoriesData } = useQuery({
+    queryKey: ["categories"],
+    queryFn: () => categoriesService.getCategories(),
   });
 
-  // Mutations
-  const activateUserMutation = useMutation({
-    mutationFn: adminService.users.activateUser,
+  // Delete product mutation
+  const deleteProductMutation = useMutation({
+    mutationFn: productsService.admin.deleteProduct,
     onSuccess: () => {
-      toast.success("User activated successfully");
-      queryClient.invalidateQueries({ queryKey: ["adminUsers"] });
-      queryClient.invalidateQueries({ queryKey: ["adminStats"] });
+      toast.success("Product deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["adminProducts"] });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to activate user");
+      toast.error(error.response?.data?.message || "Failed to delete product");
     },
   });
 
-  const deactivateUserMutation = useMutation({
-    mutationFn: adminService.users.deactivateUser,
-    onSuccess: () => {
-      toast.success("User deactivated successfully");
-      queryClient.invalidateQueries({ queryKey: ["adminUsers"] });
-      queryClient.invalidateQueries({ queryKey: ["adminStats"] });
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to deactivate user");
-    },
-  });
-
-  const bulkActivateMutation = useMutation({
-    mutationFn: adminService.users.bulkActivateUsers,
-    onSuccess: (data) => {
-      const { activated, failed } = data;
-      toast.success(`${activated.length} users activated successfully`);
-      if (failed.length > 0) {
-        toast.error(`${failed.length} users failed to activate`);
-      }
-      setSelectedUsers([]);
-      queryClient.invalidateQueries({ queryKey: ["adminUsers"] });
-      queryClient.invalidateQueries({ queryKey: ["adminStats"] });
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Bulk activation failed");
-    },
-  });
-
-  const handleFilterChange = (newFilters: Partial<UserFilters>) => {
+  const handleFilterChange = (newFilters: Partial<ProductFilters>) => {
     setFilters((prev) => ({ ...prev, ...newFilters, page: 1 }));
   };
 
@@ -185,93 +158,108 @@ function UsersManagementContent() {
 
   const handleActionMenuOpen = (
     event: React.MouseEvent<HTMLElement>,
-    userId: number
+    productId: number
   ) => {
     setActionMenuAnchor(event.currentTarget);
-    setSelectedUserId(userId);
+    setSelectedProductId(productId);
   };
 
   const handleActionMenuClose = () => {
     setActionMenuAnchor(null);
-    setSelectedUserId(null);
+    setSelectedProductId(null);
   };
 
-  const handleUserAction = (
-    action: "activate" | "deactivate" | "view" | "edit"
+  const handleProductAction = (
+    action: "view" | "edit" | "delete" | "duplicate" | "toggle_featured"
   ) => {
-    if (!selectedUserId) return;
+    if (!selectedProductId) return;
 
     switch (action) {
-      case "activate":
-        activateUserMutation.mutate(selectedUserId);
-        break;
-      case "deactivate":
-        deactivateUserMutation.mutate(selectedUserId);
-        break;
       case "view":
+        router.push(`/admin/products/${selectedProductId}`);
+        break;
       case "edit":
-        router.push(`/admin/users/${selectedUserId}`);
+        router.push(`/admin/products/${selectedProductId}/edit`);
+        break;
+      case "delete":
+        if (confirm("Are you sure you want to delete this product?")) {
+          deleteProductMutation.mutate(selectedProductId);
+        }
+        break;
+      case "duplicate":
+        toast.info("Product duplication coming soon");
+        break;
+      case "toggle_featured":
+        toast.info("Toggle featured coming soon");
         break;
     }
     handleActionMenuClose();
   };
 
-  const handleBulkAction = (action: "activate" | "deactivate") => {
-    if (selectedUsers.length === 0) {
-      toast.error("Please select users first");
+  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      const allProductIds =
+        productsData?.products.map((product) => product.id) || [];
+      setSelectedProducts(allProductIds);
+    } else {
+      setSelectedProducts([]);
+    }
+  };
+
+  const handleSelectProduct = (productId: number) => {
+    setSelectedProducts((prev) =>
+      prev.includes(productId)
+        ? prev.filter((id) => id !== productId)
+        : [...prev, productId]
+    );
+  };
+
+  const handleBulkAction = (action: "activate" | "deactivate" | "delete") => {
+    if (selectedProducts.length === 0) {
+      toast.error("Please select products first");
       return;
     }
     setBulkActionDialog({ open: true, action });
   };
 
   const confirmBulkAction = () => {
-    if (bulkActionDialog.action === "activate") {
-      bulkActivateMutation.mutate(selectedUsers);
-    }
+    toast.info("Bulk actions coming soon");
     setBulkActionDialog({ open: false, action: null });
   };
 
-  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      const allUserIds = usersData?.users.map((user) => user.id) || [];
-      setSelectedUsers(allUserIds);
-    } else {
-      setSelectedUsers([]);
-    }
-  };
-
-  const handleSelectUser = (userId: number) => {
-    setSelectedUsers((prev) =>
-      prev.includes(userId)
-        ? prev.filter((id) => id !== userId)
-        : [...prev, userId]
-    );
-  };
-
-  const getUserStatusColor = (user: any) => {
-    if (!user.is_phone_verified) return "error";
-    if (!user.is_active) return "warning";
+  const getStatusColor = (product: Product) => {
+    if (!product.is_active) return "error";
+    if (product.stock_quantity === 0) return "warning";
+    if (product.stock_quantity <= 5) return "info";
     return "success";
   };
 
-  const getUserStatusText = (user: any) => {
-    if (!user.is_phone_verified) return "Phone Not Verified";
-    if (!user.is_active) return "Pending Activation";
-    return "Active";
+  const getStatusText = (product: Product) => {
+    if (!product.is_active) return "Inactive";
+    if (product.stock_quantity === 0) return "Out of Stock";
+    if (product.stock_quantity <= 5) return "Low Stock";
+    return "In Stock";
+  };
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(price);
   };
 
   if (isLoading) {
-    return <LoadingSpinner message="Loading users..." />;
+    return <LoadingSpinner message="Loading products..." />;
   }
 
   if (error) {
     return (
-      <Alert severity="error">Failed to load users. Please try again.</Alert>
+      <Alert severity="error">Failed to load products. Please try again.</Alert>
     );
   }
 
-  const users = usersData?.users || [];
-  const pagination = usersData?.pagination;
+  const products = productsData?.products || [];
+  const pagination = productsData?.pagination;
 
   return (
     <Box>
@@ -286,25 +274,30 @@ function UsersManagementContent() {
       >
         <Box>
           <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-            User Management
+            Product Management
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Manage user accounts, activations, and permissions
+            Manage your product catalog, inventory, and settings
           </Typography>
         </Box>
         <Box sx={{ display: "flex", gap: 2 }}>
           <Button
             variant="outlined"
-            startIcon={<Refresh />}
-            onClick={() =>
-              queryClient.invalidateQueries({ queryKey: ["adminUsers"] })
-            }
+            startIcon={<GetApp />}
+            onClick={() => toast.info("Export coming soon")}
           >
-            Refresh
+            Export
           </Button>
-          <Link href="/admin/users/pending">
-            <Button variant="contained" startIcon={<PersonAdd />}>
-              Pending Users ({statsData?.stats?.pending_activation || 0})
+          <Button
+            variant="outlined"
+            startIcon={<CloudUpload />}
+            onClick={() => toast.info("Import coming soon")}
+          >
+            Import
+          </Button>
+          <Link href="/admin/products/create">
+            <Button variant="contained" startIcon={<Add />}>
+              Add Product
             </Button>
           </Link>
         </Box>
@@ -317,14 +310,14 @@ function UsersManagementContent() {
             <CardContent>
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <Avatar sx={{ bgcolor: "primary.main" }}>
-                  <People />
+                  <Inventory />
                 </Avatar>
                 <Box>
                   <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                    {statsData?.stats?.total_users || 0}
+                    {pagination?.total || 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Total Users
+                    Total Products
                   </Typography>
                 </Box>
               </Box>
@@ -340,10 +333,14 @@ function UsersManagementContent() {
                 </Avatar>
                 <Box>
                   <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                    {statsData?.stats?.active_users || 0}
+                    {
+                      products.filter(
+                        (p) => p.is_active && p.stock_quantity > 0
+                      ).length
+                    }
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Active Users
+                    In Stock
                   </Typography>
                 </Box>
               </Box>
@@ -359,10 +356,14 @@ function UsersManagementContent() {
                 </Avatar>
                 <Box>
                   <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                    {statsData?.stats?.pending_activation || 0}
+                    {
+                      products.filter(
+                        (p) => p.stock_quantity <= 5 && p.stock_quantity > 0
+                      ).length
+                    }
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Pending Activation
+                    Low Stock
                   </Typography>
                 </Box>
               </Box>
@@ -373,15 +374,15 @@ function UsersManagementContent() {
           <Card>
             <CardContent>
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <Avatar sx={{ bgcolor: "error.main" }}>
-                  <PersonOff />
+                <Avatar sx={{ bgcolor: "#fbbf24" }}>
+                  <Star />
                 </Avatar>
                 <Box>
                   <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                    {statsData?.stats?.unverified_phone || 0}
+                    {products.filter((p) => p.is_featured).length}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Unverified Phone
+                    Featured
                   </Typography>
                 </Box>
               </Box>
@@ -396,7 +397,7 @@ function UsersManagementContent() {
           <Grid item xs={12} md={4}>
             <TextField
               fullWidth
-              placeholder="Search users..."
+              placeholder="Search products..."
               value={filters.search || ""}
               onChange={(e) => handleFilterChange({ search: e.target.value })}
               InputProps={{
@@ -410,19 +411,24 @@ function UsersManagementContent() {
           </Grid>
           <Grid item xs={12} md={2}>
             <FormControl fullWidth>
-              <InputLabel>Role</InputLabel>
+              <InputLabel>Category</InputLabel>
               <Select
-                value={filters.role || ""}
-                label="Role"
+                value={filters.category_id || ""}
+                label="Category"
                 onChange={(e) =>
                   handleFilterChange({
-                    role: e.target.value as "user" | "admin" | undefined,
+                    category_id: e.target.value
+                      ? Number(e.target.value)
+                      : undefined,
                   })
                 }
               >
-                <MenuItem value="">All Roles</MenuItem>
-                <MenuItem value="user">User</MenuItem>
-                <MenuItem value="admin">Admin</MenuItem>
+                <MenuItem value="">All Categories</MenuItem>
+                {categoriesData?.categories.map((category) => (
+                  <MenuItem key={category.id} value={category.id}>
+                    {category.name}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Grid>
@@ -453,17 +459,17 @@ function UsersManagementContent() {
           </Grid>
           <Grid item xs={12} md={2}>
             <FormControl fullWidth>
-              <InputLabel>Phone Verified</InputLabel>
+              <InputLabel>Featured</InputLabel>
               <Select
                 value={
-                  filters.is_phone_verified !== undefined
-                    ? filters.is_phone_verified.toString()
+                  filters.is_featured !== undefined
+                    ? filters.is_featured.toString()
                     : ""
                 }
-                label="Phone Verified"
+                label="Featured"
                 onChange={(e) =>
                   handleFilterChange({
-                    is_phone_verified:
+                    is_featured:
                       e.target.value === ""
                         ? undefined
                         : e.target.value === "true",
@@ -471,8 +477,8 @@ function UsersManagementContent() {
                 }
               >
                 <MenuItem value="">All</MenuItem>
-                <MenuItem value="true">Verified</MenuItem>
-                <MenuItem value="false">Not Verified</MenuItem>
+                <MenuItem value="true">Featured</MenuItem>
+                <MenuItem value="false">Not Featured</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -497,24 +503,38 @@ function UsersManagementContent() {
       </Paper>
 
       {/* Bulk Actions */}
-      {selectedUsers.length > 0 && (
+      {selectedProducts.length > 0 && (
         <Paper sx={{ p: 2, mb: 3, bgcolor: "primary.50" }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Typography variant="body1" sx={{ fontWeight: 600 }}>
-              {selectedUsers.length} users selected
+              {selectedProducts.length} products selected
             </Typography>
             <Button
               variant="contained"
               size="small"
               onClick={() => handleBulkAction("activate")}
-              disabled={bulkActivateMutation.isPending}
             >
               Bulk Activate
             </Button>
             <Button
+              variant="contained"
+              size="small"
+              onClick={() => handleBulkAction("deactivate")}
+            >
+              Bulk Deactivate
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              size="small"
+              onClick={() => handleBulkAction("delete")}
+            >
+              Bulk Delete
+            </Button>
+            <Button
               variant="outlined"
               size="small"
-              onClick={() => setSelectedUsers([])}
+              onClick={() => setSelectedProducts([])}
             >
               Clear Selection
             </Button>
@@ -522,7 +542,7 @@ function UsersManagementContent() {
         </Paper>
       )}
 
-      {/* Users Table */}
+      {/* Products Table */}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -530,104 +550,136 @@ function UsersManagementContent() {
               <TableCell padding="checkbox">
                 <Checkbox
                   indeterminate={
-                    selectedUsers.length > 0 &&
-                    selectedUsers.length < users.length
+                    selectedProducts.length > 0 &&
+                    selectedProducts.length < products.length
                   }
                   checked={
-                    users.length > 0 && selectedUsers.length === users.length
+                    products.length > 0 &&
+                    selectedProducts.length === products.length
                   }
                   onChange={handleSelectAll}
                 />
               </TableCell>
-              <TableCell>User</TableCell>
-              <TableCell>Contact</TableCell>
+              <TableCell>Product</TableCell>
+              <TableCell>Category</TableCell>
+              <TableCell>Price</TableCell>
+              <TableCell>Stock</TableCell>
               <TableCell>Status</TableCell>
-              <TableCell>Role</TableCell>
-              <TableCell>Joined</TableCell>
+              <TableCell>Featured</TableCell>
+              <TableCell>Created</TableCell>
               <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id} hover>
+            {products.map((product) => (
+              <TableRow key={product.id} hover>
                 <TableCell padding="checkbox">
                   <Checkbox
-                    checked={selectedUsers.includes(user.id)}
-                    onChange={() => handleSelectUser(user.id)}
+                    checked={selectedProducts.includes(product.id)}
+                    onChange={() => handleSelectProduct(product.id)}
                   />
                 </TableCell>
                 <TableCell>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <Avatar sx={{ width: 40, height: 40 }}>
-                      {user.first_name?.[0]?.toUpperCase()}
-                    </Avatar>
-                    <Box>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                        {user.first_name} {user.last_name}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        ID: {user.id}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  <Box>
                     <Box
                       sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        mb: 0.5,
+                        width: 60,
+                        height: 60,
+                        borderRadius: 2,
+                        overflow: "hidden",
+                        bgcolor: "grey.100",
+                        flexShrink: 0,
                       }}
                     >
-                      <Phone sx={{ fontSize: 16 }} />
-                      <Typography variant="body2">
-                        {user.phone_number}
-                      </Typography>
-                      {user.is_phone_verified && (
-                        <CheckCircle
-                          sx={{ fontSize: 16, color: "success.main" }}
+                      {product.image_url ? (
+                        <Image
+                          src={product.image_url}
+                          alt={product.name}
+                          width={60}
+                          height={60}
+                          style={{ objectFit: "cover" }}
                         />
+                      ) : (
+                        <Box
+                          sx={{
+                            width: "100%",
+                            height: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            bgcolor: "grey.200",
+                            color: "text.secondary",
+                          }}
+                        >
+                          <Typography variant="caption">No Image</Typography>
+                        </Box>
                       )}
                     </Box>
-                    {user.email && (
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          fontWeight: 600,
+                          mb: 0.5,
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                        }}
                       >
-                        <Email sx={{ fontSize: 16 }} />
-                        <Typography variant="body2">{user.email}</Typography>
-                      </Box>
-                    )}
+                        {product.name}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        ID: {product.id} • SKU: {product.sku || "N/A"}
+                      </Typography>
+                    </Box>
                   </Box>
                 </TableCell>
                 <TableCell>
                   <Chip
-                    label={getUserStatusText(user)}
-                    color={getUserStatusColor(user)}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Chip
-                    label={user.role.toUpperCase()}
-                    color={user.role === "admin" ? "primary" : "default"}
+                    label={product.category_name || "Uncategorized"}
                     variant="outlined"
                     size="small"
                   />
                 </TableCell>
                 <TableCell>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    {formatPrice(product.price)}
+                  </Typography>
+                </TableCell>
+                <TableCell>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <CalendarToday sx={{ fontSize: 16 }} />
                     <Typography variant="body2">
-                      {new Date(user.created_at).toLocaleDateString()}
+                      {product.stock_quantity}
                     </Typography>
+                    {product.stock_quantity <= 5 && (
+                      <Warning sx={{ fontSize: 16, color: "warning.main" }} />
+                    )}
                   </Box>
+                </TableCell>
+                <TableCell>
+                  <Chip
+                    label={getStatusText(product)}
+                    color={getStatusColor(product)}
+                    size="small"
+                  />
+                </TableCell>
+                <TableCell>
+                  {product.is_featured ? (
+                    <Star sx={{ color: "#fbbf24" }} />
+                  ) : (
+                    <StarBorder sx={{ color: "grey.400" }} />
+                  )}
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body2">
+                    {new Date(product.created_at).toLocaleDateString()}
+                  </Typography>
                 </TableCell>
                 <TableCell align="right">
                   <Tooltip title="More actions">
                     <IconButton
-                      onClick={(e) => handleActionMenuOpen(e, user.id)}
+                      onClick={(e) => handleActionMenuOpen(e, product.id)}
                     >
                       <MoreVert />
                     </IconButton>
@@ -651,35 +703,51 @@ function UsersManagementContent() {
         </Box>
       )}
 
+      {/* Floating Action Button */}
+      <Fab
+        color="primary"
+        aria-label="add product"
+        sx={{ position: "fixed", bottom: 16, right: 16 }}
+        onClick={() => router.push("/admin/products/create")}
+      >
+        <Add />
+      </Fab>
+
       {/* Action Menu */}
       <Menu
         anchorEl={actionMenuAnchor}
         open={Boolean(actionMenuAnchor)}
         onClose={handleActionMenuClose}
       >
-        <MenuItem onClick={() => handleUserAction("view")}>
+        <MenuItem onClick={() => handleProductAction("view")}>
           <ListItemIcon>
             <Visibility fontSize="small" />
           </ListItemIcon>
           <ListItemText>View Details</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => handleUserAction("edit")}>
+        <MenuItem onClick={() => handleProductAction("edit")}>
           <ListItemIcon>
             <Edit fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Edit User</ListItemText>
+          <ListItemText>Edit Product</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => handleUserAction("activate")}>
+        <MenuItem onClick={() => handleProductAction("duplicate")}>
           <ListItemIcon>
-            <CheckCircle fontSize="small" />
+            <ContentCopy fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Activate</ListItemText>
+          <ListItemText>Duplicate</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => handleUserAction("deactivate")}>
+        <MenuItem onClick={() => handleProductAction("toggle_featured")}>
           <ListItemIcon>
-            <Cancel fontSize="small" />
+            <Star fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Deactivate</ListItemText>
+          <ListItemText>Toggle Featured</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => handleProductAction("delete")}>
+          <ListItemIcon>
+            <Delete fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Delete</ListItemText>
         </MenuItem>
       </Menu>
 
@@ -688,16 +756,11 @@ function UsersManagementContent() {
         open={bulkActionDialog.open}
         onClose={() => setBulkActionDialog({ open: false, action: null })}
       >
-        <DialogTitle>
-          Confirm Bulk{" "}
-          {bulkActionDialog.action === "activate"
-            ? "Activation"
-            : "Deactivation"}
-        </DialogTitle>
+        <DialogTitle>Confirm Bulk {bulkActionDialog.action}</DialogTitle>
         <DialogContent>
           <Typography>
             Are you sure you want to {bulkActionDialog.action}{" "}
-            {selectedUsers.length} selected users?
+            {selectedProducts.length} selected products?
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -706,11 +769,7 @@ function UsersManagementContent() {
           >
             Cancel
           </Button>
-          <Button
-            onClick={confirmBulkAction}
-            variant="contained"
-            disabled={bulkActivateMutation.isPending}
-          >
+          <Button onClick={confirmBulkAction} variant="contained">
             Confirm
           </Button>
         </DialogActions>
@@ -719,11 +778,11 @@ function UsersManagementContent() {
   );
 }
 
-export default function AdminUsersPage() {
+export default function AdminProductsPage() {
   return (
     <AdminGuard>
       <AdminLayout>
-        <UsersManagementContent />
+        <ProductsManagementContent />
       </AdminLayout>
     </AdminGuard>
   );
