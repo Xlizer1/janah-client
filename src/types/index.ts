@@ -278,3 +278,19 @@ export interface CartItem {
   quantity: number;
   subtotal: number;
 }
+
+export interface ForgotPasswordFormData {
+  phone_number: string;
+}
+
+export interface ResetPasswordFormData {
+  phone_number: string;
+  verification_code: string;
+  new_password: string;
+  confirm_password: string;
+}
+
+export interface ResendCodeFormData {
+  phone_number: string;
+  type?: 'registration' | 'password_reset';
+}
