@@ -93,6 +93,37 @@ export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
+  // Validation schemas (updated email handling)
+  const profileUpdateSchema = yup.object({
+    first_name: yup
+      .string()
+      .min(2, "First name must be at least 2 characters")
+      .optional(),
+    last_name: yup
+      .string()
+      .min(2, "Last name must be at least 2 characters")
+      .optional(),
+    email: yup
+      .string()
+      .email("Please enter a valid email address")
+      .optional()
+      .nullable()
+      .transform((value) => (value === null ? undefined : value)),
+  });
+
+  // Alternative approach - simpler schema that matches backend exactly:
+  const profileUpdateSchemaSimple = yup.object({
+    first_name: yup
+      .string()
+      .min(2, "First name must be at least 2 characters")
+      .optional(),
+    last_name: yup
+      .string()
+      .min(2, "Last name must be at least 2 characters")
+      .optional(),
+    email: yup.string().email("Please enter a valid email address").optional(),
+  });
+
   // Profile update form
   const {
     register: registerProfile,
@@ -100,11 +131,11 @@ export default function ProfilePage() {
     formState: { errors: profileErrors },
     reset: resetProfile,
   } = useForm<ProfileUpdateFormData>({
-    resolver: yupResolver(profileUpdateSchema),
+    resolver: yupResolver(profileUpdateSchemaSimple), // Use the simpler schema
     defaultValues: {
       first_name: user?.first_name || "",
       last_name: user?.last_name || "",
-      email: user?.email || "",
+      email: user?.email || "", // Will be undefined if not set
     },
   });
 

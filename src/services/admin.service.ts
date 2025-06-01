@@ -2,7 +2,7 @@ import { api } from "@/lib/api-client";
 import type {
   User,
   AdminStats,
-  PaginatedResponse,
+  UsersResponse,
   BulkUpdateResult,
   CategoryAnalytics,
   InventoryData,
@@ -20,7 +20,7 @@ export const adminService = {
         is_active?: boolean;
         is_phone_verified?: boolean;
       } = {}
-    ): Promise<PaginatedResponse<User>> => {
+    ): Promise<UsersResponse> => {
       return api.get("/admin/users", params);
     },
 
@@ -30,7 +30,7 @@ export const adminService = {
         page?: number;
         limit?: number;
       } = {}
-    ): Promise<PaginatedResponse<User>> => {
+    ): Promise<UsersResponse> => {
       return api.get("/admin/users/pending", params);
     },
 

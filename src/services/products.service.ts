@@ -4,7 +4,7 @@ import type {
   ProductCreateData,
   ProductUpdateData,
   ProductFilters,
-  PaginatedResponse,
+  ProductsResponse,
   Category,
 } from "@/types";
 
@@ -12,7 +12,7 @@ export const productsService = {
   // Get all products with filters
   getProducts: async (
     filters: ProductFilters = {}
-  ): Promise<PaginatedResponse<Product>> => {
+  ): Promise<ProductsResponse> => {
     return api.get("/products", filters);
   },
 
@@ -30,7 +30,7 @@ export const productsService = {
     sort_order?: string;
     limit?: number;
     category_id?: number;
-  }): Promise<PaginatedResponse<Product>> => {
+  }): Promise<ProductsResponse> => {
     return api.get("/products/search", params);
   },
 
@@ -39,7 +39,7 @@ export const productsService = {
     identifier: string | number,
     filters: ProductFilters = {}
   ): Promise<
-    PaginatedResponse<Product> & {
+    ProductsResponse & {
       category: { id: number; name: string; slug: string };
     }
   > => {
@@ -63,7 +63,7 @@ export const productsService = {
     // Get all products (admin view)
     getAllProducts: async (
       filters: ProductFilters = {}
-    ): Promise<PaginatedResponse<Product>> => {
+    ): Promise<ProductsResponse> => {
       return api.get("/products/admin/all", filters);
     },
 

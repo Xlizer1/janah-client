@@ -129,7 +129,8 @@ export function SearchBar() {
         >
           {/* Show suggestions if there's a query */}
           {debouncedQuery.length >= 2 &&
-            suggestions?.suggestions?.length > 0 && (
+            suggestions?.suggestions &&
+            suggestions.suggestions.length > 0 && (
               <>
                 <Box sx={{ p: 2, pb: 1 }}>
                   <Typography variant="subtitle2" color="text.secondary">
@@ -173,7 +174,8 @@ export function SearchBar() {
           {/* Show popular searches when no query or no results */}
           {(!debouncedQuery ||
             (debouncedQuery.length >= 2 &&
-              suggestions?.suggestions?.length === 0)) && (
+              suggestions?.suggestions &&
+              suggestions.suggestions.length === 0)) && (
             <>
               <Box sx={{ p: 2, pb: 1 }}>
                 <Typography

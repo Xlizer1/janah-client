@@ -4,14 +4,14 @@ import type {
   CategoryCreateData,
   CategoryOption,
   CategoryFilters,
-  PaginatedResponse,
+  CategoriesResponse,
 } from "@/types";
 
 export const categoriesService = {
   // Get all categories
   getCategories: async (
     filters: CategoryFilters = {}
-  ): Promise<PaginatedResponse<Category>> => {
+  ): Promise<CategoriesResponse> => {
     return api.get("/categories", filters);
   },
 

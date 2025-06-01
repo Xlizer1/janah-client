@@ -11,9 +11,23 @@ export interface PaginationMeta {
   totalPages: number;
 }
 
+// Generic paginated response structure
 export interface PaginatedResponse<T> {
-  items: T[];
   pagination: PaginationMeta;
+}
+
+// Specific response types that extend PaginatedResponse
+export interface ProductsResponse extends PaginatedResponse<Product> {
+  products: Product[];
+}
+
+export interface CategoriesResponse extends PaginatedResponse<Category> {
+  categories: Category[];
+}
+
+// Users response for admin
+export interface UsersResponse extends PaginatedResponse<User> {
+  users: User[];
 }
 
 // User types
@@ -22,7 +36,7 @@ export interface User {
   phone_number: string;
   first_name: string;
   last_name: string;
-  email?: string;
+  email?: string; // Changed from nullable to optional
   is_phone_verified: boolean;
   is_active: boolean;
   role: 'user' | 'admin';
@@ -183,7 +197,7 @@ export interface InventoryData {
   avg_stock_per_product: number;
 }
 
-// Form types
+// Form types - Fixed email type
 export interface LoginFormData {
   phone_number: string;
   password: string;
@@ -195,7 +209,7 @@ export interface RegisterFormData {
   confirm_password: string;
   first_name: string;
   last_name: string;
-  email?: string;
+  email?: string; // Changed from optional to required optional
 }
 
 export interface VerifyPhoneFormData {
@@ -219,7 +233,7 @@ export interface ChangePasswordFormData {
 export interface ProfileUpdateFormData {
   first_name?: string;
   last_name?: string;
-  email?: string;
+  email?: string; // Changed to optional undefined, not nullable
 }
 
 // Query types
