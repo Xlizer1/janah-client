@@ -3,9 +3,9 @@
 import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { Toaster } from "react-toastify";
 import { AuthInitializer } from "./AuthInitializer";
 import { ThemeRegistry } from "./ThemeRegistry";
+import { ToastContainer } from "react-toastify";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -55,29 +55,8 @@ export function Providers({ children }: ProvidersProps) {
       <ThemeRegistry>
         <AuthInitializer />
         {children}
-        <Toaster
+        <ToastContainer
           position="bottom-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: "#1f2937",
-              color: "#f9fafb",
-              borderRadius: "8px",
-              fontSize: "14px",
-            },
-            success: {
-              iconTheme: {
-                primary: "#10b981",
-                secondary: "#f9fafb",
-              },
-            },
-            error: {
-              iconTheme: {
-                primary: "#ef4444",
-                secondary: "#f9fafb",
-              },
-            },
-          }}
         />
         {process.env.NODE_ENV === "development" && (
           <ReactQueryDevtools initialIsOpen={false} />
