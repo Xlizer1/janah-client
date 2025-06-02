@@ -60,6 +60,7 @@ import type { ProductEditFormData, ProductUpdateData } from "@/types";
 
 // Validation schema
 const productSchema = yup.object({
+  product_id: yup.number().required(),
   name: yup
     .string()
     .required("Product name is required")
@@ -134,6 +135,7 @@ function EditProductContent() {
   } = useForm<ProductEditFormData>({
     resolver: yupResolver(productSchema),
     defaultValues: {
+      product_id: undefined,
       name: "",
       slug: "",
       description: "",
@@ -233,6 +235,7 @@ function EditProductContent() {
 
   const onSubmit = (data: ProductEditFormData) => {
     updateProductMutation.mutate(data);
+    console.log("hsahbac");
   };
 
   const handleDeleteProduct = () => {
@@ -882,7 +885,7 @@ function EditProductContent() {
           <Link href="/admin/products">
             <Button startIcon={<ArrowBack />}>Back to Products</Button>
           </Link>
-          <Box sx={{ display: "flex", gap: 2 }}>
+          <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
             {isDirty && (
               <Typography variant="body2" color="warning.main">
                 You have unsaved changes
@@ -891,7 +894,9 @@ function EditProductContent() {
             <Button
               variant="contained"
               startIcon={<Save />}
-              onClick={handleSubmit(onSubmit)}
+              onClick={() => {
+                handleSubmit(onSubmit)
+              }}
               disabled={updateProductMutation.isPending || !isDirty}
             >
               {updateProductMutation.isPending ? "Saving..." : "Save Changes"}

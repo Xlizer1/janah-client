@@ -314,6 +314,7 @@ export interface CategoryCreateFormData {
 }
 
 export interface ProductEditFormData {
+  product_id: number;
   name: string;
   slug?: string;
   description?: string;
@@ -330,6 +331,7 @@ export interface ProductEditFormData {
 
 export interface ProductCreateFormData {
   name: string;
+  code: string;
   slug?: string;
   description?: string;
   price: number;

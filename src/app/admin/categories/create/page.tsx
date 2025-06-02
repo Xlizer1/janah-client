@@ -115,7 +115,7 @@ function CreateCategoryContent() {
   // Watch name to auto-generate slug
   const watchName = watch("name");
   React.useEffect(() => {
-    if (watchName && !getValues("slug")) {
+    if (watchName) {
       const slug = watchName
         .toLowerCase()
         .replace(/[^a-z0-9\s-]/g, "")

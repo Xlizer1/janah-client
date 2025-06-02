@@ -55,6 +55,10 @@ const productCreateSchema = yup.object({
     .string()
     .required("Product name is required")
     .min(3, "Product name must be at least 3 characters"),
+  code: yup
+    .string()
+    .required("Product code is required")
+    .min(3, "Product code must be at least 3 characters"),
   slug: yup
     .string()
     .matches(
@@ -119,13 +123,14 @@ function CreateProductContent() {
     resolver: yupResolver(productCreateSchema),
     defaultValues: {
       name: "",
+      code: "",
       slug: "",
       description: "",
       price: 0,
       stock_quantity: 0,
-      category_id: undefined,
+      category_id: 0,
       sku: "",
-      weight: undefined,
+      weight: 0,
       dimensions: "",
       is_featured: false,
       image_url: "",
@@ -135,12 +140,14 @@ function CreateProductContent() {
   // Watch name to auto-generate slug
   const watchName = watch("name");
   React.useEffect(() => {
-    if (watchName && !getValues("slug")) {
+    if (watchName) {
       const slug = watchName
         .toLowerCase()
         .replace(/[^a-z0-9\s-]/g, "")
         .replace(/\s+/g, "-")
         .replace(/-+/g, "-");
+
+      console.log(slug)
       setValue("slug", slug);
     }
   }, [watchName, setValue, getValues]);
@@ -244,6 +251,21 @@ function CreateProductContent() {
                       error={!!errors.name}
                       helperText={errors.name?.message}
                       placeholder="Enter product name"
+                    />
+                  )}
+                />
+
+                <Controller
+                  name="code"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Product Code"
+                      fullWidth
+                      error={!!errors.code}
+                      helperText={errors.code?.message}
+                      placeholder="Enter product code"
                     />
                   )}
                 />
@@ -376,6 +398,7 @@ function CreateProductContent() {
                           {...field}
                           label="Weight"
                           fullWidth
+                          value={getValues().weight || ""}
                           type="number"
                           error={!!errors.weight}
                           helperText={errors.weight?.message}

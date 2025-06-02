@@ -258,9 +258,11 @@ function ProductDetailsContent() {
     },
   ];
 
-  React.useEffect(() => {
-    setNewStockQuantity(product.stock_quantity);
-  }, [product.stock_quantity]);
+  console.log(product.stock_quantity)
+
+  // React.useEffect(() => {
+  //   setNewStockQuantity(product.stock_quantity);
+  // }, [product.stock_quantity]);
 
   return (
     <Box>
