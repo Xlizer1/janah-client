@@ -1,6 +1,7 @@
 "use client";
 
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { ImportExport } from "@/components/admin/ImportExport";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useAuth } from "@/store/auth.store";
 import { Box, Typography } from "@mui/material";
@@ -34,7 +35,7 @@ export default function AdminImportExportPage() {
   return (
     <AdminGuard>
       <AdminLayout>
-        <div>Import / Export</div>
+        <ImportExport />
       </AdminLayout>
     </AdminGuard>
   );

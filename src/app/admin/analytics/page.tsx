@@ -1,6 +1,7 @@
 "use client";
 
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useAuth } from "@/store/auth.store";
 import { Box, Typography } from "@mui/material";
@@ -30,11 +31,11 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-export default function AdminAnalytics() {
+export default function AdminAnalyticsPage() {
   return (
     <AdminGuard>
       <AdminLayout>
-        <div>Analytics</div>
+        <AnalyticsDashboard />
       </AdminLayout>
     </AdminGuard>
   );

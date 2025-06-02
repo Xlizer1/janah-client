@@ -111,6 +111,16 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       icon: Settings,
       href: "/admin/settings",
     },
+    {
+      text: "Bulk Operations",
+      icon: Settings,
+      href: "/admin/bulk-operations",
+    },
+    {
+      text: "Import/Export",
+      icon: Settings,
+      href: "/admin/import-export",
+    },
   ];
 
   const generateBreadcrumbs = (pathname: string) => {

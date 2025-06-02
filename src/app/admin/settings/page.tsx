@@ -1,6 +1,7 @@
 "use client";
 
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { AdminSettings } from "@/components/admin/AdminSettings";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useAuth } from "@/store/auth.store";
 import { Box, Typography } from "@mui/material";
@@ -34,7 +35,7 @@ export default function AdminSettingsPage() {
   return (
     <AdminGuard>
       <AdminLayout>
-        <div>Settings</div>
+        <AdminSettings />
       </AdminLayout>
     </AdminGuard>
   );

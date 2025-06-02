@@ -1,6 +1,7 @@
 "use client";
 
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { BulkOperations } from "@/components/admin/BulkOperations";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useAuth } from "@/store/auth.store";
 import { Box, Typography } from "@mui/material";
@@ -30,11 +31,11 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-export default function AdminBulkOperations() {
+export default function AdminBulkOperationsPage() {
   return (
     <AdminGuard>
       <AdminLayout>
-        <div>Bulk Operations</div>
+        <BulkOperations />
       </AdminLayout>
     </AdminGuard>
   );
