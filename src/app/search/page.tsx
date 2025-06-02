@@ -258,7 +258,7 @@ function SearchPageContent() {
                         },
                       }}
                       onClick={() =>
-                        (window.location.href = `/categories/${category.slug}`)
+                        (window.location.href = `/categories/${category.id}/view`)
                       }
                     >
                       <Box

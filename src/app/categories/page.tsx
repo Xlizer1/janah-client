@@ -178,7 +178,7 @@ export default function CategoriesPage() {
               <Grid container spacing={3}>
                 {filteredCategories.map((category) => (
                   <Grid item xs={12} sm={6} md={4} lg={3} key={category.id}>
-                    <Link href={`/categories/${category.slug}`}>
+                    <Link href={`/categories/${category.id}/view`}>
                       <Card
                         sx={{
                           height: 320,
@@ -362,7 +362,7 @@ export default function CategoriesPage() {
                     .slice(0, 6)
                     .map((category) => (
                       <Grid item xs={6} sm={4} md={2} key={category.id}>
-                        <Link href={`/categories/${category.slug}`}>
+                        <Link href={`/categories/${category.id}/view`}>
                           <Paper
                             sx={{
                               p: 2,

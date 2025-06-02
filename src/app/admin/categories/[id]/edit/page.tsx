@@ -185,7 +185,7 @@ function EditCategoryContent() {
   const handlePreview = () => {
     const category = categoryData?.category;
     if (category?.slug) {
-      window.open(`/categories/${category.slug}`, "_blank");
+      window.open(`/categories/${category.id}/view`, "_blank");
     } else {
       toast.error("Category must be saved before preview");
     }

@@ -5,20 +5,19 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  Box,
-  Typography,
   Container,
   Grid,
+  Box,
+  Typography,
   Breadcrumbs,
-  Button,
+  Paper,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
   Pagination,
   Chip,
-  Paper,
-  Alert,
+  Button,
   useMediaQuery,
   useTheme,
   Drawer,
@@ -45,9 +44,12 @@ import type { ProductFilters as ProductFiltersType } from "@/types";
 
 export default function CategoryViewPage() {
   const params = useParams();
-  const categorySlug = params.slug as string;
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
+  // Handle both ID and slug - determine which one it is
+  const identifier = params.id as string;
+  const isNumeric = /^\d+$/.test(identifier);
 
   const [filters, setFilters] = useState<ProductFiltersType>({
     page: 1,
@@ -58,15 +60,23 @@ export default function CategoryViewPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  // Fetch category data and products
+  // Fetch category data - use appropriate service based on identifier type
   const {
     data: categoryData,
     isLoading: categoryLoading,
     error: categoryError,
   } = useQuery({
-    queryKey: ["categoryProducts", categorySlug, filters],
-    queryFn: () => productsService.getProductsByCategory(categorySlug, filters),
-    enabled: !!categorySlug,
+    queryKey: ["category", identifier],
+    queryFn: () => {
+      if (isNumeric) {
+        // It's an ID, use admin service or regular service
+        return categoriesService.getCategory(parseInt(identifier));
+      } else {
+        // It's a slug, use regular service
+        return categoriesService.getCategory(identifier);
+      }
+    },
+    enabled: !!identifier,
   });
 
   // Fetch all categories for filter
@@ -84,7 +94,6 @@ export default function CategoryViewPage() {
     page: number
   ) => {
     setFilters((prev) => ({ ...prev, page }));
-    // Scroll to top when page changes
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -129,8 +138,16 @@ export default function CategoryViewPage() {
   }
 
   const category = categoryData.category;
-  const products = categoryData.products || [];
-  const pagination = categoryData.pagination;
+
+  // Now fetch products using the category ID
+  const { data: productsData } = useQuery({
+    queryKey: ["categoryProducts", category.id, filters],
+    queryFn: () => productsService.getProductsByCategory(category.id, filters),
+    enabled: !!category.id,
+  });
+
+  const products = productsData?.products || [];
+  const pagination = productsData?.pagination;
 
   const sortOptions = [
     { value: "name-ASC", label: "Name: A to Z" },
@@ -143,6 +160,7 @@ export default function CategoryViewPage() {
 
   const currentSortValue = `${filters.sort_by}-${filters.sort_order}`;
 
+  // Rest of the component remains the same...
   return (
     <MainLayout>
       <Container maxWidth="xl" sx={{ py: 4 }}>
@@ -170,7 +188,6 @@ export default function CategoryViewPage() {
         {/* Category Header */}
         <Box sx={{ mb: 4 }}>
           <Grid container spacing={4} alignItems="center">
-            {/* Category Image */}
             {category.image_url && (
               <Grid item xs={12} md={4} lg={3}>
                 <Box
@@ -193,7 +210,6 @@ export default function CategoryViewPage() {
               </Grid>
             )}
 
-            {/* Category Info */}
             <Grid
               item
               xs={12}

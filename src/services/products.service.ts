@@ -9,32 +9,7 @@ import type {
 } from "@/types";
 
 export const productsService = {
-  // Get all products with filters
-  getProducts: async (
-    filters: ProductFilters = {}
-  ): Promise<ProductsResponse> => {
-    return api.get("/products", filters);
-  },
-
-  // Get featured products
-  getFeaturedProducts: async (
-    limit = 10
-  ): Promise<{ products: Product[]; total: number }> => {
-    return api.get("/products/featured", { limit });
-  },
-
-  // Search products
-  searchProducts: async (params: {
-    q: string;
-    sort_by?: string;
-    sort_order?: string;
-    limit?: number;
-    category_id?: number;
-  }): Promise<ProductsResponse> => {
-    return api.get("/products/search", params);
-  },
-
-  // Get products by category
+  // Get products by category - FIXED VERSION
   getProductsByCategory: async (
     identifier: string | number,
     filters: ProductFilters = {}
@@ -43,38 +18,81 @@ export const productsService = {
       category: { id: number; name: string; slug: string };
     }
   > => {
-    return api.get(`/products/category/${identifier}`, filters);
+    try {
+      // Clean up the filters - remove undefined values that might cause 400 errors
+      const cleanFilters = Object.fromEntries(
+        Object.entries(filters).filter(([_, value]) => value !== undefined && value !== null)
+      );
+
+      console.log('API Request:', {
+        endpoint: `/products/category/${identifier}`,
+        filters: cleanFilters
+      });
+
+      return api.get(`/products/category/${identifier}`, cleanFilters);
+    } catch (error) {
+      console.error('Error fetching products by category:', {
+        identifier,
+        filters,
+        error
+      });
+      throw error;
+    }
   },
 
-  // Get single product by ID or slug
+  // Rest of your existing methods...
+  getProducts: async (filters: ProductFilters = {}): Promise<ProductsResponse> => {
+    const cleanFilters = Object.fromEntries(
+      Object.entries(filters).filter(([_, value]) => value !== undefined && value !== null)
+    );
+    return api.get("/products", cleanFilters);
+  },
+
+  getFeaturedProducts: async (
+    limit = 10
+  ): Promise<{ products: Product[]; total: number }> => {
+    return api.get("/products/featured", { limit });
+  },
+
+  searchProducts: async (params: {
+    q: string;
+    sort_by?: string;
+    sort_order?: string;
+    limit?: number;
+    category_id?: number;
+  }): Promise<ProductsResponse> => {
+    const cleanParams = Object.fromEntries(
+      Object.entries(params).filter(([_, value]) => value !== undefined && value !== null)
+    );
+    return api.get("/products/search", cleanParams);
+  },
+
   getProduct: async (
     identifier: string | number
   ): Promise<{ product: Product }> => {
     return api.get(`/products/${identifier}`);
   },
 
-  // Get product categories
   getCategories: async (): Promise<{ categories: Category[] }> => {
     return api.get("/products/categories");
   },
 
-  // Admin methods
   admin: {
-    // Get all products (admin view)
     getAllProducts: async (
       filters: ProductFilters = {}
     ): Promise<ProductsResponse> => {
-      return api.get("/products/admin/all", filters);
+      const cleanFilters = Object.fromEntries(
+        Object.entries(filters).filter(([_, value]) => value !== undefined && value !== null)
+      );
+      return api.get("/products/admin/all", cleanFilters);
     },
 
-    // Create product
     createProduct: async (
       data: ProductCreateData
     ): Promise<{ product: Product }> => {
       return api.post("/products", data);
     },
 
-    // Update product
     updateProduct: async (
       id: number,
       data: ProductUpdateData
@@ -82,7 +100,6 @@ export const productsService = {
       return api.put(`/products/${id}`, data);
     },
 
-    // Update product stock
     updateStock: async (
       id: number,
       stock_quantity: number
@@ -94,7 +111,6 @@ export const productsService = {
       return api.patch(`/products/${id}/stock`, { stock_quantity });
     },
 
-    // Delete product
     deleteProduct: async (id: number): Promise<void> => {
       return api.delete(`/products/${id}`);
     },

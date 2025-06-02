@@ -152,7 +152,7 @@ function CategoryDetailsContent() {
   };
 
   const handleShare = async () => {
-    const url = `${window.location.origin}/categories/${category.slug}`;
+    const url = `${window.location.origin}/categories/${category.id}/view`;
     try {
       await navigator.clipboard.writeText(url);
       toast.success("Category URL copied to clipboard");
@@ -261,7 +261,7 @@ function CategoryDetailsContent() {
             variant="outlined"
             startIcon={<Visibility />}
             onClick={() =>
-              window.open(`/categories/${category.slug}`, "_blank")
+              window.open(`/categories/${category.id}/view`, "_blank")
             }
           >
             View Live
