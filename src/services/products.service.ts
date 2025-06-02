@@ -7,6 +7,8 @@ import type {
   ProductFilters,
   ProductsResponse,
   Category,
+  ProductCreateFormData,
+  ProductEditFormData,
 } from "@/types";
 
 export const productsService = {
@@ -110,7 +112,7 @@ export const productsService = {
 
     // Create product
     createProduct: async (
-      data: ProductCreateData
+      data: ProductCreateFormData
     ): Promise<{ product: Product }> => {
       return api.post("/products", data);
     },
@@ -118,7 +120,7 @@ export const productsService = {
     // Update product
     updateProduct: async (
       id: number,
-      data: ProductUpdateData
+      data: ProductEditFormData
     ): Promise<{ product: Product }> => {
       return api.put(`/products/${id}`, data);
     },

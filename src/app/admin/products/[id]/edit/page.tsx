@@ -171,7 +171,7 @@ function EditProductContent() {
 
   // Update product mutation
   const updateProductMutation = useMutation({
-    mutationFn: (data: ProductUpdateData) =>
+    mutationFn: (data: ProductEditFormData) =>
       productsService.admin.updateProduct(productId, data),
     onSuccess: (data) => {
       toast.success("Product updated successfully!");
@@ -235,7 +235,6 @@ function EditProductContent() {
 
   const onSubmit = (data: ProductEditFormData) => {
     updateProductMutation.mutate(data);
-    console.log("hsahbac");
   };
 
   const handleDeleteProduct = () => {

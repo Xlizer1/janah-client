@@ -6,6 +6,7 @@ import type {
   CategoryOption,
   CategoryFilters,
   CategoriesResponse,
+  CategoryFormData,
 } from "@/types";
 
 export const categoriesService = {
@@ -58,7 +59,7 @@ export const categoriesService = {
     updateCategory: async (
       id: number,
       data: Partial<CategoryCreateData> & { is_active?: boolean }
-    ): Promise<{ category: Category }> => {
+    ): Promise<{ category: CategoryFormData }> => {
       return api.put(`/categories/${id}`, data);
     },
 
