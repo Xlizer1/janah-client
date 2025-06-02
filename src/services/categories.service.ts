@@ -1,3 +1,4 @@
+// src/services/categories.service.ts - Complete implementation
 import { api } from "@/lib/api-client";
 import type {
   Category,
@@ -39,6 +40,11 @@ export const categoriesService = {
     return api.get(`/categories/${identifier}`);
   },
 
+  // 🆕 Get category by code
+  getCategoryByCode: async (code: string): Promise<{ category: Category }> => {
+    return api.get(`/categories/code/${code}`);
+  },
+
   // Admin methods
   admin: {
     // Create category
@@ -61,10 +67,13 @@ export const categoriesService = {
       return api.delete(`/categories/${id}`);
     },
 
-    // Update sort orders
+    // 🆕 Update sort orders
     updateSortOrders: async (
       categories: Array<{ id: number; sort_order: number }>
-    ): Promise<void> => {
+    ): Promise<{
+      updated: Array<{ id: number; old_order: number; new_order: number }>;
+      failed: Array<{ id: number; reason: string }>;
+    }> => {
       return api.put("/categories/sort-orders/update", { categories });
     },
   },
