@@ -44,7 +44,7 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useAuth } from "@/store/auth.store";
 import { categoriesService } from "@/services/categories.service";
-import type { CategoryCreateData } from "@/types";
+import type { CategoryCreateData, CategoryFormData } from "@/types";
 
 // Validation schema
 const categorySchema = yup.object({
@@ -70,7 +70,7 @@ const categorySchema = yup.object({
     .min(0, "Sort order must be positive")
     .integer("Sort order must be a whole number")
     .optional(),
-  is_active: yup.boolean().optional(),
+  is_active: yup.boolean().required(),
 });
 
 // Protect admin route
@@ -112,8 +112,16 @@ function EditCategoryContent() {
     watch,
     setValue,
     reset,
-  } = useForm<CategoryCreateData & { is_active: boolean }>({
+  } = useForm<CategoryFormData>({
     resolver: yupResolver(categorySchema),
+    defaultValues: {
+      name: "",
+      slug: "",
+      description: "",
+      image_url: "",
+      sort_order: 1,
+      is_active: true,
+    },
   });
 
   // Fetch category data
@@ -169,7 +177,7 @@ function EditCategoryContent() {
     }
   }, [categoryData, reset]);
 
-  const onSubmit = (data: CategoryCreateData & { is_active: boolean }) => {
+  const onSubmit = (data: CategoryFormData) => {
     updateCategoryMutation.mutate(data);
   };
 

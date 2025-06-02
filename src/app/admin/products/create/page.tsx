@@ -48,10 +48,9 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useAuth } from "@/store/auth.store";
 import { productsService } from "@/services/products.service";
 import { categoriesService } from "@/services/categories.service";
-import type { ProductCreateData } from "@/types";
+import type { ProductCreateData, ProductCreateFormData } from "@/types";
 
-// Validation schema
-const productSchema = yup.object({
+const productCreateSchema = yup.object({
   name: yup
     .string()
     .required("Product name is required")
@@ -116,8 +115,8 @@ function CreateProductContent() {
     watch,
     setValue,
     getValues,
-  } = useForm<ProductCreateData>({
-    resolver: yupResolver(productSchema),
+  } = useForm<ProductCreateFormData>({
+    resolver: yupResolver(productCreateSchema),
     defaultValues: {
       name: "",
       slug: "",
@@ -164,7 +163,7 @@ function CreateProductContent() {
     },
   });
 
-  const onSubmit = (data: ProductCreateData) => {
+  const onSubmit = (data: ProductCreateFormData) => {
     createProductMutation.mutate(data);
   };
 

@@ -56,7 +56,7 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useAuth } from "@/store/auth.store";
 import { productsService } from "@/services/products.service";
 import { categoriesService } from "@/services/categories.service";
-import type { ProductUpdateData } from "@/types";
+import type { ProductEditFormData, ProductUpdateData } from "@/types";
 
 // Validation schema
 const productSchema = yup.object({
@@ -86,7 +86,7 @@ const productSchema = yup.object({
   weight: yup.number().min(0, "Weight must be positive").optional(),
   dimensions: yup.string().optional(),
   is_featured: yup.boolean().optional(),
-  is_active: yup.boolean().optional(),
+  is_active: yup.boolean().required(), // Required for edit
   image_url: yup.string().url("Image URL must be valid").optional(),
 });
 
@@ -131,8 +131,22 @@ function EditProductContent() {
     watch,
     setValue,
     reset,
-  } = useForm<ProductUpdateData>({
+  } = useForm<ProductEditFormData>({
     resolver: yupResolver(productSchema),
+    defaultValues: {
+      name: "",
+      slug: "",
+      description: "",
+      price: 0,
+      stock_quantity: 0,
+      category_id: undefined,
+      sku: "",
+      weight: undefined,
+      dimensions: "",
+      is_featured: false,
+      is_active: true,
+      image_url: "",
+    },
   });
 
   // Fetch product data
@@ -217,7 +231,7 @@ function EditProductContent() {
     }
   }, [productData, reset]);
 
-  const onSubmit = (data: ProductUpdateData) => {
+  const onSubmit = (data: ProductEditFormData) => {
     updateProductMutation.mutate(data);
   };
 

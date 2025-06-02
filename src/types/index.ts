@@ -39,7 +39,7 @@ export interface User {
   email?: string; // Changed from nullable to optional
   is_phone_verified: boolean;
   is_active: boolean;
-  role: 'user' | 'admin';
+  role: "user" | "admin";
   created_at: string;
   updated_at: string;
   activated_at?: string;
@@ -120,7 +120,7 @@ export interface CategoryOption {
 // Search types
 export interface SearchSuggestion {
   suggestion: string;
-  type: 'product' | 'category';
+  type: "product" | "category";
   slug: string;
 }
 
@@ -245,8 +245,8 @@ export interface ProductFilters {
   max_price?: number;
   search?: string;
   is_featured?: boolean;
-  sort_by?: 'name' | 'price' | 'created_at' | 'stock_quantity';
-  sort_order?: 'ASC' | 'DESC';
+  sort_by?: "name" | "price" | "created_at" | "stock_quantity";
+  sort_order?: "ASC" | "DESC";
   is_active?: boolean;
 }
 
@@ -292,5 +292,53 @@ export interface ResetPasswordFormData {
 
 export interface ResendCodeFormData {
   phone_number: string;
-  type?: 'registration' | 'password_reset';
+  type?: "registration" | "password_reset";
+}
+
+export interface CategoryFormData {
+  name: string;
+  slug?: string;
+  description?: string;
+  image_url?: string;
+  sort_order?: number;
+  is_active: boolean; // Required for edit forms
+}
+
+export interface CategoryCreateFormData {
+  name: string;
+  slug?: string;
+  description?: string;
+  image_url?: string;
+  sort_order?: number;
+  // is_active not included for create forms - defaults to true
+}
+
+export interface ProductEditFormData {
+  name: string;
+  slug?: string;
+  description?: string;
+  price: number;
+  stock_quantity: number;
+  category_id?: number;
+  sku?: string;
+  weight?: number;
+  dimensions?: string;
+  is_featured?: boolean;
+  is_active: boolean; // Required for edit forms
+  image_url?: string;
+}
+
+export interface ProductCreateFormData {
+  name: string;
+  slug?: string;
+  description?: string;
+  price: number;
+  stock_quantity: number;
+  category_id?: number;
+  sku?: string;
+  weight?: number;
+  dimensions?: string;
+  is_featured?: boolean;
+  image_url?: string;
+  // is_active not included for create forms - defaults to true
 }

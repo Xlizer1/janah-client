@@ -649,10 +649,9 @@ function CategoriesManagementContent() {
             This action cannot be undone!
           </Alert>
           <Typography>
-            Are you sure you want to delete "
-            {getCategory(selectedCategoryId || 0)?.name}"?
+            Are you sure you want to delete
             {getCategory(selectedCategoryId || 0)?.product_count &&
-              getCategory(selectedCategoryId || 0)!.product_count > 0 && (
+              getCategory(selectedCategoryId || 0)!.product_count! > 0 && (
                 <span>
                   {" "}
                   This category contains{" "}
