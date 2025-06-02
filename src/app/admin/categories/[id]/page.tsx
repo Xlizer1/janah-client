@@ -261,7 +261,7 @@ function CategoryDetailsContent() {
             variant="outlined"
             startIcon={<Visibility />}
             onClick={() =>
-              window.open(`/categories/${category.id}/view`, "_blank")
+              window.open(`/admin/categories/${category.id}/view`, "_blank")
             }
           >
             View Live
