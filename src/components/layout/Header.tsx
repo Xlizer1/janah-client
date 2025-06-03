@@ -121,6 +121,13 @@ export function Header() {
                     Categories
                   </Button>
                 </Link>
+                {isAuthenticated && (
+                  <Link href="/orders">
+                    <Button color="inherit" sx={{ fontWeight: 500 }}>
+                      My Orders
+                    </Button>
+                  </Link>
+                )}
                 <Button color="inherit" sx={{ fontWeight: 500 }}>
                   About
                 </Button>

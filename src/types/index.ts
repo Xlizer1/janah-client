@@ -344,3 +344,69 @@ export interface ProductCreateFormData {
   image_url?: string;
   // is_active not included for create forms - defaults to true
 }
+
+export interface Order {
+  id: number;
+  order_number: string;
+  user_id: number;
+  status:
+    | "pending"
+    | "confirmed"
+    | "preparing"
+    | "ready_to_ship"
+    | "shipped"
+    | "delivered"
+    | "cancelled";
+  total_amount: number;
+  delivery_address: string;
+  delivery_notes?: string;
+  items: OrderItem[];
+  created_at: string;
+  updated_at: string;
+  confirmed_at?: string;
+  shipped_at?: string;
+  delivered_at?: string;
+  cancelled_at?: string;
+  cancellation_reason?: string;
+}
+
+export interface OrderItem {
+  id: number;
+  order_id: number;
+  product_id: number;
+  product_name: string;
+  product_slug?: string;
+  product_image_url?: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+}
+
+export interface OrderCreateData {
+  delivery_address: string;
+  delivery_notes?: string;
+  items: Array<{
+    product_id: number;
+    quantity: number;
+  }>;
+}
+
+export interface OrderFilters {
+  page?: number;
+  limit?: number;
+  status?: string;
+  user_id?: number;
+  start_date?: string;
+  end_date?: string;
+  search?: string;
+}
+
+export interface OrdersResponse extends PaginatedResponse<Order> {
+  orders: Order[];
+}
+
+export interface CheckoutFormData {
+  delivery_address: string;
+  delivery_notes?: string;
+  payment_method?: string;
+}

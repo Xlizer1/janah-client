@@ -31,6 +31,7 @@ import {
   ExpandLess,
   ExpandMore,
   Star,
+  Receipt,
 } from "@mui/icons-material";
 import { useAuth } from "@/store/auth.store";
 import { useUI } from "@/store/ui.store";
@@ -82,21 +83,30 @@ export function MobileMenu() {
         { label: "All Categories", href: "/categories" },
       ],
     },
-    {
-      label: "Featured",
-      icon: Star,
-      href: "/products?featured=true",
-    },
-    {
-      label: "About",
-      icon: Info,
-      href: "/about",
-    },
-    {
-      label: "Contact",
-      icon: ContactMail,
-      href: "/contact",
-    },
+    ...(isAuthenticated
+      ? [
+          {
+            label: "My Orders",
+            icon: Receipt,
+            href: "/orders",
+          },
+        ]
+      : []),
+    // {
+    //   label: "Featured",
+    //   icon: Star,
+    //   href: "/products?featured=true",
+    // },
+    // {
+    //   label: "About",
+    //   icon: Info,
+    //   href: "/about",
+    // },
+    // {
+    //   label: "Contact",
+    //   icon: ContactMail,
+    //   href: "/contact",
+    // },
   ];
 
   return (
