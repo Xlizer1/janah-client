@@ -34,8 +34,12 @@ import { useUI } from "@/store/ui.store";
 import { SearchBar } from "@/components/search/SearchBar";
 import { toast } from "react-toastify";
 
+import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
+import { useTranslation } from "@/hooks/useTranslation";
+
 export function Header() {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const router = useRouter();
 
@@ -113,7 +117,7 @@ export function Header() {
               <Box sx={{ display: "flex", gap: 3, mr: "auto" }}>
                 <Link href="/products">
                   <Button color="inherit" sx={{ fontWeight: 500 }}>
-                    Products
+                    {t("nav.products")}
                   </Button>
                 </Link>
                 <Link href="/categories">
@@ -157,6 +161,9 @@ export function Header() {
               )}
 
               {/* Cart Button */}
+
+              <LanguageSwitcher />
+
               <IconButton color="inherit" onClick={openCart}>
                 <Badge badgeContent={totalItems} color="primary">
                   <ShoppingCart />
@@ -205,6 +212,7 @@ export function Header() {
                 </>
               ) : (
                 <Box sx={{ display: "flex", gap: 1 }}>
+                  <LanguageSwitcher />
                   <Button
                     variant="outlined"
                     startIcon={<Login />}

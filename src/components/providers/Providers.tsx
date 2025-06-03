@@ -7,6 +7,8 @@ import { AuthInitializer } from "./AuthInitializer";
 import { ThemeRegistry } from "./ThemeRegistry";
 import { ToastContainer } from "react-toastify";
 
+import '@/lib/i18n';
+
 // Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
