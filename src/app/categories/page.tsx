@@ -28,8 +28,10 @@ import { useState } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { categoriesService } from "@/services/categories.service";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function CategoriesPage() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
 
   // Fetch all categories
@@ -70,7 +72,7 @@ export default function CategoriesPage() {
         >
           <Link href="/">
             <Typography color="text.secondary" sx={{ cursor: "pointer" }}>
-              Home
+              {t("nav.products")}
             </Typography>
           </Link>
           <Typography color="primary.main">Categories</Typography>

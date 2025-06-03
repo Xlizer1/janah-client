@@ -34,9 +34,11 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { categoriesService } from "@/services/categories.service";
 import { productsService } from "@/services/products.service";
 import type { ProductFilters } from "@/types";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function CategoryDetailPage() {
   const params = useParams();
+    const { t } = useTranslation();
   const slug = params.slug as string;
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -132,7 +134,7 @@ export default function CategoryDetailPage() {
         >
           <Link href="/">
             <Typography color="text.secondary" sx={{ cursor: "pointer" }}>
-              Home
+            {t("nav.products")}
             </Typography>
           </Link>
           <Link href="/categories">

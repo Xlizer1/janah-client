@@ -35,6 +35,7 @@ import {
   AccountCircle,
   Home,
   ChevronRight,
+  FilePresent,
 } from "@mui/icons-material";
 import { useAuth } from "@/store/auth.store";
 import { toast } from "react-toastify";
@@ -111,14 +112,14 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       icon: Settings,
       href: "/admin/settings",
     },
-    {
-      text: "Bulk Operations",
-      icon: Settings,
-      href: "/admin/bulk-operations",
-    },
+    // {
+    //   text: "Bulk Operations",
+    //   icon: Settings,
+    //   href: "/admin/bulk-operations",
+    // },
     {
       text: "Import/Export",
-      icon: Settings,
+      icon: FilePresent,
       href: "/admin/import-export",
     },
   ];

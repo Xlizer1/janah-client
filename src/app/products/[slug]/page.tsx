@@ -45,6 +45,7 @@ import { ProductCard } from "@/components/products/ProductCard";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useCart } from "@/store/cart.store";
 import { productsService } from "@/services/products.service";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -64,6 +65,7 @@ export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { addItem } = useCart();
+  const { t } = useTranslation();
 
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -190,7 +192,7 @@ export default function ProductDetailPage() {
         >
           <Link href="/">
             <Typography color="text.secondary" sx={{ cursor: "pointer" }}>
-              Home
+              {t("nav.products")}
             </Typography>
           </Link>
           <Link href="/products">

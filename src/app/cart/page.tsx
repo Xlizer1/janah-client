@@ -35,9 +35,11 @@ import {
 import { MainLayout } from "@/components/layout/MainLayout";
 import { useCart } from "@/store/cart.store";
 import { useAuth } from "@/store/auth.store";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function CartPage() {
   const router = useRouter();
+    const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const {
     items,
@@ -81,7 +83,7 @@ export default function CartPage() {
         >
           <Link href="/">
             <Typography color="text.secondary" sx={{ cursor: "pointer" }}>
-              Home
+            {t("nav.products")}
             </Typography>
           </Link>
           <Typography color="primary.main">Shopping Cart</Typography>

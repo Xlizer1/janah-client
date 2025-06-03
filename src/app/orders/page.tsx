@@ -1,4 +1,4 @@
-// src/app/orders/page.tsx
+// src/app/orders/page.tsx - Fixed version
 "use client";
 
 import React, { useState } from "react";
@@ -171,7 +171,7 @@ export default function OrdersPage() {
             My Orders
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            {data?.pagination.total
+            {data?.pagination?.total
               ? `${data.pagination.total} orders found`
               : "Loading orders..."}
           </Typography>
@@ -354,76 +354,93 @@ export default function OrdersPage() {
                         </Grid>
                       </Box>
 
-                      {/* Order Items */}
+                      {/* Order Items - FIXED: Added safe array access */}
                       <Box sx={{ p: 3 }}>
                         <Typography
                           variant="subtitle2"
                           sx={{ fontWeight: 600, mb: 2 }}
                         >
-                          Order Items ({order.items.length})
+                          Order Items ({order.items?.length || 0})
                         </Typography>
                         <List dense>
-                          {order.items.slice(0, 3).map((item, index) => (
-                            <React.Fragment key={item.id}>
-                              <ListItem sx={{ px: 0 }}>
-                                <ListItemAvatar>
-                                  <Avatar
-                                    sx={{
-                                      width: 50,
-                                      height: 50,
-                                      borderRadius: 1,
-                                    }}
-                                    variant="rounded"
-                                  >
-                                    {item.product_image_url ? (
-                                      <Image
-                                        src={item.product_image_url}
-                                        alt={item.product_name}
-                                        width={50}
-                                        height={50}
-                                        style={{ objectFit: "cover" }}
-                                      />
-                                    ) : (
-                                      <ShoppingBag />
-                                    )}
-                                  </Avatar>
-                                </ListItemAvatar>
-                                <ListItemText
-                                  primary={
-                                    <Typography
-                                      variant="subtitle2"
-                                      fontWeight={600}
+                          {/* SAFE ARRAY ACCESS: Check if items exists and has length */}
+                          {order.items && order.items.length > 0 ? (
+                            order.items.slice(0, 3).map((item, index) => (
+                              <React.Fragment key={item.id}>
+                                <ListItem sx={{ px: 0 }}>
+                                  <ListItemAvatar>
+                                    <Avatar
+                                      sx={{
+                                        width: 50,
+                                        height: 50,
+                                        borderRadius: 1,
+                                      }}
+                                      variant="rounded"
                                     >
-                                      {item.product_name}
-                                    </Typography>
-                                  }
-                                  secondary={
-                                    <Box>
+                                      {item.product_image_url ? (
+                                        <Image
+                                          src={item.product_image_url}
+                                          alt={item.product_name}
+                                          width={50}
+                                          height={50}
+                                          style={{ objectFit: "cover" }}
+                                        />
+                                      ) : (
+                                        <ShoppingBag />
+                                      )}
+                                    </Avatar>
+                                  </ListItemAvatar>
+                                  <ListItemText
+                                    primary={
                                       <Typography
-                                        variant="body2"
-                                        color="text.secondary"
-                                      >
-                                        Quantity: {item.quantity} ×{" "}
-                                        {formatPrice(item.unit_price)}
-                                      </Typography>
-                                      <Typography
-                                        variant="body2"
-                                        color="primary.main"
+                                        variant="subtitle2"
                                         fontWeight={600}
                                       >
-                                        Subtotal:{" "}
-                                        {formatPrice(item.total_price)}
+                                        {item.product_name}
                                       </Typography>
-                                    </Box>
-                                  }
-                                />
-                              </ListItem>
-                              {index < Math.min(order.items.length - 1, 2) && (
-                                <Divider />
-                              )}
-                            </React.Fragment>
-                          ))}
-                          {order.items.length > 3 && (
+                                    }
+                                    secondary={
+                                      <Box>
+                                        <Typography
+                                          variant="body2"
+                                          color="text.secondary"
+                                        >
+                                          Quantity: {item.quantity} ×{" "}
+                                          {formatPrice(item.unit_price)}
+                                        </Typography>
+                                        <Typography
+                                          variant="body2"
+                                          color="primary.main"
+                                          fontWeight={600}
+                                        >
+                                          Subtotal:{" "}
+                                          {formatPrice(item.total_price)}
+                                        </Typography>
+                                      </Box>
+                                    }
+                                  />
+                                </ListItem>
+                                {index < Math.min((order.items?.length || 0) - 1, 2) && (
+                                  <Divider />
+                                )}
+                              </React.Fragment>
+                            ))
+                          ) : (
+                            /* Show message when no items */
+                            <ListItem sx={{ px: 0, py: 1 }}>
+                              <ListItemText>
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                >
+                                  No items found in this order
+                                </Typography>
+                              </ListItemText>
+                            </ListItem>
+                          )}
+                          
+                          {/* Show "more items" message only if items exist and length > 3 */}
+                          {order.items && order.items.length > 3 && (
                             <ListItem sx={{ px: 0, py: 1 }}>
                               <ListItemText>
                                 <Typography
@@ -470,7 +487,7 @@ export default function OrdersPage() {
             </Grid>
 
             {/* Pagination */}
-            {data.pagination.totalPages > 1 && (
+            {data.pagination && data.pagination.totalPages > 1 && (
               <Box sx={{ display: "flex", justifyContent: "center", mt: 6 }}>
                 <Pagination
                   count={data.pagination.totalPages}
