@@ -33,11 +33,11 @@ export default function HomePage() {
         </section>
 
         {/* Newsletter Section */}
-        <section className="py-16 bg-primary-600">
+        {/* <section className="py-16 bg-primary-600">
           <Container maxWidth="lg">
             <NewsletterSection />
           </Container>
-        </section>
+        </section> */}
       </div>
     </MainLayout>
   );

@@ -54,61 +54,56 @@ export function MobileMenu() {
     try {
       await logout();
       router.push("/");
-      toast.success("Logged out successfully");
+      toast.success(t("auth.success"));
     } catch (error) {
-      toast.error("Logout failed");
+      toast.error(t("auth.error"));
     }
     closeMobileMenu();
   };
 
   const menuItems = [
     {
-      label: "Home",
+      label: t("nav.home"),
       icon: Home,
       href: "/",
     },
     {
-      label: "Products",
+      label: t("nav.products"),
       icon: ShoppingBag,
       href: "/products",
     },
     {
-      label: "Categories",
+      label: t("nav.categories"),
       icon: Category,
       href: "/categories",
       hasSubmenu: true,
       submenu: [
-        { label: "Electronics", href: "/categories/electronics" },
-        { label: "Computers", href: "/categories/computers" },
-        { label: "Smartphones", href: "/categories/smartphones" },
-        { label: "Accessories", href: "/categories/accessories" },
-        { label: "All Categories", href: "/categories" },
+        { label: t("categories.electronics"), href: "/categories/electronics" },
+        { label: t("categories.computers"), href: "/categories/computers" },
+        { label: t("categories.smartphones"), href: "/categories/smartphones" },
+        { label: t("categories.accessories"), href: "/categories/accessories" },
+        { label: t("categories.viewAll"), href: "/categories" },
       ],
     },
     ...(isAuthenticated
       ? [
           {
-            label: "My Orders",
+            label: t("nav.orders"),
             icon: Receipt,
             href: "/orders",
           },
         ]
       : []),
-    // {
-    //   label: "Featured",
-    //   icon: Star,
-    //   href: "/products?featured=true",
-    // },
-    // {
-    //   label: "About",
-    //   icon: Info,
-    //   href: "/about",
-    // },
-    // {
-    //   label: "Contact",
-    //   icon: ContactMail,
-    //   href: "/contact",
-    // },
+    {
+      label: t("nav.about"),
+      icon: Info,
+      href: "/about",
+    },
+    {
+      label: t("nav.contact"),
+      icon: ContactMail,
+      href: "/contact",
+    },
   ];
 
   return (
@@ -163,7 +158,7 @@ export function MobileMenu() {
         ) : (
           <Box sx={{ p: 2, bgcolor: "grey.50" }}>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Sign in to access your account
+              {t("auth.signInToAccess")}
             </Typography>
             <Box sx={{ display: "flex", gap: 1 }}>
               <Link href="/auth/login" className="flex-1">
@@ -183,7 +178,7 @@ export function MobileMenu() {
                     cursor: "pointer",
                   }}
                 >
-                  Login
+                  {t("nav.login")}
                 </Box>
               </Link>
               <Link href="/auth/register" className="flex-1">
@@ -204,7 +199,7 @@ export function MobileMenu() {
                     cursor: "pointer",
                   }}
                 >
-                  Register
+                  {t("nav.register")}
                 </Box>
               </Link>
             </Box>
@@ -270,7 +265,7 @@ export function MobileMenu() {
                 <ListItemIcon>
                   <Person />
                 </ListItemIcon>
-                <ListItemText primary="Profile" />
+                <ListItemText primary={t("nav.profile")} />
               </ListItemButton>
             </ListItem>
 
@@ -280,7 +275,7 @@ export function MobileMenu() {
                   <ListItemIcon>
                     <Dashboard />
                   </ListItemIcon>
-                  <ListItemText primary="Admin Dashboard" />
+                  <ListItemText primary={t("nav.admin")} />
                 </ListItemButton>
               </ListItem>
             )}
@@ -290,7 +285,7 @@ export function MobileMenu() {
                 <ListItemIcon>
                   <Logout />
                 </ListItemIcon>
-                <ListItemText primary="Logout" />
+                <ListItemText primary={t("nav.logout")} />
               </ListItemButton>
             </ListItem>
           </List>

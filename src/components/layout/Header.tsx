@@ -63,9 +63,9 @@ export function Header() {
     try {
       await logout();
       router.push("/");
-      toast.success("Logged out successfully");
+      toast.success(t("auth.success"));
     } catch (error) {
-      toast.error("Logout failed");
+      toast.error(t("auth.error"));
     }
     handleUserMenuClose();
   };
@@ -122,22 +122,26 @@ export function Header() {
                 </Link>
                 <Link href="/categories">
                   <Button color="inherit" sx={{ fontWeight: 500 }}>
-                    Categories
+                    {t("nav.categories")}
                   </Button>
                 </Link>
                 {isAuthenticated && (
                   <Link href="/orders">
                     <Button color="inherit" sx={{ fontWeight: 500 }}>
-                      My Orders
+                      {t("nav.orders")}
                     </Button>
                   </Link>
                 )}
-                <Button color="inherit" sx={{ fontWeight: 500 }}>
-                  About
-                </Button>
-                <Button color="inherit" sx={{ fontWeight: 500 }}>
-                  Contact
-                </Button>
+                <Link href="/about">
+                  <Button color="inherit" sx={{ fontWeight: 500 }}>
+                    {t("nav.about")}
+                  </Button>
+                </Link>
+                <Link href="/contact">
+                  <Button color="inherit" sx={{ fontWeight: 500 }}>
+                    {t("nav.contact")}
+                  </Button>
+                </Link>
               </Box>
             )}
 
@@ -160,10 +164,10 @@ export function Header() {
                 </IconButton>
               )}
 
-              {/* Cart Button */}
-
+              {/* Language Switcher */}
               <LanguageSwitcher />
 
+              {/* Cart Button */}
               <IconButton color="inherit" onClick={openCart}>
                 <Badge badgeContent={totalItems} color="primary">
                   <ShoppingCart />
@@ -194,32 +198,31 @@ export function Header() {
                   >
                     <MenuItem onClick={() => handleNavigation("/profile")}>
                       <AccountCircle sx={{ mr: 1 }} />
-                      Profile
+                      {t("nav.profile")}
                     </MenuItem>
 
                     {isAdmin && (
                       <MenuItem onClick={() => handleNavigation("/admin")}>
                         <Dashboard sx={{ mr: 1 }} />
-                        Admin Dashboard
+                        {t("nav.admin")}
                       </MenuItem>
                     )}
 
                     <MenuItem onClick={handleLogout}>
                       <Logout sx={{ mr: 1 }} />
-                      Logout
+                      {t("nav.logout")}
                     </MenuItem>
                   </Menu>
                 </>
               ) : (
                 <Box sx={{ display: "flex", gap: 1 }}>
-                  <LanguageSwitcher />
                   <Button
                     variant="outlined"
                     startIcon={<Login />}
                     onClick={() => router.push("/auth/login")}
                     sx={{ display: { xs: "none", sm: "flex" } }}
                   >
-                    Login
+                    {t("nav.login")}
                   </Button>
                   <IconButton
                     color="inherit"

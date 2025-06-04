@@ -986,6 +986,10 @@ const enTranslations = {
   "newsletter.invalidEmail": "Please enter a valid email address",
   "newsletter.subscribeSuccess": "Successfully subscribed to newsletter!",
   "newsletter.subscribeError": "Failed to subscribe. Please try again.",
+
+  "auth.signInToAccess": "Sign in to access your account",
+  "auth.success": "Logged out successfully",
+  "auth.error": "Logout failed",
 };
 
 export default enTranslations;

@@ -971,6 +971,10 @@ const arTranslations = {
   "newsletter.invalidEmail": "يرجى إدخال عنوان بريد إلكتروني صحيح",
   "newsletter.subscribeSuccess": "تم الاشتراك في النشرة الإخبارية بنجاح!",
   "newsletter.subscribeError": "فشل في الاشتراك. يرجى المحاولة مرة أخرى.",
+
+  "auth.signInToAccess": "سجل دخولك للوصول إلى حسابك",
+  "auth.success": "تم تسجيل الخروج بنجاح",
+  "auth.error": "فشل تسجيل الخروج",
 };
 
 export default arTranslations;

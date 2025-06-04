@@ -85,9 +85,7 @@ export function Footer() {
       }}
     >
       <Container maxWidth="xl">
-        {/* Main Footer Content */}
-        <Grid container spacing={4}>
-          {/* Company Info */}
+        {/* <Grid container spacing={4}>
           <Grid item xs={12} md={4}>
             <Typography
               variant="h4"
@@ -114,7 +112,6 @@ export function Footer() {
               customer service.
             </Typography>
 
-            {/* Contact Info */}
             <Box sx={{ mb: 3 }}>
               <Box
                 sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
@@ -142,7 +139,6 @@ export function Footer() {
               </Box>
             </Box>
 
-            {/* Social Links */}
             <Box sx={{ display: "flex", gap: 1 }}>
               {socialLinks.map((social) => (
                 <IconButton
@@ -167,10 +163,8 @@ export function Footer() {
             </Box>
           </Grid>
 
-          {/* Footer Links */}
           <Grid item xs={12} md={8}>
             <Grid container spacing={4}>
-              {/* Products */}
               <Grid item xs={6} sm={3}>
                 <Typography
                   variant="h6"
@@ -200,7 +194,6 @@ export function Footer() {
                 </Box>
               </Grid>
 
-              {/* Company */}
               <Grid item xs={6} sm={3}>
                 <Typography
                   variant="h6"
@@ -230,7 +223,6 @@ export function Footer() {
                 </Box>
               </Grid>
 
-              {/* Support */}
               <Grid item xs={6} sm={3}>
                 <Typography
                   variant="h6"
@@ -260,7 +252,6 @@ export function Footer() {
                 </Box>
               </Grid>
 
-              {/* Legal */}
               <Grid item xs={6} sm={3}>
                 <Typography
                   variant="h6"
@@ -291,12 +282,10 @@ export function Footer() {
               </Grid>
             </Grid>
           </Grid>
-        </Grid>
+        </Grid> */}
 
-        {/* Divider */}
-        <Divider sx={{ my: 4, borderColor: "rgba(255,255,255,0.1)" }} />
+        {/* <Divider sx={{ my: 4, borderColor: "rgba(255,255,255,0.1)" }} /> */}
 
-        {/* Bottom Footer */}
         <Box
           sx={{
             display: "flex",
@@ -315,7 +304,6 @@ export function Footer() {
               Made with ❤️ in Iraq
             </Typography>
 
-            {/* Scroll to Top Button */}
             <IconButton
               onClick={scrollToTop}
               sx={{
