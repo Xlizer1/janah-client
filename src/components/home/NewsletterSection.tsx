@@ -24,7 +24,7 @@ export function NewsletterSection() {
     e.preventDefault();
 
     if (!email || !email.includes("@")) {
-      toast.error("Please enter a valid email address");
+      toast.error(t("newsletter.invalidEmail"));
       return;
     }
 
@@ -35,9 +35,9 @@ export function NewsletterSection() {
 
       setIsSubscribed(true);
       setEmail("");
-      toast.success("Successfully subscribed to newsletter!");
+      toast.success(t("newsletter.subscribeSuccess"));
     } catch (error) {
-      toast.error("Failed to subscribe. Please try again.");
+      toast.error(t("newsletter.subscribeError"));
     } finally {
       setIsLoading(false);
     }
@@ -51,14 +51,13 @@ export function NewsletterSection() {
           variant="h4"
           sx={{ color: "white", fontWeight: 700, mb: 2 }}
         >
-          Thank You!
+          {t("newsletter.thankYou")}
         </Typography>
         <Typography
           variant="body1"
           sx={{ color: "rgba(255,255,255,0.9)", fontSize: "1.1rem" }}
         >
-          You've successfully subscribed to our newsletter. Get ready for
-          amazing deals and updates!
+          {t("newsletter.thankYou.message")}
         </Typography>
       </Box>
     );
@@ -77,7 +76,7 @@ export function NewsletterSection() {
                 fontSize: { xs: "1.75rem", md: "2.25rem" },
               }}
             >
-              Stay in the Loop
+              {t("newsletter.title")}
             </Typography>
 
             <Typography
@@ -89,9 +88,7 @@ export function NewsletterSection() {
                 mb: 3,
               }}
             >
-              Subscribe to our newsletter and be the first to know about new
-              products, exclusive deals, and special offers. No spam, just great
-              content!
+              {t("newsletter.subtitle")}
             </Typography>
 
             {/* Newsletter Benefits */}
@@ -104,10 +101,10 @@ export function NewsletterSection() {
               }}
             >
               {[
-                "🎉 Exclusive discounts and early access",
-                "📦 New product announcements",
-                "💡 Tech tips and buying guides",
-                "🎁 Special member-only offers",
+                t("newsletter.benefits.1"),
+                t("newsletter.benefits.2"),
+                t("newsletter.benefits.3"),
+                t("newsletter.benefits.4"),
               ].map((benefit, index) => (
                 <Typography
                   key={index}
@@ -137,7 +134,7 @@ export function NewsletterSection() {
             }}
           >
             <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
-              Join 10,000+ Subscribers
+              {t("newsletter.joinSubscribers")}
             </Typography>
 
             <form onSubmit={handleSubmit}>
@@ -145,7 +142,7 @@ export function NewsletterSection() {
                 <TextField
                   fullWidth
                   type="email"
-                  placeholder="Enter your email address"
+                  placeholder={t("newsletter.enterEmail")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoading}
@@ -195,7 +192,9 @@ export function NewsletterSection() {
                     },
                   }}
                 >
-                  {isLoading ? "Subscribing..." : "Subscribe Now"}
+                  {isLoading
+                    ? t("newsletter.subscribing")
+                    : t("newsletter.subscribe")}
                 </Button>
               </Box>
             </form>
@@ -209,8 +208,7 @@ export function NewsletterSection() {
                 fontSize: "0.8rem",
               }}
             >
-              By subscribing, you agree to our privacy policy. Unsubscribe at
-              any time.
+              {t("newsletter.privacyNote")}
             </Typography>
           </Box>
         </Grid>

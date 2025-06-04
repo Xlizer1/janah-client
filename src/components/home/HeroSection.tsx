@@ -61,7 +61,7 @@ export function HeroSection() {
                   WebkitTextFillColor: "transparent",
                 }}
               >
-                Discover Amazing Products
+                {t("hero.title")}
               </Typography>
 
               <Typography
@@ -73,8 +73,7 @@ export function HeroSection() {
                   lineHeight: 1.6,
                 }}
               >
-                Shop the latest electronics, gadgets, and more with unbeatable
-                prices and fast delivery.
+                {t("hero.subtitle")}
               </Typography>
 
               <Box
@@ -107,32 +106,34 @@ export function HeroSection() {
                       transition: "all 0.3s ease",
                     }}
                   >
-                    Shop Now
+                    {t("hero.shopNow")}
                   </Button>
                 </Link>
 
-                <Button
-                  variant="outlined"
-                  size="large"
-                  startIcon={<TrendingUp />}
-                  sx={{
-                    borderColor: "white",
-                    color: "white",
-                    px: 4,
-                    py: 1.5,
-                    fontSize: "1.1rem",
-                    fontWeight: 600,
-                    borderRadius: 2,
-                    borderWidth: 2,
-                    "&:hover": {
+                <Link href="/products?featured=true">
+                  <Button
+                    variant="outlined"
+                    size="large"
+                    startIcon={<TrendingUp />}
+                    sx={{
                       borderColor: "white",
-                      bgcolor: "rgba(255,255,255,0.1)",
+                      color: "white",
+                      px: 4,
+                      py: 1.5,
+                      fontSize: "1.1rem",
+                      fontWeight: 600,
+                      borderRadius: 2,
                       borderWidth: 2,
-                    },
-                  }}
-                >
-                  View Trending
-                </Button>
+                      "&:hover": {
+                        borderColor: "white",
+                        bgcolor: "rgba(255,255,255,0.1)",
+                        borderWidth: 2,
+                      },
+                    }}
+                  >
+                    {t("hero.viewTrending")}
+                  </Button>
+                </Link>
               </Box>
             </Box>
           </Grid>
@@ -162,7 +163,7 @@ export function HeroSection() {
                 }}
               >
                 <Typography variant="h6" sx={{ opacity: 0.8 }}>
-                  Hero Image Placeholder
+                  {t("hero.imagePlaceholder")}
                 </Typography>
               </Box>
 
@@ -186,11 +187,11 @@ export function HeroSection() {
                 >
                   <Star sx={{ color: "#fbbf24", fontSize: 20 }} />
                   <Typography variant="body2" fontWeight={600}>
-                    4.8/5 Rating
+                    {t("hero.rating")}
                   </Typography>
                 </Box>
                 <Typography variant="caption" color="text.secondary">
-                  From 1000+ reviews
+                  {t("hero.reviews")}
                 </Typography>
               </Box>
 
@@ -212,7 +213,7 @@ export function HeroSection() {
                   10,000+
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  Happy Customers
+                  {t("hero.happyCustomers")}
                 </Typography>
               </Box>
             </Box>

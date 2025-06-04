@@ -18,14 +18,14 @@ export function CategoriesGrid() {
   });
 
   if (isLoading) {
-    return <LoadingSpinner message="Loading categories..." />;
+    return <LoadingSpinner message={t("categories.loading")} />;
   }
 
   if (error || !data?.categories?.length) {
     return (
       <Box sx={{ textAlign: "center", py: 8 }}>
         <Typography variant="h6" color="text.secondary">
-          No categories available at the moment.
+          {t("categories.noCategories")}
         </Typography>
       </Box>
     );
@@ -55,7 +55,7 @@ export function CategoriesGrid() {
               fontSize: { xs: "1.75rem", md: "2.25rem" },
             }}
           >
-            Shop by Category
+            {t("categories.title")}
           </Typography>
         </Box>
 
@@ -64,8 +64,7 @@ export function CategoriesGrid() {
           color="text.secondary"
           sx={{ maxWidth: 600, mx: "auto", fontSize: "1.1rem" }}
         >
-          Browse our wide range of product categories to find exactly what
-          you're looking for
+          {t("categories.subtitle")}
         </Typography>
       </Box>
 
@@ -150,7 +149,9 @@ export function CategoriesGrid() {
                   {/* Product Count Badge */}
                   <Box sx={{ alignSelf: "flex-start" }}>
                     <Chip
-                      label={`${category.product_count || 0} Products`}
+                      label={t("categories.productsCount", {
+                        count: category.product_count || 0,
+                      })}
                       size="small"
                       sx={{
                         bgcolor: "rgba(255,255,255,0.2)",
@@ -201,7 +202,7 @@ export function CategoriesGrid() {
                         fontWeight: 600,
                       }}
                     >
-                      <span>Explore Category</span>
+                      <span>{t("categories.exploreCategory")}</span>
                       <ArrowForward
                         className="category-arrow"
                         sx={{
@@ -247,7 +248,7 @@ export function CategoriesGrid() {
                 },
               }}
             >
-              View All Categories
+              {t("categories.viewAll")}
               <ArrowForward sx={{ fontSize: 20 }} />
             </Box>
           </Link>

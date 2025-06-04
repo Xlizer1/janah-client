@@ -106,26 +106,30 @@ export function UserManagement() {
   const activateUserMutation = useMutation({
     mutationFn: adminService.users.activateUser,
     onSuccess: () => {
-      toast.success("User activated successfully");
+      toast.success(t("admin.users.userActivated"));
       queryClient.invalidateQueries({ queryKey: ["adminUsers"] });
       queryClient.invalidateQueries({ queryKey: ["adminStats"] });
       setActionDialog({ open: false, type: null, userId: null });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to activate user");
+      toast.error(
+        error.response?.data?.message || t("admin.users.activationFailed")
+      );
     },
   });
 
   const deactivateUserMutation = useMutation({
     mutationFn: adminService.users.deactivateUser,
     onSuccess: () => {
-      toast.success("User deactivated successfully");
+      toast.success(t("admin.users.userDeactivated"));
       queryClient.invalidateQueries({ queryKey: ["adminUsers"] });
       queryClient.invalidateQueries({ queryKey: ["adminStats"] });
       setActionDialog({ open: false, type: null, userId: null });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to deactivate user");
+      toast.error(
+        error.response?.data?.message || t("admin.users.deactivationFailed")
+      );
     },
   });
 
@@ -153,9 +157,9 @@ export function UserManagement() {
   };
 
   const getUserStatusText = (user: any) => {
-    if (!user.is_phone_verified) return "Phone Not Verified";
-    if (!user.is_active) return "Pending Activation";
-    return "Active";
+    if (!user.is_phone_verified) return t("admin.users.phoneNotVerified");
+    if (!user.is_active) return t("admin.users.pendingActivation");
+    return t("profile.active");
   };
 
   const filteredUsers = (usersData?.users || []).filter((user) => {
@@ -182,7 +186,7 @@ export function UserManagement() {
           }}
         >
           <Typography variant="h4" sx={{ fontWeight: 700 }}>
-            User Management
+            {t("admin.users.management")}
           </Typography>
           <Box sx={{ display: "flex", gap: 2 }}>
             <Button
@@ -192,14 +196,15 @@ export function UserManagement() {
                 queryClient.invalidateQueries({ queryKey: ["adminUsers"] })
               }
             >
-              Refresh
+              {t("common.refresh")}
             </Button>
             <Button
               variant="contained"
               startIcon={<PersonAdd />}
               onClick={() => router.push("/admin/users/pending")}
             >
-              Pending Users ({statsData?.stats?.pending_activation || 0})
+              {t("admin.users.pendingUsers")} (
+              {statsData?.stats?.pending_activation || 0})
             </Button>
           </Box>
         </Box>
@@ -219,7 +224,7 @@ export function UserManagement() {
                     {statsData?.stats?.total_users || 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Total Users
+                    {t("admin.users.totalUsers")}
                   </Typography>
                 </Box>
               </Box>
@@ -238,7 +243,7 @@ export function UserManagement() {
                     {statsData?.stats?.active_users || 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Active Users
+                    {t("admin.users.activeUsers")}
                   </Typography>
                 </Box>
               </Box>
@@ -257,7 +262,7 @@ export function UserManagement() {
                     {statsData?.stats?.pending_activation || 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Pending Approval
+                    {t("admin.dashboard.pendingActivation")}
                   </Typography>
                 </Box>
               </Box>
@@ -276,7 +281,7 @@ export function UserManagement() {
                     {statsData?.stats?.activation_rate || 0}%
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Activation Rate
+                    {t("admin.dashboard.activationRate")}
                   </Typography>
                 </Box>
               </Box>
@@ -291,7 +296,7 @@ export function UserManagement() {
           <Grid item xs={12} md={6}>
             <TextField
               fullWidth
-              placeholder="Search users by name, phone, or email..."
+              placeholder={t("admin.users.searchUsers")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               InputProps={{
@@ -305,16 +310,20 @@ export function UserManagement() {
           </Grid>
           <Grid item xs={12} md={3}>
             <FormControl fullWidth>
-              <InputLabel>Status Filter</InputLabel>
+              <InputLabel>{t("admin.users.statusFilter")}</InputLabel>
               <Select
                 value={statusFilter}
-                label="Status Filter"
+                label={t("admin.users.statusFilter")}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 startAdornment={<FilterList sx={{ mr: 1 }} />}
               >
-                <MenuItem value="all">All Users</MenuItem>
-                <MenuItem value="active">Active Only</MenuItem>
-                <MenuItem value="inactive">Inactive Only</MenuItem>
+                <MenuItem value="all">{t("admin.users.allUsers")}</MenuItem>
+                <MenuItem value="active">
+                  {t("admin.users.activeOnly")}
+                </MenuItem>
+                <MenuItem value="inactive">
+                  {t("admin.users.inactiveOnly")}
+                </MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -324,7 +333,7 @@ export function UserManagement() {
               fullWidth
               onClick={() => router.push("/admin/users")}
             >
-              View Full User List
+              {t("admin.users.viewFullList")}
             </Button>
           </Grid>
         </Grid>
@@ -337,11 +346,15 @@ export function UserManagement() {
             value={selectedTab}
             onChange={(e, newValue) => setSelectedTab(newValue)}
           >
-            <Tab label={`Recent Users (${filteredUsers.length})`} />
             <Tab
-              label={`Pending Approval (${
-                statsData?.stats?.pending_activation || 0
-              })`}
+              label={t("admin.users.recentUsers", {
+                count: filteredUsers.length,
+              })}
+            />
+            <Tab
+              label={t("admin.users.pendingApproval", {
+                count: statsData?.stats?.pending_activation || 0,
+              })}
             />
           </Tabs>
         </Box>
@@ -374,7 +387,7 @@ export function UserManagement() {
                           {user.role === "admin" && (
                             <Chip
                               icon={<AdminPanelSettings />}
-                              label="Admin"
+                              label={t("admin.users.adminRole")}
                               size="small"
                               color="primary"
                             />
@@ -469,12 +482,12 @@ export function UserManagement() {
           ) : (
             <Box sx={{ textAlign: "center", py: 8 }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                No users found
+                {t("admin.users.noUsersFound")}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {searchQuery
-                  ? `No users match "${searchQuery}"`
-                  : "No users to display"}
+                  ? t("admin.users.noUsersMatch", { query: searchQuery })
+                  : t("admin.users.noUsersToDisplay")}
               </Typography>
             </Box>
           )}
@@ -484,16 +497,18 @@ export function UserManagement() {
         <TabPanel value={selectedTab} index={1}>
           <Box sx={{ textAlign: "center", py: 4 }}>
             <Typography variant="h6" sx={{ mb: 2 }}>
-              Pending User Approvals
+              {t("admin.users.pending.title")}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              Users waiting for admin approval after phone verification
+              {t("admin.users.pending.subtitle")}
             </Typography>
             <Button
               variant="contained"
               onClick={() => router.push("/admin/users/pending")}
             >
-              View Pending Users ({statsData?.stats?.pending_activation || 0})
+              {t("admin.users.viewPendingUsers", {
+                count: statsData?.stats?.pending_activation || 0,
+              })}
             </Button>
           </Box>
         </TabPanel>
@@ -507,14 +522,17 @@ export function UserManagement() {
         }
       >
         <DialogTitle>
-          Confirm User{" "}
-          {actionDialog.type === "activate" ? "Activation" : "Deactivation"}
+          {t(
+            `admin.users.confirm${
+              actionDialog.type === "activate" ? "Activation" : "Deactivation"
+            }`
+          )}
         </DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to {actionDialog.type} this user account?
+            {t(`admin.users.${actionDialog.type}Question`)}
             {actionDialog.type === "activate" &&
-              " The user will receive an SMS notification."}
+              " " + t("admin.users.activationNotification")}
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -523,7 +541,7 @@ export function UserManagement() {
               setActionDialog({ open: false, type: null, userId: null })
             }
           >
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button
             onClick={confirmUserAction}
@@ -534,12 +552,14 @@ export function UserManagement() {
             color={actionDialog.type === "activate" ? "primary" : "error"}
           >
             {activateUserMutation.isPending || deactivateUserMutation.isPending
-              ? "Processing..."
-              : `Confirm ${
-                  actionDialog.type === "activate"
-                    ? "Activation"
-                    : "Deactivation"
-                }`}
+              ? t("admin.users.processing")
+              : t(
+                  `admin.users.confirm${
+                    actionDialog.type === "activate"
+                      ? "Activation"
+                      : "Deactivation"
+                  }Button`
+                )}
           </Button>
         </DialogActions>
       </Dialog>

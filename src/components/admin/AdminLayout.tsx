@@ -36,7 +36,7 @@ import {
   Home,
   ChevronRight,
   FilePresent,
-  Receipt, // Added for Orders
+  Receipt,
 } from "@mui/icons-material";
 import { useAuth } from "@/store/auth.store";
 import { toast } from "react-toastify";
@@ -77,51 +77,51 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     try {
       await logout();
       router.push("/");
-      toast.success("Logged out successfully");
+      toast.success(t("auth.success"));
     } catch (error) {
-      toast.error("Logout failed");
+      toast.error(t("auth.error"));
     }
     handleUserMenuClose();
   };
 
   const menuItems = [
     {
-      text: "Dashboard",
+      text: t("admin.dashboard"),
       icon: Dashboard,
       href: "/admin",
     },
     {
-      text: "Products",
+      text: t("admin.products"),
       icon: Inventory,
       href: "/admin/products",
     },
     {
-      text: "Categories",
+      text: t("admin.categories"),
       icon: Category,
       href: "/admin/categories",
     },
     {
-      text: "Orders", // Added Orders menu item
+      text: t("nav.orders"),
       icon: Receipt,
       href: "/admin/orders",
     },
     {
-      text: "Users",
+      text: t("admin.users"),
       icon: People,
       href: "/admin/users",
     },
     {
-      text: "Analytics",
+      text: t("admin.analytics"),
       icon: Analytics,
       href: "/admin/analytics",
     },
     {
-      text: "Settings",
+      text: t("admin.settings"),
       icon: Settings,
       href: "/admin/settings",
     },
     {
-      text: "Import/Export",
+      text: t("admin.importExport"),
       icon: FilePresent,
       href: "/admin/import-export",
     },
@@ -130,14 +130,47 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const generateBreadcrumbs = (pathname: string) => {
     const paths = pathname.split("/").filter(Boolean);
     const breadcrumbs = [
-      { label: "Home", href: "/" },
-      { label: "Admin", href: "/admin" },
+      { label: t("nav.home"), href: "/" },
+      { label: t("admin.dashboard"), href: "/admin" },
     ];
 
     if (paths.length > 1) {
       for (let i = 1; i < paths.length; i++) {
         const path = `/${paths.slice(0, i + 1).join("/")}`;
-        const label = paths[i].charAt(0).toUpperCase() + paths[i].slice(1);
+        const pathSegment = paths[i];
+
+        // Translate known path segments
+        let label = pathSegment.charAt(0).toUpperCase() + pathSegment.slice(1);
+        switch (pathSegment) {
+          case "products":
+            label = t("admin.products");
+            break;
+          case "categories":
+            label = t("admin.categories");
+            break;
+          case "users":
+            label = t("admin.users");
+            break;
+          case "analytics":
+            label = t("admin.analytics");
+            break;
+          case "settings":
+            label = t("admin.settings");
+            break;
+          case "import-export":
+            label = t("admin.importExport");
+            break;
+          case "orders":
+            label = t("nav.orders");
+            break;
+          case "pending":
+            label = t("admin.users.pending.title");
+            break;
+          default:
+            // Keep the default capitalized label for dynamic routes
+            break;
+        }
+
         breadcrumbs.push({ label, href: path });
       }
     }
@@ -210,7 +243,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             <ListItemIcon>
               <Home />
             </ListItemIcon>
-            <ListItemText primary="Back to Store" />
+            <ListItemText primary={t("admin.back")} />
           </ListItemButton>
         </Link>
       </Box>
@@ -280,11 +313,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               }}
             >
               <AccountCircle sx={{ mr: 2 }} />
-              Profile
+              {t("nav.profile")}
             </MenuItem>
             <MenuItem onClick={handleLogout}>
               <Logout sx={{ mr: 2 }} />
-              Logout
+              {t("nav.logout")}
             </MenuItem>
           </Menu>
         </Toolbar>

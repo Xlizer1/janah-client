@@ -83,7 +83,7 @@ export function CartDrawer() {
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <ShoppingBag color="primary" />
             <Typography variant="h6" sx={{ fontWeight: 600 }}>
-              Shopping Cart
+              {t("cart.title")}
             </Typography>
             {totalItems > 0 && (
               <Badge badgeContent={totalItems} color="primary" />
@@ -115,10 +115,10 @@ export function CartDrawer() {
               }}
             />
             <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-              Your cart is empty
+              {t("cart.empty")}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              Add some products to get started
+              {t("cart.emptySubtitle")}
             </Typography>
             <Link href="/products">
               <Button
@@ -126,7 +126,7 @@ export function CartDrawer() {
                 onClick={closeCart}
                 sx={{ textTransform: "none" }}
               >
-                Continue Shopping
+                {t("cart.continueShopping")}
               </Button>
             </Link>
           </Box>
@@ -171,7 +171,7 @@ export function CartDrawer() {
                               }}
                             >
                               <Typography variant="caption">
-                                No Image
+                                {t("admin.products.noImage")}
                               </Typography>
                             </Box>
                           )}
@@ -296,7 +296,7 @@ export function CartDrawer() {
                             variant="body2"
                             sx={{ fontWeight: 600, mt: 1 }}
                           >
-                            Subtotal: {formatPrice(item.subtotal)}
+                            {t("common.subtotal")}: {formatPrice(item.subtotal)}
                           </Typography>
                         </Box>
                       </Box>
@@ -328,7 +328,8 @@ export function CartDrawer() {
                 }}
               >
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  Total ({totalItems} items)
+                  {t("cart.total")} (
+                  {t("cart.itemsCount", { count: totalItems })})
                 </Typography>
                 <Typography
                   variant="h6"
@@ -354,7 +355,7 @@ export function CartDrawer() {
                       textTransform: "none",
                     }}
                   >
-                    Proceed to Checkout
+                    {t("cart.proceedToCheckout")}
                   </Button>
                 </Link>
 
@@ -366,7 +367,7 @@ export function CartDrawer() {
                       onClick={closeCart}
                       sx={{ textTransform: "none" }}
                     >
-                      View Cart
+                      {t("cart.viewCart")}
                     </Button>
                   </Link>
 
@@ -376,7 +377,7 @@ export function CartDrawer() {
                     onClick={clearCart}
                     sx={{ textTransform: "none", minWidth: "auto", px: 2 }}
                   >
-                    Clear
+                    {t("cart.clear")}
                   </Button>
                 </Box>
               </Box>
@@ -394,7 +395,7 @@ export function CartDrawer() {
                   }}
                   onClick={closeCart}
                 >
-                  Continue Shopping
+                  {t("cart.continueShopping")}
                 </Typography>
               </Link>
             </Paper>

@@ -81,12 +81,12 @@ export function AnalyticsDashboard() {
 
   // Mock data for charts
   const salesData = [
-    { name: "Jan", sales: 4000, revenue: 2400 },
-    { name: "Feb", sales: 3000, revenue: 1398 },
-    { name: "Mar", sales: 2000, revenue: 9800 },
-    { name: "Apr", sales: 2780, revenue: 3908 },
-    { name: "May", sales: 1890, revenue: 4800 },
-    { name: "Jun", sales: 2390, revenue: 3800 },
+    { name: t("common.january"), sales: 4000, revenue: 2400 },
+    { name: t("common.february"), sales: 3000, revenue: 1398 },
+    { name: t("common.march"), sales: 2000, revenue: 9800 },
+    { name: t("common.april"), sales: 2780, revenue: 3908 },
+    { name: t("common.may"), sales: 1890, revenue: 4800 },
+    { name: t("common.june"), sales: 2390, revenue: 3800 },
   ];
 
   const handleExport = () => {
@@ -107,20 +107,24 @@ export function AnalyticsDashboard() {
           }}
         >
           <Typography variant="h4" sx={{ fontWeight: 700 }}>
-            Analytics Dashboard
+            {t("admin.analytics.title")}
           </Typography>
           <Box sx={{ display: "flex", gap: 2 }}>
             <FormControl size="small" sx={{ minWidth: 120 }}>
-              <InputLabel>Date Range</InputLabel>
+              <InputLabel>{t("admin.analytics.dateRange")}</InputLabel>
               <Select
                 value={dateRange}
-                label="Date Range"
+                label={t("admin.analytics.dateRange")}
                 onChange={(e) => setDateRange(e.target.value)}
               >
-                <MenuItem value="7d">Last 7 days</MenuItem>
-                <MenuItem value="30d">Last 30 days</MenuItem>
-                <MenuItem value="90d">Last 90 days</MenuItem>
-                <MenuItem value="1y">Last year</MenuItem>
+                <MenuItem value="7d">{t("admin.analytics.last7Days")}</MenuItem>
+                <MenuItem value="30d">
+                  {t("admin.analytics.last30Days")}
+                </MenuItem>
+                <MenuItem value="90d">
+                  {t("admin.analytics.last90Days")}
+                </MenuItem>
+                <MenuItem value="1y">{t("admin.analytics.lastYear")}</MenuItem>
               </Select>
             </FormControl>
             <Button
@@ -128,14 +132,14 @@ export function AnalyticsDashboard() {
               startIcon={<Refresh />}
               onClick={() => window.location.reload()}
             >
-              Refresh
+              {t("common.refresh")}
             </Button>
             <Button
               variant="contained"
               startIcon={<GetApp />}
               onClick={handleExport}
             >
-              Export
+              {t("admin.products.export")}
             </Button>
           </Box>
         </Box>
@@ -162,7 +166,7 @@ export function AnalyticsDashboard() {
                     $24,560
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Total Revenue
+                    {t("admin.dashboard.totalRevenue")}
                   </Typography>
                   <Box
                     sx={{
@@ -202,7 +206,7 @@ export function AnalyticsDashboard() {
                     1,247
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Products Sold
+                    {t("admin.dashboard.productsSold")}
                   </Typography>
                   <Box
                     sx={{
@@ -242,7 +246,7 @@ export function AnalyticsDashboard() {
                     {statsData?.stats?.active_users || 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Active Users
+                    {t("admin.dashboard.activeUsers")}
                   </Typography>
                   <Box
                     sx={{
@@ -282,7 +286,7 @@ export function AnalyticsDashboard() {
                     3.2%
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Conversion Rate
+                    {t("admin.dashboard.conversionRate")}
                   </Typography>
                   <Box
                     sx={{
@@ -307,7 +311,7 @@ export function AnalyticsDashboard() {
         <Grid item xs={12} md={8}>
           <Card>
             <CardHeader
-              title="Sales & Revenue Trends"
+              title={t("admin.analytics.salesRevenueTrends")}
               action={
                 <IconButton>
                   <DateRange />
@@ -326,12 +330,14 @@ export function AnalyticsDashboard() {
                     dataKey="sales"
                     stroke="#8884d8"
                     strokeWidth={2}
+                    name={t("admin.analytics.sales")}
                   />
                   <Line
                     type="monotone"
                     dataKey="revenue"
                     stroke="#82ca9d"
                     strokeWidth={2}
+                    name={t("admin.analytics.revenue")}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -342,7 +348,7 @@ export function AnalyticsDashboard() {
         {/* Category Performance */}
         <Grid item xs={12} md={4}>
           <Card>
-            <CardHeader title="Category Performance" />
+            <CardHeader title={t("admin.analytics.categoryPerformance")} />
             <CardContent>
               {categoryLoading ? (
                 <LinearProgress />
@@ -381,7 +387,7 @@ export function AnalyticsDashboard() {
         {/* Top Categories Table */}
         <Grid item xs={12} md={6}>
           <Card>
-            <CardHeader title="Top Categories" />
+            <CardHeader title={t("admin.dashboard.topCategories")} />
             <CardContent>
               {categoryLoading ? (
                 <LinearProgress />
@@ -390,9 +396,13 @@ export function AnalyticsDashboard() {
                   <Table>
                     <TableHead>
                       <TableRow>
-                        <TableCell>Category</TableCell>
-                        <TableCell align="right">Products</TableCell>
-                        <TableCell align="right">Avg Price</TableCell>
+                        <TableCell>{t("common.category")}</TableCell>
+                        <TableCell align="right">
+                          {t("admin.products.totalProducts")}
+                        </TableCell>
+                        <TableCell align="right">
+                          {t("admin.analytics.avgPrice")}
+                        </TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -427,15 +437,17 @@ export function AnalyticsDashboard() {
         {/* Products Needing Attention */}
         <Grid item xs={12} md={6}>
           <Card>
-            <CardHeader title="Products Needing Attention" />
+            <CardHeader title={t("admin.dashboard.productsNeedingAttention")} />
             <CardContent>
               <TableContainer>
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Product</TableCell>
-                      <TableCell>Issue</TableCell>
-                      <TableCell align="right">Stock</TableCell>
+                      <TableCell>{t("admin.products.productName")}</TableCell>
+                      <TableCell>{t("admin.analytics.issue")}</TableCell>
+                      <TableCell align="right">
+                        {t("admin.products.stockQuantity")}
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -459,7 +471,13 @@ export function AnalyticsDashboard() {
                           </TableCell>
                           <TableCell>
                             <Chip
-                              label={product.issue_type}
+                              label={
+                                product.issue_type === "Out of Stock"
+                                  ? t("products.outOfStock")
+                                  : product.issue_type === "Low Stock"
+                                  ? t("products.lowStock")
+                                  : product.issue_type
+                              }
                               color={
                                 product.issue_type === "Out of Stock"
                                   ? "error"
@@ -485,7 +503,7 @@ export function AnalyticsDashboard() {
         {/* Inventory Overview */}
         <Grid item xs={12}>
           <Card>
-            <CardHeader title="Inventory Overview by Category" />
+            <CardHeader title={t("admin.analytics.inventoryOverview")} />
             <CardContent>
               {inventoryLoading ? (
                 <LinearProgress />
@@ -496,13 +514,21 @@ export function AnalyticsDashboard() {
                     <XAxis dataKey="category_name" />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="in_stock" fill="#8884d8" name="In Stock" />
+                    <Bar
+                      dataKey="in_stock"
+                      fill="#8884d8"
+                      name={t("admin.products.inStock")}
+                    />
                     <Bar
                       dataKey="out_of_stock"
                       fill="#82ca9d"
-                      name="Out of Stock"
+                      name={t("products.outOfStock")}
                     />
-                    <Bar dataKey="low_stock" fill="#ffc658" name="Low Stock" />
+                    <Bar
+                      dataKey="low_stock"
+                      fill="#ffc658"
+                      name={t("products.lowStock")}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               )}

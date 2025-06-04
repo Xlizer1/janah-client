@@ -149,9 +149,9 @@ export function AdminSettings() {
     try {
       // TODO: Implement API call
       console.log("General settings:", data);
-      toast.success("General settings updated successfully");
+      toast.success(t("admin.success"));
     } catch (error) {
-      toast.error("Failed to update general settings");
+      toast.error(t("admin.error"));
     } finally {
       setIsLoading(false);
     }
@@ -162,9 +162,9 @@ export function AdminSettings() {
     try {
       // TODO: Implement API call
       console.log("Security settings:", data);
-      toast.success("Security settings updated successfully");
+      toast.success(t("admin.success"));
     } catch (error) {
-      toast.error("Failed to update security settings");
+      toast.error(t("admin.error"));
     } finally {
       setIsLoading(false);
     }
@@ -175,9 +175,9 @@ export function AdminSettings() {
     try {
       // TODO: Implement API call
       console.log("Notification settings:", data);
-      toast.success("Notification settings updated successfully");
+      toast.success(t("admin.success"));
     } catch (error) {
-      toast.error("Failed to update notification settings");
+      toast.error(t("admin.error"));
     } finally {
       setIsLoading(false);
     }
@@ -187,10 +187,10 @@ export function AdminSettings() {
     setIsLoading(true);
     try {
       // TODO: Implement backup API call
-      toast.success("Backup created successfully");
+      toast.success(t("admin.success"));
       setBackupDialog(false);
     } catch (error) {
-      toast.error("Failed to create backup");
+      toast.error(t("admin.error"));
     } finally {
       setIsLoading(false);
     }
@@ -201,10 +201,10 @@ export function AdminSettings() {
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-          System Settings
+          {t("admin.settings.title")}
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          Configure your application settings and preferences
+          {t("admin.settings.subtitle")}
         </Typography>
       </Box>
 
@@ -215,17 +215,25 @@ export function AdminSettings() {
             value={selectedTab}
             onChange={(e, newValue) => setSelectedTab(newValue)}
           >
-            <Tab icon={<Store />} iconPosition="start" label="General" />
-            <Tab icon={<Security />} iconPosition="start" label="Security" />
+            <Tab
+              icon={<Store />}
+              iconPosition="start"
+              label={t("common.general")}
+            />
+            <Tab
+              icon={<Security />}
+              iconPosition="start"
+              label={t("admin.users.security")}
+            />
             <Tab
               icon={<Notifications />}
               iconPosition="start"
-              label="Notifications"
+              label={t("admin.users.notifications")}
             />
             <Tab
               icon={<Backup />}
               iconPosition="start"
-              label="Backup & Restore"
+              label={t("admin.backup")}
             />
           </Tabs>
         </Box>
@@ -238,7 +246,7 @@ export function AdminSettings() {
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
                   {/* Site Information */}
                   <Card>
-                    <CardHeader title="Site Information" />
+                    <CardHeader title={t("admin.settings.siteInfo")} />
                     <CardContent
                       sx={{ display: "flex", flexDirection: "column", gap: 3 }}
                     >
@@ -248,7 +256,7 @@ export function AdminSettings() {
                         render={({ field }) => (
                           <TextField
                             {...field}
-                            label="Site Name"
+                            label={t("admin.settings.siteName")}
                             fullWidth
                             required
                           />
@@ -261,7 +269,7 @@ export function AdminSettings() {
                         render={({ field }) => (
                           <TextField
                             {...field}
-                            label="Site Description"
+                            label={t("admin.categories.categoryDescription")}
                             fullWidth
                             multiline
                             rows={3}
@@ -277,7 +285,7 @@ export function AdminSettings() {
                             render={({ field }) => (
                               <TextField
                                 {...field}
-                                label="Contact Email"
+                                label={t("auth.email")}
                                 type="email"
                                 fullWidth
                                 required
@@ -299,7 +307,7 @@ export function AdminSettings() {
                             render={({ field }) => (
                               <TextField
                                 {...field}
-                                label="Contact Phone"
+                                label={t("auth.phone")}
                                 fullWidth
                                 required
                                 InputProps={{
@@ -319,7 +327,7 @@ export function AdminSettings() {
 
                   {/* Regional Settings */}
                   <Card>
-                    <CardHeader title="Regional Settings" />
+                    <CardHeader title={t("admin.settings.regional")} />
                     <CardContent>
                       <Grid container spacing={3}>
                         <Grid item xs={12} sm={6}>
@@ -328,8 +336,13 @@ export function AdminSettings() {
                             control={generalControl}
                             render={({ field }) => (
                               <FormControl fullWidth>
-                                <InputLabel>Currency</InputLabel>
-                                <Select {...field} label="Currency">
+                                <InputLabel>
+                                  {t("admin.settings.currency")}
+                                </InputLabel>
+                                <Select
+                                  {...field}
+                                  label={t("admin.settings.currency")}
+                                >
                                   <MenuItem value="USD">
                                     USD - US Dollar
                                   </MenuItem>
@@ -348,8 +361,13 @@ export function AdminSettings() {
                             control={generalControl}
                             render={({ field }) => (
                               <FormControl fullWidth>
-                                <InputLabel>Timezone</InputLabel>
-                                <Select {...field} label="Timezone">
+                                <InputLabel>
+                                  {t("admin.settings.timezone")}
+                                </InputLabel>
+                                <Select
+                                  {...field}
+                                  label={t("admin.settings.timezone")}
+                                >
                                   <MenuItem value="Asia/Baghdad">
                                     Asia/Baghdad (GMT+3)
                                   </MenuItem>
@@ -372,7 +390,7 @@ export function AdminSettings() {
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
                   {/* System Status */}
                   <Card>
-                    <CardHeader title="System Status" />
+                    <CardHeader title={t("admin.settings.systemStatus")} />
                     <CardContent>
                       <Box
                         sx={{
@@ -392,7 +410,7 @@ export function AdminSettings() {
                                   onChange={field.onChange}
                                 />
                               }
-                              label="Maintenance Mode"
+                              label={t("admin.settings.maintenanceMode")}
                             />
                           )}
                         />
@@ -408,15 +426,14 @@ export function AdminSettings() {
                                   onChange={field.onChange}
                                 />
                               }
-                              label="Auto-approve Users"
+                              label={t("admin.settings.autoApprove")}
                             />
                           )}
                         />
 
                         <Alert severity="info" sx={{ mt: 2 }}>
                           <Typography variant="body2">
-                            Maintenance mode will display a maintenance page to
-                            visitors.
+                            {t("admin.settings.maintenanceInfo")}
                           </Typography>
                         </Alert>
                       </Box>
@@ -432,7 +449,9 @@ export function AdminSettings() {
                     disabled={!isGeneralDirty || isLoading}
                     fullWidth
                   >
-                    {isLoading ? "Saving..." : "Save General Settings"}
+                    {isLoading
+                      ? t("common.loading")
+                      : t("admin.settings.saveGeneral")}
                   </Button>
                 </Box>
               </Grid>
@@ -446,7 +465,7 @@ export function AdminSettings() {
             <Grid container spacing={3}>
               <Grid item xs={12} md={8}>
                 <Card>
-                  <CardHeader title="Security Configuration" />
+                  <CardHeader title={t("admin.settings.securityConfig")} />
                   <CardContent
                     sx={{ display: "flex", flexDirection: "column", gap: 3 }}
                   >
@@ -461,7 +480,7 @@ export function AdminSettings() {
                               onChange={field.onChange}
                             />
                           }
-                          label="Enable Two-Factor Authentication"
+                          label={t("admin.settings.twoFactor")}
                         />
                       )}
                     />
@@ -477,7 +496,7 @@ export function AdminSettings() {
                               onChange={field.onChange}
                             />
                           }
-                          label="Require Phone Verification"
+                          label={t("admin.settings.requirePhone")}
                         />
                       )}
                     />
@@ -490,7 +509,7 @@ export function AdminSettings() {
                           render={({ field }) => (
                             <TextField
                               {...field}
-                              label="Session Timeout (minutes)"
+                              label={t("admin.settings.sessionTimeout")}
                               type="number"
                               fullWidth
                               inputProps={{ min: 5, max: 480 }}
@@ -505,7 +524,7 @@ export function AdminSettings() {
                           render={({ field }) => (
                             <TextField
                               {...field}
-                              label="Max Login Attempts"
+                              label={t("admin.settings.maxLoginAttempts")}
                               type="number"
                               fullWidth
                               inputProps={{ min: 3, max: 10 }}
@@ -521,7 +540,7 @@ export function AdminSettings() {
                       render={({ field }) => (
                         <TextField
                           {...field}
-                          label="Minimum Password Length"
+                          label={t("admin.settings.passwordMinLength")}
                           type="number"
                           fullWidth
                           inputProps={{ min: 6, max: 20 }}
@@ -536,8 +555,7 @@ export function AdminSettings() {
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
                   <Alert severity="warning">
                     <Typography variant="body2">
-                      Security changes may affect user sessions and require
-                      users to re-authenticate.
+                      {t("admin.settings.securityWarning")}
                     </Typography>
                   </Alert>
 
@@ -549,7 +567,9 @@ export function AdminSettings() {
                     disabled={!isSecurityDirty || isLoading}
                     fullWidth
                   >
-                    {isLoading ? "Saving..." : "Save Security Settings"}
+                    {isLoading
+                      ? t("common.loading")
+                      : t("admin.settings.saveSecurity")}
                   </Button>
                 </Box>
               </Grid>
@@ -563,7 +583,7 @@ export function AdminSettings() {
             <Grid container spacing={3}>
               <Grid item xs={12} md={8}>
                 <Card>
-                  <CardHeader title="Notification Preferences" />
+                  <CardHeader title={t("admin.settings.notificationPrefs")} />
                   <CardContent
                     sx={{ display: "flex", flexDirection: "column", gap: 2 }}
                   >
@@ -578,7 +598,7 @@ export function AdminSettings() {
                               onChange={field.onChange}
                             />
                           }
-                          label="Email Notifications"
+                          label={t("admin.settings.emailNotifications")}
                         />
                       )}
                     />
@@ -594,14 +614,14 @@ export function AdminSettings() {
                               onChange={field.onChange}
                             />
                           }
-                          label="SMS Notifications"
+                          label={t("admin.settings.smsNotifications")}
                         />
                       )}
                     />
 
                     <Divider sx={{ my: 1 }} />
                     <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                      Alert Types
+                      {t("admin.settings.alertTypes")}
                     </Typography>
 
                     <Controller
@@ -615,7 +635,7 @@ export function AdminSettings() {
                               onChange={field.onChange}
                             />
                           }
-                          label="New User Registration Alerts"
+                          label={t("admin.settings.newUserAlerts")}
                         />
                       )}
                     />
@@ -631,7 +651,7 @@ export function AdminSettings() {
                               onChange={field.onChange}
                             />
                           }
-                          label="Low Stock Alerts"
+                          label={t("admin.settings.lowStockAlerts")}
                         />
                       )}
                     />
@@ -647,7 +667,7 @@ export function AdminSettings() {
                               onChange={field.onChange}
                             />
                           }
-                          label="Order Notifications"
+                          label={t("admin.settings.orderNotifications")}
                         />
                       )}
                     />
@@ -664,7 +684,9 @@ export function AdminSettings() {
                   disabled={!isNotificationDirty || isLoading}
                   fullWidth
                 >
-                  {isLoading ? "Saving..." : "Save Notification Settings"}
+                  {isLoading
+                    ? t("common.loading")
+                    : t("admin.settings.saveNotifications")}
                 </Button>
               </Grid>
             </Grid>
@@ -678,15 +700,14 @@ export function AdminSettings() {
               <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
                 {/* Database Backup */}
                 <Card>
-                  <CardHeader title="Database Backup" />
+                  <CardHeader title={t("admin.settings.databaseBackup")} />
                   <CardContent>
                     <Typography
                       variant="body2"
                       color="text.secondary"
                       sx={{ mb: 3 }}
                     >
-                      Create a backup of your database including all products,
-                      categories, and user data.
+                      {t("admin.settings.backupDescription")}
                     </Typography>
 
                     <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
@@ -695,17 +716,16 @@ export function AdminSettings() {
                         startIcon={<Backup />}
                         onClick={() => setBackupDialog(true)}
                       >
-                        Create Backup
+                        {t("admin.settings.createBackup")}
                       </Button>
                       <Button variant="outlined" startIcon={<CloudSync />}>
-                        Schedule Backup
+                        {t("admin.settings.scheduleBackup")}
                       </Button>
                     </Box>
 
                     <Alert severity="info">
                       <Typography variant="body2">
-                        Backups are automatically created daily at 2:00 AM.
-                        Manual backups can be created anytime.
+                        {t("admin.settings.backupInfo")}
                       </Typography>
                     </Alert>
                   </CardContent>
@@ -713,29 +733,31 @@ export function AdminSettings() {
 
                 {/* Recent Backups */}
                 <Card>
-                  <CardHeader title="Recent Backups" />
+                  <CardHeader title={t("admin.settings.recentBackups")} />
                   <CardContent>
                     <List>
                       {[
                         {
                           date: "2024-01-15 02:00",
                           size: "45.2 MB",
-                          type: "Automatic",
+                          type: t("admin.settings.automatic"),
                         },
                         {
                           date: "2024-01-14 02:00",
                           size: "44.8 MB",
-                          type: "Automatic",
+                          type: t("admin.settings.automatic"),
                         },
                         {
                           date: "2024-01-13 14:30",
                           size: "44.5 MB",
-                          type: "Manual",
+                          type: t("admin.settings.manual"),
                         },
                       ].map((backup, index) => (
                         <ListItem key={index}>
                           <ListItemText
-                            primary={`Backup - ${backup.date}`}
+                            primary={`${t("admin.settings.backup")} - ${
+                              backup.date
+                            }`}
                             secondary={
                               <Box
                                 sx={{
@@ -773,15 +795,15 @@ export function AdminSettings() {
             <Grid item xs={12} md={4}>
               <Alert severity="warning" sx={{ mb: 2 }}>
                 <Typography variant="body2">
-                  <strong>Important:</strong> Always test your backups in a
-                  staging environment before relying on them for recovery.
+                  <strong>{t("common.important")}:</strong>{" "}
+                  {t("admin.settings.backupTestWarning")}
                 </Typography>
               </Alert>
 
               <Alert severity="error">
                 <Typography variant="body2">
-                  <strong>Danger Zone:</strong> Restore operations will
-                  overwrite current data. This action cannot be undone.
+                  <strong>{t("admin.settings.dangerZone")}:</strong>{" "}
+                  {t("admin.settings.restoreWarning")}
                 </Typography>
               </Alert>
             </Grid>
@@ -791,21 +813,22 @@ export function AdminSettings() {
 
       {/* Backup Confirmation Dialog */}
       <Dialog open={backupDialog} onClose={() => setBackupDialog(false)}>
-        <DialogTitle>Create Database Backup</DialogTitle>
+        <DialogTitle>{t("admin.settings.createBackupTitle")}</DialogTitle>
         <DialogContent>
-          <Typography>
-            Are you sure you want to create a manual backup? This process may
-            take a few minutes depending on your database size.
-          </Typography>
+          <Typography>{t("admin.settings.backupConfirmation")}</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setBackupDialog(false)}>Cancel</Button>
+          <Button onClick={() => setBackupDialog(false)}>
+            {t("common.cancel")}
+          </Button>
           <Button
             onClick={handleBackup}
             variant="contained"
             disabled={isLoading}
           >
-            {isLoading ? "Creating..." : "Create Backup"}
+            {isLoading
+              ? t("admin.settings.creating")
+              : t("admin.settings.createBackup")}
           </Button>
         </DialogActions>
       </Dialog>

@@ -70,14 +70,20 @@ export function ImportExport() {
       setImportResult(data);
       setResultDialog(true);
       if (data.successful > 0) {
-        toast.success(`Successfully imported ${data.successful} items`);
+        toast.success(
+          t("admin.importExport.importSuccess", { count: data.successful })
+        );
       }
       if (data.failed > 0) {
-        toast.warning(`${data.failed} items failed to import`);
+        toast.warning(
+          t("admin.importExport.importFailed", { count: data.failed })
+        );
       }
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Import failed");
+      toast.error(
+        error.response?.data?.message || t("admin.importExport.importError")
+      );
     },
   });
 
@@ -88,14 +94,23 @@ export function ImportExport() {
       setImportResult(data);
       setResultDialog(true);
       if (data.successful > 0) {
-        toast.success(`Successfully imported ${data.successful} categories`);
+        toast.success(
+          t("admin.importExport.categoryImportSuccess", {
+            count: data.successful,
+          })
+        );
       }
       if (data.failed > 0) {
-        toast.warning(`${data.failed} categories failed to import`);
+        toast.warning(
+          t("admin.importExport.categoryImportFailed", { count: data.failed })
+        );
       }
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Category import failed");
+      toast.error(
+        error.response?.data?.message ||
+          t("admin.importExport.categoryImportError")
+      );
     },
   });
 
@@ -103,7 +118,7 @@ export function ImportExport() {
     const file = event.target.files?.[0];
     if (file) {
       if (!file.name.endsWith(".csv")) {
-        toast.error("Please select a CSV file");
+        toast.error(t("admin.importExport.csvFileOnly"));
         return;
       }
       setSelectedFile(file);
@@ -112,7 +127,7 @@ export function ImportExport() {
 
   const handleImport = () => {
     if (!selectedFile) {
-      toast.error("Please select a file to import");
+      toast.error(t("admin.importExport.selectFile"));
       return;
     }
 
@@ -147,10 +162,12 @@ export function ImportExport() {
       document.body.removeChild(a);
 
       toast.success(
-        `${type.charAt(0).toUpperCase() + type.slice(1)} exported successfully`
+        t("admin.importExport.exportSuccess", { type: t(`admin.${type}`) })
       );
     } catch (error) {
-      toast.error(`Export failed: ${error}`);
+      toast.error(
+        t("admin.importExport.exportError", { error: String(error) })
+      );
     }
   };
 
@@ -174,10 +191,12 @@ export function ImportExport() {
       document.body.removeChild(a);
 
       toast.success(
-        `${type.charAt(0).toUpperCase() + type.slice(1)} template downloaded`
+        t("admin.importExport.templateDownloaded", { type: t(`admin.${type}`) })
       );
     } catch (error) {
-      toast.error(`Template download failed: ${error}`);
+      toast.error(
+        t("admin.importExport.templateError", { error: String(error) })
+      );
     }
   };
 
@@ -189,10 +208,10 @@ export function ImportExport() {
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-          Import / Export
+          {t("admin.importExport.title")}
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          Bulk import and export data using CSV files
+          {t("admin.importExport.subtitle")}
         </Typography>
       </Box>
 
@@ -201,17 +220,17 @@ export function ImportExport() {
         <Grid item xs={12} md={6}>
           <Card>
             <CardHeader
-              title="Import Data"
+              title={t("admin.importExport.importData")}
               avatar={<CloudUpload color="primary" />}
             />
             <CardContent>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
                 {/* Import Type */}
                 <FormControl fullWidth>
-                  <InputLabel>Import Type</InputLabel>
+                  <InputLabel>{t("admin.importExport.importType")}</InputLabel>
                   <Select
                     value={importType}
-                    label="Import Type"
+                    label={t("admin.importExport.importType")}
                     onChange={(e) =>
                       setImportType(e.target.value as "products" | "categories")
                     }
@@ -221,7 +240,7 @@ export function ImportExport() {
                         sx={{ display: "flex", alignItems: "center", gap: 1 }}
                       >
                         <Inventory fontSize="small" />
-                        Products
+                        {t("admin.products")}
                       </Box>
                     </MenuItem>
                     <MenuItem value="categories">
@@ -229,7 +248,7 @@ export function ImportExport() {
                         sx={{ display: "flex", alignItems: "center", gap: 1 }}
                       >
                         <Category fontSize="small" />
-                        Categories
+                        {t("admin.categories")}
                       </Box>
                     </MenuItem>
                   </Select>
@@ -251,11 +270,14 @@ export function ImportExport() {
                     startIcon={<FilePresent />}
                     sx={{ mb: 1 }}
                   >
-                    {selectedFile ? selectedFile.name : "Select CSV File"}
+                    {selectedFile
+                      ? selectedFile.name
+                      : t("admin.importExport.selectCSV")}
                   </Button>
                   {selectedFile && (
                     <Typography variant="caption" color="text.secondary">
-                      File size: {(selectedFile.size / 1024).toFixed(2)} KB
+                      {t("admin.importExport.fileSize")}:{" "}
+                      {(selectedFile.size / 1024).toFixed(2)} KB
                     </Typography>
                   )}
                 </Box>
@@ -269,7 +291,7 @@ export function ImportExport() {
                         onChange={(e) => setDryRun(e.target.checked)}
                       />
                     }
-                    label="Dry Run (Preview Only)"
+                    label={t("admin.importExport.dryRun")}
                   />
                   <FormControlLabel
                     control={
@@ -278,14 +300,13 @@ export function ImportExport() {
                         onChange={(e) => setSkipErrors(e.target.checked)}
                       />
                     }
-                    label="Skip Errors"
+                    label={t("admin.importExport.skipErrors")}
                   />
                 </Box>
 
                 {dryRun && (
                   <Alert severity="info">
-                    Dry run mode: No data will be actually imported. Use this to
-                    validate your CSV file.
+                    {t("admin.importExport.dryRunInfo")}
                   </Alert>
                 )}
 
@@ -297,7 +318,11 @@ export function ImportExport() {
                   disabled={!selectedFile || isLoading}
                   startIcon={<CloudUpload />}
                 >
-                  {isLoading ? "Processing..." : `Import ${importType}`}
+                  {isLoading
+                    ? t("admin.importExport.processing")
+                    : t("admin.importExport.import", {
+                        type: t(`admin.${importType}`),
+                      })}
                 </Button>
 
                 {isLoading && <LinearProgress />}
@@ -310,7 +335,9 @@ export function ImportExport() {
                   onClick={() => handleDownloadTemplate(importType)}
                   startIcon={<Description />}
                 >
-                  Download {importType} Template
+                  {t("admin.importExport.downloadTemplate", {
+                    type: t(`admin.${importType}`),
+                  })}
                 </Button>
               </Box>
             </CardContent>
@@ -321,7 +348,7 @@ export function ImportExport() {
         <Grid item xs={12} md={6}>
           <Card>
             <CardHeader
-              title="Export Data"
+              title={t("admin.importExport.exportData")}
               avatar={<GetApp color="success" />}
             />
             <CardContent>
@@ -331,7 +358,7 @@ export function ImportExport() {
                   color="text.secondary"
                   sx={{ mb: 2 }}
                 >
-                  Export your current data to CSV format for backup or analysis
+                  {t("admin.importExport.exportDescription")}
                 </Typography>
 
                 {/* Export Products */}
@@ -342,7 +369,7 @@ export function ImportExport() {
                   startIcon={<Inventory />}
                   sx={{ mb: 1 }}
                 >
-                  Export All Products
+                  {t("admin.importExport.exportAllProducts")}
                 </Button>
 
                 {/* Export Categories */}
@@ -353,14 +380,14 @@ export function ImportExport() {
                   startIcon={<Category />}
                   sx={{ mb: 1 }}
                 >
-                  Export All Categories
+                  {t("admin.importExport.exportAllCategories")}
                 </Button>
 
                 <Divider sx={{ my: 2 }} />
 
                 {/* Template Downloads */}
                 <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                  CSV Templates
+                  {t("admin.importExport.csvTemplates")}
                 </Typography>
 
                 <Button
@@ -370,7 +397,7 @@ export function ImportExport() {
                   startIcon={<Description />}
                   sx={{ mb: 1 }}
                 >
-                  Product Template
+                  {t("admin.importExport.productTemplate")}
                 </Button>
 
                 <Button
@@ -379,7 +406,7 @@ export function ImportExport() {
                   onClick={() => handleDownloadTemplate("categories")}
                   startIcon={<Description />}
                 >
-                  Category Template
+                  {t("admin.importExport.categoryTemplate")}
                 </Button>
               </Box>
             </CardContent>
@@ -395,8 +422,14 @@ export function ImportExport() {
         fullWidth
       >
         <DialogTitle>
-          Import Results
-          {dryRun && <Chip label="Dry Run" color="info" sx={{ ml: 2 }} />}
+          {t("admin.importExport.importResults")}
+          {dryRun && (
+            <Chip
+              label={t("admin.importExport.dryRun")}
+              color="info"
+              sx={{ ml: 2 }}
+            />
+          )}
         </DialogTitle>
         <DialogContent>
           {importResult && (
@@ -407,7 +440,9 @@ export function ImportExport() {
                     <Typography variant="h4" color="primary.main">
                       {importResult.total}
                     </Typography>
-                    <Typography variant="body2">Total Rows</Typography>
+                    <Typography variant="body2">
+                      {t("admin.importExport.totalRows")}
+                    </Typography>
                   </Paper>
                 </Grid>
                 <Grid item xs={4}>
@@ -415,7 +450,9 @@ export function ImportExport() {
                     <Typography variant="h4" color="success.main">
                       {importResult.successful}
                     </Typography>
-                    <Typography variant="body2">Successful</Typography>
+                    <Typography variant="body2">
+                      {t("admin.importExport.successful")}
+                    </Typography>
                   </Paper>
                 </Grid>
                 <Grid item xs={4}>
@@ -423,7 +460,9 @@ export function ImportExport() {
                     <Typography variant="h4" color="error.main">
                       {importResult.failed}
                     </Typography>
-                    <Typography variant="body2">Failed</Typography>
+                    <Typography variant="body2">
+                      {t("admin.importExport.failed")}
+                    </Typography>
                   </Paper>
                 </Grid>
               </Grid>
@@ -434,15 +473,16 @@ export function ImportExport() {
                     variant="subtitle1"
                     sx={{ fontWeight: 600, mb: 2 }}
                   >
-                    Errors ({importResult.errors.length})
+                    {t("admin.importExport.errors")} (
+                    {importResult.errors.length})
                   </Typography>
                   <TableContainer component={Paper} sx={{ maxHeight: 300 }}>
                     <Table stickyHeader>
                       <TableHead>
                         <TableRow>
-                          <TableCell>Row</TableCell>
-                          <TableCell>Error</TableCell>
-                          <TableCell>Data</TableCell>
+                          <TableCell>{t("admin.importExport.row")}</TableCell>
+                          <TableCell>{t("admin.importExport.error")}</TableCell>
+                          <TableCell>{t("admin.importExport.data")}</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -468,8 +508,10 @@ export function ImportExport() {
                       color="text.secondary"
                       sx={{ mt: 1 }}
                     >
-                      Showing first 10 errors. Total:{" "}
-                      {importResult.errors.length}
+                      {t("admin.importExport.showingErrors", {
+                        showing: 10,
+                        total: importResult.errors.length,
+                      })}
                     </Typography>
                   )}
                 </Box>
@@ -478,7 +520,9 @@ export function ImportExport() {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setResultDialog(false)}>Close</Button>
+          <Button onClick={() => setResultDialog(false)}>
+            {t("common.close")}
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

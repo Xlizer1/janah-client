@@ -151,7 +151,7 @@ export function OrderManagement() {
       data: { status: string; notes?: string };
     }) => ordersService.admin.updateOrderStatus(orderId, data),
     onSuccess: () => {
-      toast.success("Order status updated successfully");
+      toast.success(t("orders.statusUpdated"));
       queryClient.invalidateQueries({ queryKey: ["adminOrders"] });
       queryClient.invalidateQueries({ queryKey: ["orderStatistics"] });
       setActionDialog({ open: false, type: null, order: null });
@@ -159,7 +159,7 @@ export function OrderManagement() {
     },
     onError: (error: any) => {
       toast.error(
-        error.response?.data?.message || "Failed to update order status"
+        error.response?.data?.message || t("orders.statusUpdateFailed")
       );
     },
   });
@@ -168,14 +168,14 @@ export function OrderManagement() {
     mutationFn: ({ orderId, reason }: { orderId: number; reason: string }) =>
       ordersService.admin.cancelOrder(orderId, reason),
     onSuccess: () => {
-      toast.success("Order cancelled successfully");
+      toast.success(t("orders.orderCancelled"));
       queryClient.invalidateQueries({ queryKey: ["adminOrders"] });
       queryClient.invalidateQueries({ queryKey: ["orderStatistics"] });
       setActionDialog({ open: false, type: null, order: null });
       setCancelReason("");
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to cancel order");
+      toast.error(error.response?.data?.message || t("orders.cancelFailed"));
     },
   });
 
@@ -265,7 +265,7 @@ export function OrderManagement() {
           }}
         >
           <Typography variant="h4" sx={{ fontWeight: 700 }}>
-            Order Management
+            {t("orders.management")}
           </Typography>
           <Box sx={{ display: "flex", gap: 2 }}>
             <Button
@@ -275,7 +275,7 @@ export function OrderManagement() {
                 queryClient.invalidateQueries({ queryKey: ["adminOrders"] })
               }
             >
-              Refresh
+              {t("common.refresh")}
             </Button>
           </Box>
         </Box>
@@ -295,7 +295,7 @@ export function OrderManagement() {
                     {statsData?.total_orders || 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Total Orders
+                    {t("admin.dashboard.totalOrders")}
                   </Typography>
                 </Box>
               </Box>
@@ -314,7 +314,7 @@ export function OrderManagement() {
                     {statsData?.pending_orders || 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Pending Orders
+                    {t("orders.pendingOrders")}
                   </Typography>
                 </Box>
               </Box>
@@ -333,7 +333,7 @@ export function OrderManagement() {
                     {formatPrice(statsData?.total_revenue || 0)}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Total Revenue
+                    {t("admin.dashboard.totalRevenue")}
                   </Typography>
                 </Box>
               </Box>
@@ -352,7 +352,7 @@ export function OrderManagement() {
                     {formatPrice(statsData?.average_order_value || 0)}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Avg Order Value
+                    {t("orders.avgOrderValue")}
                   </Typography>
                 </Box>
               </Box>
@@ -367,7 +367,7 @@ export function OrderManagement() {
           <Grid item xs={12} md={4}>
             <TextField
               fullWidth
-              placeholder="Search orders by number, customer, or address..."
+              placeholder={t("orders.searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               InputProps={{
@@ -381,38 +381,52 @@ export function OrderManagement() {
           </Grid>
           <Grid item xs={12} md={3}>
             <FormControl fullWidth>
-              <InputLabel>Status Filter</InputLabel>
+              <InputLabel>{t("orders.statusFilter")}</InputLabel>
               <Select
                 value={statusFilter}
-                label="Status Filter"
+                label={t("orders.statusFilter")}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 startAdornment={<FilterList sx={{ mr: 1 }} />}
               >
-                <MenuItem value="all">All Statuses</MenuItem>
-                <MenuItem value="pending">Pending</MenuItem>
-                <MenuItem value="confirmed">Confirmed</MenuItem>
-                <MenuItem value="preparing">Preparing</MenuItem>
-                <MenuItem value="ready_to_ship">Ready to Ship</MenuItem>
-                <MenuItem value="shipped">Shipped</MenuItem>
-                <MenuItem value="delivered">Delivered</MenuItem>
-                <MenuItem value="cancelled">Cancelled</MenuItem>
+                <MenuItem value="all">{t("orders.allStatuses")}</MenuItem>
+                <MenuItem value="pending">
+                  {t("orders.orderStatus.pending")}
+                </MenuItem>
+                <MenuItem value="confirmed">
+                  {t("orders.orderStatus.confirmed")}
+                </MenuItem>
+                <MenuItem value="preparing">
+                  {t("orders.orderStatus.preparing")}
+                </MenuItem>
+                <MenuItem value="ready_to_ship">
+                  {t("orders.orderStatus.ready")}
+                </MenuItem>
+                <MenuItem value="shipped">
+                  {t("orders.orderStatus.shipped")}
+                </MenuItem>
+                <MenuItem value="delivered">
+                  {t("orders.orderStatus.delivered")}
+                </MenuItem>
+                <MenuItem value="cancelled">
+                  {t("orders.orderStatus.cancelled")}
+                </MenuItem>
               </Select>
             </FormControl>
           </Grid>
           <Grid item xs={12} md={3}>
             <FormControl fullWidth>
-              <InputLabel>Date Range</InputLabel>
+              <InputLabel>{t("orders.dateRange")}</InputLabel>
               <Select
                 value={dateRange}
-                label="Date Range"
+                label={t("orders.dateRange")}
                 onChange={(e) => setDateRange(e.target.value)}
                 startAdornment={<CalendarToday sx={{ mr: 1 }} />}
               >
-                <MenuItem value="all">All Time</MenuItem>
-                <MenuItem value="today">Today</MenuItem>
-                <MenuItem value="week">This Week</MenuItem>
-                <MenuItem value="month">This Month</MenuItem>
-                <MenuItem value="quarter">This Quarter</MenuItem>
+                <MenuItem value="all">{t("orders.allTime")}</MenuItem>
+                <MenuItem value="today">{t("orders.today")}</MenuItem>
+                <MenuItem value="week">{t("orders.thisWeek")}</MenuItem>
+                <MenuItem value="month">{t("orders.thisMonth")}</MenuItem>
+                <MenuItem value="quarter">{t("orders.thisQuarter")}</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -429,12 +443,16 @@ export function OrderManagement() {
             scrollButtons="auto"
           >
             <Tab
-              label={`All Orders (${ordersData?.pagination?.total || 0})`}
+              label={t("orders.allOrdersCount", {
+                count: ordersData?.pagination?.total || 0,
+              })}
               icon={<Receipt />}
               iconPosition="start"
             />
             <Tab
-              label={`Pending (${statsData?.pending_orders || 0})`}
+              label={t("orders.pendingCount", {
+                count: statsData?.pending_orders || 0,
+              })}
               icon={
                 <Badge
                   badgeContent={statsData?.pending_orders || 0}
@@ -446,27 +464,29 @@ export function OrderManagement() {
               iconPosition="start"
             />
             <Tab
-              label={`Confirmed (${statsData?.confirmed_orders || 0})`}
+              label={t("orders.confirmedCount", {
+                count: statsData?.confirmed_orders || 0,
+              })}
               icon={<CheckCircle />}
               iconPosition="start"
             />
             <Tab
-              label="Preparing"
+              label={t("orders.preparing")}
               icon={<HourglassEmpty />}
               iconPosition="start"
             />
             <Tab
-              label="Ready to Ship"
+              label={t("orders.readyToShip")}
               icon={<LocalShipping />}
               iconPosition="start"
             />
             <Tab
-              label="Shipped"
+              label={t("orders.shipped")}
               icon={<LocalShipping />}
               iconPosition="start"
             />
             <Tab
-              label="Delivered"
+              label={t("orders.delivered")}
               icon={<CheckCircle />}
               iconPosition="start"
             />
@@ -483,13 +503,13 @@ export function OrderManagement() {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Order #</TableCell>
-                      <TableCell>Customer</TableCell>
-                      <TableCell>Status</TableCell>
-                      <TableCell>Items</TableCell>
-                      <TableCell>Total</TableCell>
-                      <TableCell>Date</TableCell>
-                      <TableCell align="right">Actions</TableCell>
+                      <TableCell>{t("orders.orderNumber")}</TableCell>
+                      <TableCell>{t("orders.customer")}</TableCell>
+                      <TableCell>{t("orders.status")}</TableCell>
+                      <TableCell>{t("orders.items")}</TableCell>
+                      <TableCell>{t("orders.total")}</TableCell>
+                      <TableCell>{t("common.date")}</TableCell>
+                      <TableCell align="right">{t("common.actions")}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -509,7 +529,9 @@ export function OrderManagement() {
                               variant="body2"
                               sx={{ fontWeight: 600 }}
                             >
-                              Customer #{order.user_id}
+                              {t("orders.customerNumber", {
+                                id: order.user_id,
+                              })}
                             </Typography>
                             <Box
                               sx={{
@@ -534,7 +556,7 @@ export function OrderManagement() {
                         <TableCell>
                           <Chip
                             icon={getStatusIcon(order.status)}
-                            label={order.status.replace("_", " ").toUpperCase()}
+                            label={t(`orders.orderStatus.${order.status}`)}
                             color={getStatusColor(order.status) as any}
                             size="small"
                             sx={{ fontWeight: 600 }}
@@ -542,11 +564,10 @@ export function OrderManagement() {
                         </TableCell>
                         <TableCell>
                           <Typography variant="body2">
-                            {order.items_count || order.items?.length || 0} item
-                            {(order.items_count || order.items?.length || 0) !==
-                            1
-                              ? "s"
-                              : ""}
+                            {t("orders.itemsCount", {
+                              count:
+                                order.items_count || order.items?.length || 0,
+                            })}
                           </Typography>
                         </TableCell>
                         <TableCell>
@@ -588,17 +609,21 @@ export function OrderManagement() {
                   setPage(0);
                 }}
                 rowsPerPageOptions={[5, 10, 25, 50]}
+                labelRowsPerPage={t("orders.rowsPerPage")}
+                labelDisplayedRows={({ from, to, count }) =>
+                  t("orders.displayedRows", { from, to, count })
+                }
               />
             </>
           ) : (
             <Box sx={{ textAlign: "center", py: 8 }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                No orders found
+                {t("orders.noOrdersFound")}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {searchQuery
-                  ? `No orders match "${searchQuery}"`
-                  : "No orders to display"}
+                  ? t("orders.noOrdersMatch", { query: searchQuery })
+                  : t("orders.noOrdersToDisplay")}
               </Typography>
             </Box>
           )}
@@ -618,7 +643,7 @@ export function OrderManagement() {
           }}
         >
           <Visibility sx={{ mr: 1 }} />
-          View Details
+          {t("orders.viewDetails")}
         </MenuItem>
         {selectedOrder &&
           selectedOrder.status !== "cancelled" &&
@@ -630,7 +655,7 @@ export function OrderManagement() {
               }}
             >
               <Edit sx={{ mr: 1 }} />
-              Update Status
+              {t("orders.updateStatus")}
             </MenuItem>
           )}
         {selectedOrder &&
@@ -643,7 +668,7 @@ export function OrderManagement() {
               }}
             >
               <Cancel sx={{ mr: 1, color: "error.main" }} />
-              Cancel Order
+              {t("orders.cancelOrder")}
             </MenuItem>
           )}
       </Menu>
@@ -657,18 +682,20 @@ export function OrderManagement() {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>Update Order Status</DialogTitle>
+        <DialogTitle>{t("orders.updateOrderStatus")}</DialogTitle>
         <DialogContent>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3, mt: 2 }}>
             <Alert severity="info">
-              Update the status of order #{actionDialog.order?.order_number}
+              {t("orders.updateStatusInfo", {
+                orderNumber: actionDialog.order?.order_number,
+              })}
             </Alert>
 
             <FormControl fullWidth>
-              <InputLabel>New Status</InputLabel>
+              <InputLabel>{t("orders.newStatus")}</InputLabel>
               <Select
                 value={statusUpdate.status}
-                label="New Status"
+                label={t("orders.newStatus")}
                 onChange={(e) =>
                   setStatusUpdate((prev) => ({
                     ...prev,
@@ -676,23 +703,33 @@ export function OrderManagement() {
                   }))
                 }
               >
-                <MenuItem value="confirmed">Confirmed</MenuItem>
-                <MenuItem value="preparing">Preparing</MenuItem>
-                <MenuItem value="ready_to_ship">Ready to Ship</MenuItem>
-                <MenuItem value="shipped">Shipped</MenuItem>
-                <MenuItem value="delivered">Delivered</MenuItem>
+                <MenuItem value="confirmed">
+                  {t("orders.orderStatus.confirmed")}
+                </MenuItem>
+                <MenuItem value="preparing">
+                  {t("orders.orderStatus.preparing")}
+                </MenuItem>
+                <MenuItem value="ready_to_ship">
+                  {t("orders.orderStatus.ready")}
+                </MenuItem>
+                <MenuItem value="shipped">
+                  {t("orders.orderStatus.shipped")}
+                </MenuItem>
+                <MenuItem value="delivered">
+                  {t("orders.orderStatus.delivered")}
+                </MenuItem>
               </Select>
             </FormControl>
 
             <TextField
-              label="Notes (Optional)"
+              label={t("orders.notesOptional")}
               multiline
               rows={3}
               value={statusUpdate.notes}
               onChange={(e) =>
                 setStatusUpdate((prev) => ({ ...prev, notes: e.target.value }))
               }
-              placeholder="Add any notes about this status update..."
+              placeholder={t("orders.statusUpdateNotes")}
             />
           </Box>
         </DialogContent>
@@ -702,14 +739,16 @@ export function OrderManagement() {
               setActionDialog({ open: false, type: null, order: null })
             }
           >
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button
             onClick={confirmStatusUpdate}
             variant="contained"
             disabled={!statusUpdate.status || updateStatusMutation.isPending}
           >
-            {updateStatusMutation.isPending ? "Updating..." : "Update Status"}
+            {updateStatusMutation.isPending
+              ? t("orders.updating")
+              : t("orders.updateStatus")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -723,21 +762,22 @@ export function OrderManagement() {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>Cancel Order</DialogTitle>
+        <DialogTitle>{t("orders.cancelOrder")}</DialogTitle>
         <DialogContent>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3, mt: 2 }}>
             <Alert severity="warning">
-              Are you sure you want to cancel order #
-              {actionDialog.order?.order_number}? This action cannot be undone.
+              {t("orders.cancelOrderWarning", {
+                orderNumber: actionDialog.order?.order_number,
+              })}
             </Alert>
 
             <TextField
-              label="Cancellation Reason"
+              label={t("orders.cancellationReason")}
               multiline
               rows={3}
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
-              placeholder="Please provide a reason for cancelling this order..."
+              placeholder={t("orders.cancellationReasonPlaceholder")}
               required
             />
           </Box>
@@ -748,7 +788,7 @@ export function OrderManagement() {
               setActionDialog({ open: false, type: null, order: null })
             }
           >
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button
             onClick={confirmCancelOrder}
@@ -756,7 +796,9 @@ export function OrderManagement() {
             color="error"
             disabled={!cancelReason.trim() || cancelOrderMutation.isPending}
           >
-            {cancelOrderMutation.isPending ? "Cancelling..." : "Cancel Order"}
+            {cancelOrderMutation.isPending
+              ? t("orders.cancelling")
+              : t("orders.cancelOrder")}
           </Button>
         </DialogActions>
       </Dialog>

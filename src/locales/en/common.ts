@@ -633,7 +633,6 @@ const enTranslations = {
   "admin.users.allStatus": "All Status",
   "admin.users.verified": "Verified",
   "admin.users.notVerified": "Not Verified",
-  "admin.users.searchUsers": "Search users...",
   "admin.users.usersSelected": "users selected",
   "admin.users.viewDetails": "View Details",
   "admin.users.editUser": "Edit User",
@@ -665,7 +664,6 @@ const enTranslations = {
   "admin.users.startEdit": "Edit",
   "admin.users.saveEdit": "Save",
   "admin.users.cancelEdit": "Cancel",
-  "admin.users.confirmActivation": "Confirm Activation",
   "admin.users.confirmDeactivation": "Confirm Deactivation",
   "admin.users.activationQuestion":
     "Are you sure you want to activate this user account?",
@@ -718,22 +716,167 @@ const enTranslations = {
   "admin.users.pending.activateUsers": "Activate Users",
 
   // Admin Analytics
-  "admin.analytics.title": "Analytics Dashboard",
-  "admin.analytics.subtitle":
-    "Detailed analytics functionality is coming soon. This will include sales trends, product performance, and category insights.",
+  "admin.analytics.dateRange": "Date Range",
+  "admin.analytics.last7Days": "Last 7 days",
+  "admin.analytics.last30Days": "Last 30 days",
+  "admin.analytics.last90Days": "Last 90 days",
+  "admin.analytics.lastYear": "Last year",
+  "admin.analytics.salesRevenueTrends": "Sales & Revenue Trends",
+  "admin.analytics.sales": "Sales",
+  "admin.analytics.revenue": "Revenue",
+  "admin.analytics.categoryPerformance": "Category Performance",
+  "admin.analytics.avgPrice": "Avg Price",
+  "admin.analytics.issue": "Issue",
+  "admin.analytics.inventoryOverview": "Inventory Overview by Category",
 
   // Admin Settings
-  "admin.settings.title": "Admin Settings",
+  "admin.settings.title": "System Settings",
   "admin.settings.subtitle":
-    "Configure your admin preferences and system settings",
+    "Configure your application settings and preferences",
+  "admin.settings.siteInfo": "Site Information",
+  "admin.settings.siteName": "Site Name",
+  "admin.settings.regional": "Regional Settings",
+  "admin.settings.currency": "Currency",
+  "admin.settings.timezone": "Timezone",
+  "admin.settings.systemStatus": "System Status",
+  "admin.settings.maintenanceMode": "Maintenance Mode",
+  "admin.settings.autoApprove": "Auto-approve Users",
+  "admin.settings.maintenanceInfo":
+    "Maintenance mode will display a maintenance page to visitors.",
+  "admin.settings.saveGeneral": "Save General Settings",
+  "admin.settings.securityConfig": "Security Configuration",
+  "admin.settings.twoFactor": "Enable Two-Factor Authentication",
+  "admin.settings.requirePhone": "Require Phone Verification",
+  "admin.settings.sessionTimeout": "Session Timeout (minutes)",
+  "admin.settings.maxLoginAttempts": "Max Login Attempts",
+  "admin.settings.passwordMinLength": "Minimum Password Length",
+  "admin.settings.securityWarning":
+    "Security changes may affect user sessions and require users to re-authenticate.",
+  "admin.settings.saveSecurity": "Save Security Settings",
+  "admin.settings.notificationPrefs": "Notification Preferences",
+  "admin.settings.emailNotifications": "Email Notifications",
+  "admin.settings.smsNotifications": "SMS Notifications",
+  "admin.settings.alertTypes": "Alert Types",
+  "admin.settings.newUserAlerts": "New User Registration Alerts",
+  "admin.settings.lowStockAlerts": "Low Stock Alerts",
+  "admin.settings.orderNotifications": "Order Notifications",
+  "admin.settings.saveNotifications": "Save Notification Settings",
+  "admin.settings.databaseBackup": "Database Backup",
+  "admin.settings.backupDescription":
+    "Create a backup of your database including all products, categories, and user data.",
+  "admin.settings.createBackup": "Create Backup",
+  "admin.settings.scheduleBackup": "Schedule Backup",
+  "admin.settings.backupInfo":
+    "Backups are automatically created daily at 2:00 AM. Manual backups can be created anytime.",
+  "admin.settings.recentBackups": "Recent Backups",
+  "admin.settings.automatic": "Automatic",
+  "admin.settings.manual": "Manual",
+  "admin.settings.backup": "Backup",
+  "admin.settings.backupTestWarning":
+    "Always test your backups in a staging environment before relying on them for recovery.",
+  "admin.settings.dangerZone": "Danger Zone",
+  "admin.settings.restoreWarning":
+    "Restore operations will overwrite current data. This action cannot be undone.",
+  "admin.settings.createBackupTitle": "Create Database Backup",
+  "admin.settings.backupConfirmation":
+    "Are you sure you want to create a manual backup? This process may take a few minutes depending on your database size.",
+  "admin.settings.creating": "Creating...",
+
+  // Common months
+  "common.january": "Jan",
+  "common.february": "Feb",
+  "common.march": "Mar",
+  "common.april": "Apr",
+  "common.may": "May",
+  "common.june": "Jun",
+  "common.general": "General",
+  "common.important": "Important",
+  "common.operation": "Operation",
 
   // Admin Bulk Operations
-  "admin.bulk.title": "Bulk Operations",
-  "admin.bulk.subtitle": "Perform bulk actions on products and categories",
+  "admin.bulk.selectOperation": "Select Operation",
+  "admin.bulk.bulkOperation": "Bulk Operation",
+  "admin.bulk.updateCategories.short": "Update Categories",
+  "admin.bulk.updatePrices.short": "Update Prices",
+  "admin.bulk.updateCodes.short": "Update Product Codes",
+  "admin.bulk.updateCategories.title": "Update Product Categories",
+  "admin.bulk.updateCategories.description":
+    "Assign products to different categories",
+  "admin.bulk.updatePrices.title": "Update Product Prices",
+  "admin.bulk.updatePrices.description":
+    "Set, increase, or apply percentage changes to prices",
+  "admin.bulk.updateCodes.title": "Update Product Codes",
+  "admin.bulk.updateCodes.description": "Change product codes in bulk",
+  "admin.bulk.useJSONFormat": "Use the JSON format shown in the example panel",
+  "admin.bulk.bulkDataInput": "Bulk Data Input",
+  "admin.bulk.executeOperation": "Execute Operation",
+  "admin.bulk.jsonData": "JSON Data",
+  "admin.bulk.jsonPlaceholder":
+    "Enter your bulk operation data in JSON format...",
+  "admin.bulk.exampleFormat": "Example Format",
+  "admin.bulk.confirmOperation": "Confirm Bulk Operation",
+  "admin.bulk.operationWarning":
+    "This action will affect multiple records and cannot be undone!",
+  "admin.bulk.operationConfirmation":
+    "Are you sure you want to execute this bulk operation?",
+  "admin.bulk.processing": "Processing...",
+  "admin.bulk.execute": "Execute",
+  "admin.bulk.enterData": "Please enter bulk data",
+  "admin.bulk.invalidJSON": "Invalid JSON format",
+  "admin.bulk.updateSuccess": "Updated {{count}} products successfully",
+  "admin.bulk.updateFailed": "{{count}} updates failed",
+  "admin.bulk.priceUpdateSuccess": "Updated {{count}} product prices",
+  "admin.bulk.priceUpdateFailed": "{{count}} price updates failed",
+  "admin.bulk.codeUpdateSuccess": "Updated {{count}} product codes",
+  "admin.bulk.codeUpdateFailed": "{{count}} code updates failed",
 
   // Admin Import/Export
-  "admin.importExport.title": "Import/Export",
-  "admin.importExport.subtitle": "Import and export your data",
+  "admin.importExport.importData": "Import Data",
+  "admin.importExport.importType": "Import Type",
+  "admin.importExport.selectCSV": "Select CSV File",
+  "admin.importExport.fileSize": "File size",
+  "admin.importExport.dryRun": "Dry Run (Preview Only)",
+  "admin.importExport.skipErrors": "Skip Errors",
+  "admin.importExport.dryRunInfo":
+    "Dry run mode: No data will be actually imported. Use this to validate your CSV file.",
+  "admin.importExport.processing": "Processing...",
+  "admin.importExport.import": "Import {{type}}",
+  "admin.importExport.downloadTemplate": "Download {{type}} Template",
+  "admin.importExport.exportData": "Export Data",
+  "admin.importExport.exportDescription":
+    "Export your current data to CSV format for backup or analysis",
+  "admin.importExport.exportAllProducts": "Export All Products",
+  "admin.importExport.exportAllCategories": "Export All Categories",
+  "admin.importExport.csvTemplates": "CSV Templates",
+  "admin.importExport.productTemplate": "Product Template",
+  "admin.importExport.categoryTemplate": "Category Template",
+  "admin.importExport.importResults": "Import Results",
+  "admin.importExport.totalRows": "Total Rows",
+  "admin.importExport.successful": "Successful",
+  "admin.importExport.failed": "Failed",
+  "admin.importExport.errors": "Errors",
+  "admin.importExport.row": "Row",
+  "admin.importExport.error": "Error",
+  "admin.importExport.data": "Data",
+  "admin.importExport.showingErrors":
+    "Showing first {{showing}} errors. Total: {{total}}",
+  "admin.importExport.csvFileOnly": "Please select a CSV file",
+  "admin.importExport.selectFile": "Please select a file to import",
+  "admin.importExport.importError": "Import failed",
+  "admin.importExport.categoryImportError": "Category import failed",
+  "admin.importExport.importSuccess": "Successfully imported {{count}} items",
+  "admin.importExport.importFailed": "{{count}} items failed to import",
+  "admin.importExport.categoryImportSuccess":
+    "Successfully imported {{count}} categories",
+  "admin.importExport.categoryImportFailed":
+    "{{count}} categories failed to import",
+  "admin.importExport.exportSuccess": "{{type}} exported successfully",
+  "admin.importExport.exportError": "Export failed: {{error}}",
+  "admin.importExport.templateDownloaded": "{{type}} template downloaded",
+  "admin.importExport.templateError": "Template download failed: {{error}}",
+
+  // Admin General
+  "admin.backup": "Backup & Restore",
 
   // Admin General Messages
   "admin.loading": "Loading...",
@@ -752,6 +895,97 @@ const enTranslations = {
   "featured.subtitle":
     "Discover our handpicked selection of the most popular and high-quality products",
   "featured.viewAll": "View All Featured Products",
+
+  // Orders Management
+  "orders.management": "Order Management",
+  "orders.pendingOrders": "Pending Orders",
+  "orders.avgOrderValue": "Avg Order Value",
+  "orders.searchPlaceholder":
+    "Search orders by number, customer, or address...",
+  "orders.statusFilter": "Status Filter",
+  "orders.dateRange": "Date Range",
+  "orders.allStatuses": "All Statuses",
+  "orders.allTime": "All Time",
+  "orders.today": "Today",
+  "orders.thisWeek": "This Week",
+  "orders.thisMonth": "This Month",
+  "orders.thisQuarter": "This Quarter",
+  "orders.allOrdersCount": "All Orders ({{count}})",
+  "orders.pendingCount": "Pending ({{count}})",
+  "orders.confirmedCount": "Confirmed ({{count}})",
+  "orders.preparing": "Preparing",
+  "orders.readyToShip": "Ready to Ship",
+  "orders.shipped": "Shipped",
+  "orders.delivered": "Delivered",
+  "orders.orderNumber": "Order #",
+  "orders.customer": "Customer",
+  "orders.items": "Items",
+  "orders.total": "Total",
+  "orders.customerNumber": "Customer #{{id}}",
+  "orders.itemsCount": "{{count}} item{{count, plural, one {} other {s}}}",
+  "orders.rowsPerPage": "Rows per page:",
+  "orders.displayedRows": "{{from}}-{{to}} of {{count}}",
+  "orders.noOrdersFound": "No orders found",
+  "orders.noOrdersMatch": 'No orders match "{{query}}"',
+  "orders.noOrdersToDisplay": "No orders to display",
+  "orders.updateStatus": "Update Status",
+  "orders.cancelOrder": "Cancel Order",
+  "orders.updateOrderStatus": "Update Order Status",
+  "orders.updateStatusInfo": "Update the status of order #{{orderNumber}}",
+  "orders.newStatus": "New Status",
+  "orders.notesOptional": "Notes (Optional)",
+  "orders.statusUpdateNotes": "Add any notes about this status update...",
+  "orders.updating": "Updating...",
+  "orders.cancelOrderWarning":
+    "Are you sure you want to cancel order #{{orderNumber}}? This action cannot be undone.",
+  "orders.cancellationReason": "Cancellation Reason",
+  "orders.cancellationReasonPlaceholder":
+    "Please provide a reason for cancelling this order...",
+  "orders.cancelling": "Cancelling...",
+  "orders.statusUpdated": "Order status updated successfully",
+  "orders.statusUpdateFailed": "Failed to update order status",
+  "orders.orderCancelled": "Order cancelled successfully",
+  "orders.cancelFailed": "Failed to cancel order",
+
+  // Users Management
+  "admin.users.userActivated": "User activated successfully",
+  "admin.users.userDeactivated": "User deactivated successfully",
+  "admin.users.activationFailed": "Failed to activate user",
+  "admin.users.deactivationFailed": "Failed to deactivate user",
+  "admin.users.searchUsers": "Search users by name, phone, or email...",
+  "admin.users.statusFilter": "Status Filter",
+  "admin.users.activeOnly": "Active Only",
+  "admin.users.inactiveOnly": "Inactive Only",
+  "admin.users.viewFullList": "View Full User List",
+  "admin.users.recentUsers": "Recent Users ({{count}})",
+  "admin.users.pendingApproval": "Pending Approval ({{count}})",
+  "admin.users.noUsersFound": "No users found",
+  "admin.users.noUsersMatch": 'No users match "{{query}}"',
+  "admin.users.noUsersToDisplay": "No users to display",
+  "admin.users.viewPendingUsers": "View Pending Users ({{count}})",
+  "admin.users.confirmActivation": "Confirm User Activation",
+
+  "cart.itemsCount": "{{count}} item{{count, plural, one {} other {s}}}",
+  "cart.viewCart": "View Cart",
+  "cart.clear": "Clear",
+
+  // Categories Loading and States
+  "categories.loading": "Loading categories...",
+  "categories.productsCount":
+    "{{count}} Product{{count, plural, one {} other {s}}}",
+
+  // Featured Products
+  "products.loadingFeatured": "Loading featured products...",
+  "products.noFeaturedAvailable":
+    "No featured products available at the moment.",
+
+  // Hero Section
+  "hero.imagePlaceholder": "Hero Image Placeholder",
+
+  // Newsletter
+  "newsletter.invalidEmail": "Please enter a valid email address",
+  "newsletter.subscribeSuccess": "Successfully subscribed to newsletter!",
+  "newsletter.subscribeError": "Failed to subscribe. Please try again.",
 };
 
 export default enTranslations;

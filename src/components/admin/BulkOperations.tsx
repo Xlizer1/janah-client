@@ -53,54 +53,66 @@ export function BulkOperations() {
   const bulkUpdateCategoriesMutation = useMutation({
     mutationFn: adminService.bulk.updateCategories,
     onSuccess: (data) => {
-      toast.success(`Updated ${data.updated.length} products successfully`);
+      toast.success(
+        t("admin.bulk.updateSuccess", { count: data.updated.length })
+      );
       if (data.failed.length > 0) {
-        toast.warning(`${data.failed.length} updates failed`);
+        toast.warning(
+          t("admin.bulk.updateFailed", { count: data.failed.length })
+        );
       }
       queryClient.invalidateQueries({ queryKey: ["adminProducts"] });
       setConfirmDialog(false);
       setBulkData("");
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Bulk operation failed");
+      toast.error(error.response?.data?.message || t("admin.error"));
     },
   });
 
   const bulkUpdatePricesMutation = useMutation({
     mutationFn: adminService.bulk.updatePrices,
     onSuccess: (data) => {
-      toast.success(`Updated ${data.updated.length} product prices`);
+      toast.success(
+        t("admin.bulk.priceUpdateSuccess", { count: data.updated.length })
+      );
       if (data.failed.length > 0) {
-        toast.warning(`${data.failed.length} price updates failed`);
+        toast.warning(
+          t("admin.bulk.priceUpdateFailed", { count: data.failed.length })
+        );
       }
       queryClient.invalidateQueries({ queryKey: ["adminProducts"] });
       setConfirmDialog(false);
       setBulkData("");
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Price update failed");
+      toast.error(error.response?.data?.message || t("admin.error"));
     },
   });
 
   const bulkUpdateCodesMutation = useMutation({
     mutationFn: adminService.bulk.updateProductCodes,
     onSuccess: (data) => {
-      toast.success(`Updated ${data.updated.length} product codes`);
+      toast.success(
+        t("admin.bulk.codeUpdateSuccess", { count: data.updated.length })
+      );
       if (data.failed.length > 0) {
-        toast.warning(`${data.failed.length} code updates failed`);
+        toast.warning(
+          t("admin.bulk.codeUpdateFailed", { count: data.failed.length })
+        );
       }
       queryClient.invalidateQueries({ queryKey: ["adminProducts"] });
       setConfirmDialog(false);
       setBulkData("");
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Code update failed");
+      toast.error(error.response?.data?.message || t("admin.error"));
     },
   });
 
   const handleBulkOperation = () => {
     if (!bulkData.trim()) {
-      toast.error("Please enter bulk data");
+      toast.error(t("admin.bulk.enterData"));
       return;
     }
 
@@ -118,17 +130,17 @@ export function BulkOperations() {
           bulkUpdateCodesMutation.mutate(data.updates);
           break;
         default:
-          toast.error("Please select an operation");
+          toast.error(t("admin.bulk.selectOperation"));
       }
     } catch (error) {
-      toast.error("Invalid JSON format");
+      toast.error(t("admin.bulk.invalidJSON"));
     }
   };
 
   const operationExamples = {
     update_categories: {
-      title: "Update Product Categories",
-      description: "Assign products to different categories",
+      title: t("admin.bulk.updateCategories.title"),
+      description: t("admin.bulk.updateCategories.description"),
       example: `{
   "updates": [
     { "product_id": 1, "category_id": 2 },
@@ -137,8 +149,8 @@ export function BulkOperations() {
 }`,
     },
     update_prices: {
-      title: "Update Product Prices",
-      description: "Set, increase, or apply percentage changes to prices",
+      title: t("admin.bulk.updatePrices.title"),
+      description: t("admin.bulk.updatePrices.description"),
       example: `{
   "operation": "percentage",
   "updates": [
@@ -148,8 +160,8 @@ export function BulkOperations() {
 }`,
     },
     update_codes: {
-      title: "Update Product Codes",
-      description: "Change product codes in bulk",
+      title: t("admin.bulk.updateCodes.title"),
+      description: t("admin.bulk.updateCodes.description"),
       example: `{
   "updates": [
     { "product_id": 1, "new_code": "NEWCODE1" },
@@ -164,10 +176,10 @@ export function BulkOperations() {
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-          Bulk Operations
+          {t("admin.bulk.title")}
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          Perform bulk updates on products and categories
+          {t("admin.bulk.subtitle")}
         </Typography>
       </Box>
 
@@ -175,31 +187,31 @@ export function BulkOperations() {
         {/* Operation Selector */}
         <Grid item xs={12} md={4}>
           <Card>
-            <CardHeader title="Select Operation" />
+            <CardHeader title={t("admin.bulk.selectOperation")} />
             <CardContent>
               <FormControl fullWidth sx={{ mb: 3 }}>
-                <InputLabel>Bulk Operation</InputLabel>
+                <InputLabel>{t("admin.bulk.bulkOperation")}</InputLabel>
                 <Select
                   value={selectedOperation}
-                  label="Bulk Operation"
+                  label={t("admin.bulk.bulkOperation")}
                   onChange={(e) => setSelectedOperation(e.target.value)}
                 >
                   <MenuItem value="update_categories">
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <Category fontSize="small" />
-                      Update Categories
+                      {t("admin.bulk.updateCategories.short")}
                     </Box>
                   </MenuItem>
                   <MenuItem value="update_prices">
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <AttachMoney fontSize="small" />
-                      Update Prices
+                      {t("admin.bulk.updatePrices.short")}
                     </Box>
                   </MenuItem>
                   <MenuItem value="update_codes">
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <Code fontSize="small" />
-                      Update Product Codes
+                      {t("admin.bulk.updateCodes.short")}
                     </Box>
                   </MenuItem>
                 </Select>
@@ -233,7 +245,7 @@ export function BulkOperations() {
                     </Typography>
                     <Alert severity="info" sx={{ mb: 2 }}>
                       <Typography variant="caption">
-                        Use the JSON format shown in the example panel
+                        {t("admin.bulk.useJSONFormat")}
                       </Typography>
                     </Alert>
                   </Box>
@@ -246,14 +258,14 @@ export function BulkOperations() {
         <Grid item xs={12} md={8}>
           <Card>
             <CardHeader
-              title="Bulk Data Input"
+              title={t("admin.bulk.bulkDataInput")}
               action={
                 <Button
                   variant="contained"
                   onClick={() => setConfirmDialog(true)}
                   disabled={!selectedOperation || !bulkData.trim()}
                 >
-                  Execute Operation
+                  {t("admin.bulk.executeOperation")}
                 </Button>
               }
             />
@@ -262,10 +274,10 @@ export function BulkOperations() {
                 fullWidth
                 multiline
                 rows={15}
-                label="JSON Data"
+                label={t("admin.bulk.jsonData")}
                 value={bulkData}
                 onChange={(e) => setBulkData(e.target.value)}
-                placeholder="Enter your bulk operation data in JSON format..."
+                placeholder={t("admin.bulk.jsonPlaceholder")}
                 sx={{ mb: 2 }}
               />
 
@@ -278,7 +290,7 @@ export function BulkOperations() {
                       variant="subtitle2"
                       sx={{ fontWeight: 600, mb: 1 }}
                     >
-                      Example Format:
+                      {t("admin.bulk.exampleFormat")}:
                     </Typography>
                     <Paper sx={{ p: 2, bgcolor: "grey.50" }}>
                       <pre
@@ -304,17 +316,15 @@ export function BulkOperations() {
 
       {/* Confirmation Dialog */}
       <Dialog open={confirmDialog} onClose={() => setConfirmDialog(false)}>
-        <DialogTitle>Confirm Bulk Operation</DialogTitle>
+        <DialogTitle>{t("admin.bulk.confirmOperation")}</DialogTitle>
         <DialogContent>
           <Alert severity="warning" sx={{ mb: 2 }}>
-            This action will affect multiple records and cannot be undone!
+            {t("admin.bulk.operationWarning")}
           </Alert>
-          <Typography>
-            Are you sure you want to execute this bulk operation?
-          </Typography>
+          <Typography>{t("admin.bulk.operationConfirmation")}</Typography>
           {selectedOperation && (
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Operation:{" "}
+              {t("common.operation")}:{" "}
               {
                 operationExamples[
                   selectedOperation as keyof typeof operationExamples
@@ -324,7 +334,9 @@ export function BulkOperations() {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setConfirmDialog(false)}>Cancel</Button>
+          <Button onClick={() => setConfirmDialog(false)}>
+            {t("common.cancel")}
+          </Button>
           <Button
             onClick={handleBulkOperation}
             variant="contained"
@@ -338,8 +350,8 @@ export function BulkOperations() {
             {bulkUpdateCategoriesMutation.isPending ||
             bulkUpdatePricesMutation.isPending ||
             bulkUpdateCodesMutation.isPending
-              ? "Processing..."
-              : "Execute"}
+              ? t("admin.bulk.processing")
+              : t("admin.bulk.execute")}
           </Button>
         </DialogActions>
       </Dialog>

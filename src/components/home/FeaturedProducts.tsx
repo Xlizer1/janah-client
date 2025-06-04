@@ -18,14 +18,14 @@ export function FeaturedProducts() {
   });
 
   if (isLoading) {
-    return <LoadingSpinner message="Loading featured products..." />;
+    return <LoadingSpinner message={t("products.loadingFeatured")} />;
   }
 
   if (error || !data?.products?.length) {
     return (
       <Box sx={{ textAlign: "center", py: 8 }}>
         <Typography variant="h6" color="text.secondary">
-          No featured products available at the moment.
+          {t("products.noFeaturedAvailable")}
         </Typography>
       </Box>
     );
@@ -53,7 +53,7 @@ export function FeaturedProducts() {
               fontSize: { xs: "1.75rem", md: "2.25rem" },
             }}
           >
-            Featured Products
+            {t("featured.title")}
           </Typography>
         </Box>
 
@@ -62,8 +62,7 @@ export function FeaturedProducts() {
           color="text.secondary"
           sx={{ maxWidth: 600, mx: "auto", fontSize: "1.1rem" }}
         >
-          Discover our handpicked selection of the most popular and high-quality
-          products
+          {t("featured.subtitle")}
         </Typography>
       </Box>
 
@@ -98,7 +97,7 @@ export function FeaturedProducts() {
               transition: "all 0.3s ease",
             }}
           >
-            View All Featured Products
+            {t("featured.viewAll")}
           </Button>
         </Link>
       </Box>
