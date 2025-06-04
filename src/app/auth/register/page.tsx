@@ -33,6 +33,7 @@ import { toast } from "react-toastify";
 
 import { authService } from "@/services/auth.service";
 import type { RegisterFormData } from "@/types";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const registerSchema = yup.object({
   phone_number: yup
@@ -60,6 +61,7 @@ const registerSchema = yup.object({
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -75,23 +77,21 @@ export default function RegisterPage() {
   const registerMutation = useMutation({
     mutationFn: authService.register,
     onSuccess: (data, variables) => {
-      toast.success(
-        "Registration successful! Please verify your phone number."
-      );
+      toast.success(t("auth.registerSuccess"));
       router.push(
         `/auth/verify-phone?phone=${encodeURIComponent(variables.phone_number)}`
       );
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message || "Registration failed";
+      const message = error.response?.data?.message || t("auth.registerFailed");
 
       if (message.includes("phone number already exists")) {
         setError("phone_number", {
-          message: "An account with this phone number already exists",
+          message: t("auth.phoneExists"),
         });
       } else if (message.includes("email already exists")) {
         setError("email", {
-          message: "An account with this email already exists",
+          message: t("auth.emailExists"),
         });
       } else {
         toast.error(message);
@@ -134,10 +134,10 @@ export default function RegisterPage() {
               WebkitTextFillColor: "transparent",
             }}
           >
-            Create Account
+            {t("auth.register.title")}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Join Janah to start shopping amazing products
+            {t("auth.register.subtitle")}
           </Typography>
         </Box>
 
@@ -149,7 +149,7 @@ export default function RegisterPage() {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="First Name"
+                  label={t("auth.firstName")}
                   {...register("first_name")}
                   error={!!errors.first_name}
                   helperText={errors.first_name?.message}
@@ -165,7 +165,7 @@ export default function RegisterPage() {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Last Name"
+                  label={t("auth.lastName")}
                   {...register("last_name")}
                   error={!!errors.last_name}
                   helperText={errors.last_name?.message}
@@ -183,14 +183,11 @@ export default function RegisterPage() {
             {/* Phone Number */}
             <TextField
               fullWidth
-              label="Phone Number"
+              label={t("auth.phone")}
               placeholder="+964 773 300 2076"
               {...register("phone_number")}
               error={!!errors.phone_number}
-              helperText={
-                errors.phone_number?.message ||
-                "Include country code (e.g., +964)"
-              }
+              helperText={errors.phone_number?.message || t("auth.phoneHelper")}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -204,7 +201,7 @@ export default function RegisterPage() {
             <TextField
               fullWidth
               type="email"
-              label="Email (Optional)"
+              label={t("auth.emailOptional")}
               {...register("email")}
               error={!!errors.email}
               helperText={errors.email?.message}
@@ -223,7 +220,7 @@ export default function RegisterPage() {
                 <TextField
                   fullWidth
                   type={showPassword ? "text" : "password"}
-                  label="Password"
+                  label={t("auth.password")}
                   {...register("password")}
                   error={!!errors.password}
                   helperText={errors.password?.message}
@@ -250,7 +247,7 @@ export default function RegisterPage() {
                 <TextField
                   fullWidth
                   type={showConfirmPassword ? "text" : "password"}
-                  label="Confirm Password"
+                  label={t("auth.confirmPassword")}
                   {...register("confirm_password")}
                   error={!!errors.confirm_password}
                   helperText={errors.confirm_password?.message}
@@ -305,8 +302,8 @@ export default function RegisterPage() {
               }}
             >
               {registerMutation.isPending
-                ? "Creating Account..."
-                : "Create Account"}
+                ? t("auth.creating")
+                : t("auth.createAccount")}
             </Button>
           </Box>
         </form>
@@ -314,7 +311,7 @@ export default function RegisterPage() {
         {/* Divider */}
         <Divider sx={{ my: 3 }}>
           <Typography variant="body2" color="text.secondary">
-            Already have an account?
+            {t("auth.alreadyHaveAccount")}
           </Typography>
         </Divider>
 
@@ -338,7 +335,7 @@ export default function RegisterPage() {
                 },
               }}
             >
-              Sign In Instead
+              {t("auth.signInInstead")}
             </Button>
           </Link>
         </Box>
@@ -346,8 +343,7 @@ export default function RegisterPage() {
         {/* Info Alert */}
         <Alert severity="info" sx={{ mt: 3 }}>
           <Typography variant="body2">
-            After registration, you'll need to verify your phone number and wait
-            for admin approval before you can start shopping.
+            {t("auth.infoAlert.verification")}
           </Typography>
         </Alert>
       </Paper>

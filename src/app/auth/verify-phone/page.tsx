@@ -23,6 +23,7 @@ import { toast } from "react-toastify";
 
 import { authService } from "@/services/auth.service";
 import type { VerifyPhoneFormData } from "@/types";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const verifyPhoneSchema = yup.object({
   phone_number: yup.string().required("Phone number is required"),
@@ -35,6 +36,7 @@ const verifyPhoneSchema = yup.object({
 
 function VerifyPhoneContent() {
   const router = useRouter();
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const phoneFromUrl = searchParams.get("phone") || "";
 
@@ -72,15 +74,16 @@ function VerifyPhoneContent() {
   const verifyMutation = useMutation({
     mutationFn: authService.verifyPhone,
     onSuccess: (data) => {
-      toast.success("Phone number verified successfully!");
+      toast.success(t("auth.phoneVerified"));
       router.push("/auth/login?verified=true");
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message || "Verification failed";
+      const message =
+        error.response?.data?.message || t("auth.verificationFailed");
 
       if (message.includes("Invalid or expired")) {
         setError("verification_code", {
-          message: "Invalid or expired verification code",
+          message: t("auth.codeInvalid"),
         });
       } else {
         toast.error(message);
@@ -92,12 +95,12 @@ function VerifyPhoneContent() {
     mutationFn: (phone_number: string) =>
       authService.resendCode({ phone_number, type: "registration" }),
     onSuccess: (data) => {
-      toast.success("Verification code sent successfully!");
+      toast.success(t("auth.codeSent"));
       setTimeLeft(120);
       setCanResend(false);
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message || "Failed to resend code";
+      const message = error.response?.data?.message || t("auth.resendFailed");
       toast.error(message);
     },
   });
@@ -109,7 +112,7 @@ function VerifyPhoneContent() {
   const handleResendCode = () => {
     const phoneNumber = phoneFromUrl || "";
     if (!phoneNumber) {
-      toast.error("Phone number is required");
+      toast.error(t("auth.phoneRequired"));
       return;
     }
     resendMutation.mutate(phoneNumber);
@@ -152,10 +155,10 @@ function VerifyPhoneContent() {
               WebkitTextFillColor: "transparent",
             }}
           >
-            Verify Your Phone
+            {t("auth.verifyPhone.title")}
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-            We've sent a 6-digit verification code to your phone number
+            {t("auth.verifyPhone.subtitle")}
           </Typography>
           {phoneFromUrl && (
             <Typography
@@ -174,7 +177,7 @@ function VerifyPhoneContent() {
             {/* Phone Number (read-only if from URL) */}
             <TextField
               fullWidth
-              label="Phone Number"
+              label={t("auth.phone")}
               {...register("phone_number")}
               error={!!errors.phone_number}
               helperText={errors.phone_number?.message}
@@ -196,8 +199,8 @@ function VerifyPhoneContent() {
             {/* Verification Code */}
             <TextField
               fullWidth
-              label="Verification Code"
-              placeholder="Enter 6-digit code"
+              label={t("auth.verification.code")}
+              placeholder={t("auth.enterCode")}
               {...register("verification_code")}
               error={!!errors.verification_code}
               helperText={errors.verification_code?.message}
@@ -220,7 +223,7 @@ function VerifyPhoneContent() {
             <Box sx={{ textAlign: "center" }}>
               {!canResend ? (
                 <Typography variant="body2" color="text.secondary">
-                  Resend code in {formatTime(timeLeft)}
+                  {t("auth.resendIn")} {formatTime(timeLeft)}
                 </Typography>
               ) : (
                 <Button
@@ -236,7 +239,9 @@ function VerifyPhoneContent() {
                   disabled={resendMutation.isPending}
                   sx={{ textTransform: "none" }}
                 >
-                  {resendMutation.isPending ? "Sending..." : "Resend Code"}
+                  {resendMutation.isPending
+                    ? t("auth.sending")
+                    : t("auth.resendCode")}
                 </Button>
               )}
             </Box>
@@ -267,10 +272,10 @@ function VerifyPhoneContent() {
               {verifyMutation.isPending ? (
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <CircularProgress size={20} color="inherit" />
-                  Verifying...
+                  {t("auth.verifying")}
                 </Box>
               ) : (
-                "Verify Phone Number"
+                t("auth.verifyCode")
               )}
             </Button>
           </Box>
@@ -282,13 +287,12 @@ function VerifyPhoneContent() {
         <Box sx={{ textAlign: "center" }}>
           <Alert severity="info" sx={{ mb: 2 }}>
             <Typography variant="body2">
-              After phone verification, your account will be pending admin
-              approval. You'll receive notification once approved.
+              {t("auth.infoAlert.verification")}
             </Typography>
           </Alert>
 
           <Typography variant="body2" color="text.secondary">
-            Didn't receive the code? Check your SMS messages or try resending.
+            {t("auth.didntReceive")}
           </Typography>
         </Box>
       </Paper>

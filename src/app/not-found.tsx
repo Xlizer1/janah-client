@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { Container, Box, Typography, Button, Paper } from "@mui/material";
 import { Home, Search, ArrowBack } from "@mui/icons-material";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function NotFound() {
+  const { t } = useTranslation();
+
   return (
     <Container maxWidth="md" sx={{ py: 8 }}>
       <Paper
@@ -42,7 +45,7 @@ export default function NotFound() {
             color: "text.primary",
           }}
         >
-          Oops! Page Not Found
+          {t("404.title")}
         </Typography>
 
         <Typography
@@ -56,8 +59,7 @@ export default function NotFound() {
             lineHeight: 1.6,
           }}
         >
-          The page you're looking for doesn't exist. It might have been moved,
-          deleted, or you entered the wrong URL.
+          {t("404.subtitle")}
         </Typography>
 
         {/* Action Buttons */}
@@ -92,7 +94,7 @@ export default function NotFound() {
                 transition: "all 0.3s ease",
               }}
             >
-              Go Home
+              {t("404.goHome")}
             </Button>
           </Link>
 
@@ -114,7 +116,7 @@ export default function NotFound() {
                 },
               }}
             >
-              Browse Products
+              {t("404.browseProducts")}
             </Button>
           </Link>
         </Box>
@@ -122,7 +124,7 @@ export default function NotFound() {
         {/* Quick Links */}
         <Box sx={{ mt: 6 }}>
           <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
-            Or try these popular pages:
+            {t("404.tryPopular")}
           </Typography>
           <Box
             sx={{
@@ -141,7 +143,7 @@ export default function NotFound() {
                   "&:hover": { textDecoration: "underline" },
                 }}
               >
-                Categories
+                {t("nav.categories")}
               </Typography>
             </Link>
             <Typography variant="body2" color="text.disabled">
@@ -159,7 +161,7 @@ export default function NotFound() {
                   "&:hover": { textDecoration: "underline" },
                 }}
               >
-                Featured Products
+                {t("products.featured")}
               </Typography>
             </Link>
             <Typography variant="body2" color="text.disabled">
@@ -174,7 +176,7 @@ export default function NotFound() {
                   "&:hover": { textDecoration: "underline" },
                 }}
               >
-                Sign In
+                {t("nav.login")}
               </Typography>
             </Link>
           </Box>

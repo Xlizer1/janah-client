@@ -1,4 +1,3 @@
-// src/app/cart/page.tsx
 "use client";
 
 import React from "react";
@@ -205,7 +204,7 @@ export default function CartPage() {
                             />
                           ) : (
                             <Typography variant="body2" color="text.secondary">
-                              No Image
+                              {t("admin.products.noImage")}
                             </Typography>
                           )}
                         </Box>
@@ -260,7 +259,9 @@ export default function CartPage() {
                               sx={{ mb: 2, maxWidth: 300 }}
                             >
                               <Typography variant="body2">
-                                Only {item.product.stock_quantity} left in stock
+                                {t("products.lowStockWarning", {
+                                  count: item.product.stock_quantity,
+                                })}
                               </Typography>
                             </Alert>
                           )}
@@ -456,7 +457,7 @@ export default function CartPage() {
                   >
                     {isAuthenticated
                       ? t("cart.proceedToCheckout")
-                      : "Sign In to Checkout"}
+                      : t("auth.signInToCheckout")}
                   </Button>
 
                   {!isAuthenticated && (
@@ -465,7 +466,7 @@ export default function CartPage() {
                       color="text.secondary"
                       sx={{ mt: 2, textAlign: "center" }}
                     >
-                      You'll be redirected to sign in
+                      {t("auth.redirectToSignIn")}
                     </Typography>
                   )}
                 </Paper>

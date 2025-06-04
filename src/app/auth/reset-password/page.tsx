@@ -111,15 +111,16 @@ function ResetPasswordContent() {
       toast.success(t("auth.resetPassword.complete"));
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message || "Password reset failed";
+      const message =
+        error.response?.data?.message || t("auth.resetPassword.failed");
 
       if (message.includes("Invalid or expired")) {
         setError("verification_code", {
-          message: "Invalid or expired verification code",
+          message: t("auth.codeInvalid"),
         });
       } else if (message.includes("phone number")) {
         setError("phone_number", {
-          message: "Phone number not found",
+          message: t("auth.phoneNotFound"),
         });
       } else {
         toast.error(message);
@@ -136,7 +137,7 @@ function ResetPasswordContent() {
       setCanResend(false);
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message || "Failed to resend code";
+      const message = error.response?.data?.message || t("auth.resendFailed");
       toast.error(message);
     },
   });
@@ -148,7 +149,7 @@ function ResetPasswordContent() {
   const handleResendCode = () => {
     const phoneNumber = watch("phone_number");
     if (!phoneNumber) {
-      toast.error("Please enter your phone number first");
+      toast.error(t("auth.phoneRequired"));
       return;
     }
     resendMutation.mutate(phoneNumber);
@@ -238,7 +239,7 @@ function ResetPasswordContent() {
               startIcon={<ArrowBack />}
               sx={{ textTransform: "none", color: "text.secondary" }}
             >
-              Back to Forgot Password
+              {t("auth.backToForgotPassword")}
             </Button>
           </Link>
         </Box>
@@ -305,7 +306,7 @@ function ResetPasswordContent() {
               <TextField
                 fullWidth
                 label={t("auth.verification.code")}
-                placeholder="Enter 6-digit code"
+                placeholder={t("auth.enterCode")}
                 {...register("verification_code")}
                 error={!!errors.verification_code}
                 helperText={errors.verification_code?.message}
@@ -443,7 +444,7 @@ function ResetPasswordContent() {
               {resetPasswordMutation.isPending ? (
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <CircularProgress size={20} color="inherit" />
-                  Resetting Password...
+                  {t("auth.resetting")}
                 </Box>
               ) : (
                 t("auth.resetPassword")

@@ -23,6 +23,7 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
 import { authService } from "@/services/auth.service";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const forgotPasswordSchema = yup.object({
   phone_number: yup
@@ -37,6 +38,7 @@ interface ForgotPasswordFormData {
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [isSuccess, setIsSuccess] = useState(false);
   const [submittedPhone, setSubmittedPhone] = useState("");
 
@@ -54,15 +56,15 @@ export default function ForgotPasswordPage() {
     onSuccess: (data, variables) => {
       setSubmittedPhone(variables.phone_number);
       setIsSuccess(true);
-      toast.success("Reset code sent successfully!");
+      toast.success(t("auth.resetCode.sent"));
     },
     onError: (error: any) => {
       const message =
-        error.response?.data?.message || "Failed to send reset code";
+        error.response?.data?.message || t("auth.resetCode.sendFailed");
 
       if (message.includes("phone number")) {
         setError("phone_number", {
-          message: "Please check your phone number and try again",
+          message: t("auth.phoneCheckAndRetry"),
         });
       } else {
         toast.error(message);
@@ -109,7 +111,7 @@ export default function ForgotPasswordPage() {
               color: "success.main",
             }}
           >
-            Reset Code Sent!
+            {t("auth.resetCode.sent")}
           </Typography>
 
           <Typography
@@ -117,7 +119,7 @@ export default function ForgotPasswordPage() {
             color="text.secondary"
             sx={{ mb: 2, lineHeight: 1.6 }}
           >
-            We've sent a 6-digit reset code to your phone number:
+            {t("auth.resetCode.sentTo")}
           </Typography>
 
           <Typography
@@ -128,8 +130,7 @@ export default function ForgotPasswordPage() {
           </Typography>
 
           <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
-            Please check your SMS messages for the verification code. The code
-            will expire in 10 minutes.
+            {t("auth.resetCode.checkSMS")}
           </Typography>
 
           <Button
@@ -146,7 +147,7 @@ export default function ForgotPasswordPage() {
               mb: 2,
             }}
           >
-            Continue to Reset Password
+            {t("auth.continueToReset")}
           </Button>
 
           <Button
@@ -154,7 +155,7 @@ export default function ForgotPasswordPage() {
             onClick={() => setIsSuccess(false)}
             sx={{ textTransform: "none" }}
           >
-            Try Different Phone Number
+            {t("auth.differentPhone")}
           </Button>
         </Paper>
       </Container>
@@ -178,7 +179,7 @@ export default function ForgotPasswordPage() {
               startIcon={<ArrowBack />}
               sx={{ textTransform: "none", color: "text.secondary" }}
             >
-              Back to Login
+              {t("auth.backToLogin")}
             </Button>
           </Link>
         </Box>
@@ -204,14 +205,14 @@ export default function ForgotPasswordPage() {
               WebkitTextFillColor: "transparent",
             }}
           >
-            Forgot Password?
+            {t("auth.forgotPassword.title")}
           </Typography>
           <Typography
             variant="body1"
             color="text.secondary"
             sx={{ lineHeight: 1.6 }}
           >
-            No worries! Enter your phone number and we'll send you a reset code
+            {t("auth.forgotPassword.subtitle")}
           </Typography>
         </Box>
 
@@ -221,14 +222,11 @@ export default function ForgotPasswordPage() {
             {/* Phone Number */}
             <TextField
               fullWidth
-              label="Phone Number"
+              label={t("auth.phone")}
               placeholder="+964 773 300 2076"
               {...register("phone_number")}
               error={!!errors.phone_number}
-              helperText={
-                errors.phone_number?.message ||
-                "Enter the phone number associated with your account"
-              }
+              helperText={errors.phone_number?.message || t("auth.phoneHelper")}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -264,10 +262,10 @@ export default function ForgotPasswordPage() {
               {forgotPasswordMutation.isPending ? (
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <CircularProgress size={20} color="inherit" />
-                  Sending Reset Code...
+                  {t("auth.sending")}
                 </Box>
               ) : (
-                "Send Reset Code"
+                t("auth.sendResetCode")
               )}
             </Button>
           </Box>
@@ -275,7 +273,7 @@ export default function ForgotPasswordPage() {
 
         <Divider sx={{ my: 3 }}>
           <Typography variant="body2" color="text.secondary">
-            Remember your password?
+            {t("auth.rememberPassword")}
           </Typography>
         </Divider>
 
@@ -299,17 +297,14 @@ export default function ForgotPasswordPage() {
                 },
               }}
             >
-              Back to Login
+              {t("auth.backToLogin")}
             </Button>
           </Link>
         </Box>
 
         {/* Info Alert */}
         <Alert severity="info" sx={{ mt: 3 }}>
-          <Typography variant="body2">
-            You'll receive a 6-digit verification code via SMS. Make sure you
-            have access to the phone number associated with your account.
-          </Typography>
+          <Typography variant="body2">{t("auth.infoAlert.reset")}</Typography>
         </Alert>
       </Paper>
     </Container>
