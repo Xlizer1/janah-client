@@ -1,4 +1,3 @@
-// src/services/admin.service.ts - Complete implementation
 import { api } from "@/lib/api-client";
 import { authUtils } from "@/lib/api-client";
 import type {
@@ -11,9 +10,7 @@ import type {
 } from "@/types";
 
 export const adminService = {
-  // User management
   users: {
-    // Get all users
     getAllUsers: async (
       params: {
         page?: number;
@@ -26,7 +23,6 @@ export const adminService = {
       return api.get("/admin/users", params);
     },
 
-    // Get pending users
     getPendingUsers: async (
       params: {
         page?: number;
@@ -36,12 +32,10 @@ export const adminService = {
       return api.get("/admin/users/pending", params);
     },
 
-    // Get user by ID
     getUserById: async (userId: number): Promise<{ user: User }> => {
       return api.get(`/admin/users/${userId}`);
     },
 
-    // Search users
     searchUsers: async (params: {
       query: string;
       type?: "phone" | "email" | "id";
@@ -49,17 +43,14 @@ export const adminService = {
       return api.get("/admin/users/search", params);
     },
 
-    // Activate user
     activateUser: async (userId: number): Promise<{ user: User }> => {
       return api.post("/admin/users/activate", { user_id: userId });
     },
 
-    // Deactivate user
     deactivateUser: async (userId: number): Promise<{ user: User }> => {
       return api.post("/admin/users/deactivate", { user_id: userId });
     },
 
-    // Bulk activate users
     bulkActivateUsers: async (
       userIds: number[]
     ): Promise<{
@@ -72,14 +63,11 @@ export const adminService = {
     },
   },
 
-  // Statistics
   getStats: async (): Promise<{ stats: AdminStats }> => {
     return api.get("/admin/stats");
   },
 
-  // Analytics
   analytics: {
-    // Get category analytics
     getCategoryAnalytics: async (params?: {
       startDate?: string;
       endDate?: string;
@@ -87,21 +75,18 @@ export const adminService = {
       return api.get("/analytics/categories", params);
     },
 
-    // Get top categories
     getTopCategories: async (
       limit = 10
     ): Promise<{ categories: CategoryAnalytics[] }> => {
       return api.get("/analytics/top-categories", { limit });
     },
 
-    // Get inventory analytics
     getInventoryByCategory: async (): Promise<{
       inventory: InventoryData[];
     }> => {
       return api.get("/analytics/inventory");
     },
 
-    // Get products needing attention
     getProductsNeedingAttention: async (): Promise<{
       products: Array<{
         id: number;
@@ -117,9 +102,7 @@ export const adminService = {
     },
   },
 
-  // Bulk operations
   bulk: {
-    // Bulk update categories
     updateCategories: async (
       updates: Array<{
         product_id?: number;
@@ -131,7 +114,6 @@ export const adminService = {
       return api.put("/bulk/categories", { updates });
     },
 
-    // Bulk update prices
     updatePrices: async (params: {
       operation: "set" | "increase" | "decrease" | "percentage";
       updates: Array<{
@@ -151,7 +133,6 @@ export const adminService = {
       return api.put("/bulk/prices", params);
     },
 
-    // Bulk update status
     updateStatus: async (params: {
       product_ids?: number[];
       product_codes?: string[];
@@ -160,7 +141,6 @@ export const adminService = {
       return api.put("/bulk/status", params);
     },
 
-    // 🆕 Bulk update product codes
     updateProductCodes: async (
       updates: Array<{
         product_id?: number;
@@ -180,9 +160,7 @@ export const adminService = {
     },
   },
 
-  // Import/Export
   import: {
-    // Import products from CSV
     importProductsCSV: async (
       file: File,
       options?: {
@@ -203,7 +181,6 @@ export const adminService = {
       return api.post("/import/products/csv", formData);
     },
 
-    // 🆕 Import categories from CSV
     importCategoriesCSV: async (
       file: File,
       options?: {
@@ -224,7 +201,6 @@ export const adminService = {
       return api.post("/import/categories/csv", formData);
     },
 
-    // Export products to CSV
     exportProductsCSV: async (options?: {
       category_id?: number;
       is_active?: boolean;
@@ -247,7 +223,6 @@ export const adminService = {
       return response.blob();
     },
 
-    // 🆕 Export categories to CSV
     exportCategoriesCSV: async (options?: {
       include_inactive?: boolean;
     }): Promise<Blob> => {
@@ -268,7 +243,6 @@ export const adminService = {
       return response.blob();
     },
 
-    // 🆕 Get product CSV template
     getProductTemplate: async (): Promise<Blob> => {
       const token = authUtils.getToken();
       const response = await fetch(
@@ -282,7 +256,6 @@ export const adminService = {
       return response.blob();
     },
 
-    // 🆕 Get category CSV template
     getCategoryTemplate: async (): Promise<Blob> => {
       const token = authUtils.getToken();
       const response = await fetch(

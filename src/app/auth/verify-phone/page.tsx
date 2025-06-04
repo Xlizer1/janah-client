@@ -24,7 +24,6 @@ import { toast } from "react-toastify";
 import { authService } from "@/services/auth.service";
 import type { VerifyPhoneFormData } from "@/types";
 
-// Validation schema
 const verifyPhoneSchema = yup.object({
   phone_number: yup.string().required("Phone number is required"),
   verification_code: yup
@@ -55,7 +54,6 @@ function VerifyPhoneContent() {
     },
   });
 
-  // Timer for resend button
   useEffect(() => {
     if (timeLeft > 0) {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
@@ -65,14 +63,12 @@ function VerifyPhoneContent() {
     }
   }, [timeLeft]);
 
-  // Auto-fill phone number from URL
   useEffect(() => {
     if (phoneFromUrl) {
       setValue("phone_number", phoneFromUrl);
     }
   }, [phoneFromUrl, setValue]);
 
-  // Verify phone mutation
   const verifyMutation = useMutation({
     mutationFn: authService.verifyPhone,
     onSuccess: (data) => {
@@ -92,7 +88,6 @@ function VerifyPhoneContent() {
     },
   });
 
-  // Resend code mutation
   const resendMutation = useMutation({
     mutationFn: (phone_number: string) =>
       authService.resendCode({ phone_number, type: "registration" }),

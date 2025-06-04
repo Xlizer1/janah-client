@@ -93,9 +93,7 @@ export function CartDrawer() {
           </IconButton>
         </Box>
 
-        {/* Cart Content */}
         {items.length === 0 ? (
-          // Empty Cart
           <Box
             sx={{
               flex: 1,

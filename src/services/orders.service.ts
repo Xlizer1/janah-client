@@ -22,16 +22,13 @@ const normalizeOrder = (order: any): Order => {
 };
 
 export const ordersService = {
-  // Customer order methods
   customer: {
-    // Create a new order
     createOrder: async (
       data: OrderCreateData
     ): Promise<{ order: Order; message: string }> => {
       return api.post("/orders", data);
     },
 
-    // Get customer's orders
     getMyOrders: async (
       filters: OrderFilters = {}
     ): Promise<OrdersResponse> => {
@@ -43,12 +40,10 @@ export const ordersService = {
       return api.get("/orders/my-orders", cleanFilters);
     },
 
-    // Get specific order by ID
     getMyOrder: async (orderId: number): Promise<{ order: Order }> => {
       return api.get(`/orders/my-orders/${orderId}`);
     },
 
-    // Track order by order number
     trackOrder: async (
       orderNumber: string
     ): Promise<{
@@ -64,9 +59,7 @@ export const ordersService = {
     },
   },
 
-  // Admin order methods (for reference)
   admin: {
-    // Get all orders
     getAllOrders: async (
       filters: OrderFilters = {}
     ): Promise<OrdersResponse> => {
@@ -80,7 +73,6 @@ export const ordersService = {
 
         const response = await api.get("/orders/admin/all", cleanFilters);
 
-        // Normalize the orders data
         if (response.orders && Array.isArray(response.orders)) {
           response.orders = response.orders.map(normalizeOrder);
         }
@@ -92,7 +84,6 @@ export const ordersService = {
       }
     },
 
-    // Get order by ID
     getOrder: async (orderId: number): Promise<{ order: Order }> => {
       try {
         const response = await api.get(`/orders/admin/${orderId}`);
@@ -108,7 +99,6 @@ export const ordersService = {
       }
     },
 
-    // Update order status
     updateOrderStatus: async (
       orderId: number,
       data: { status: string; notes?: string }
@@ -116,7 +106,6 @@ export const ordersService = {
       return api.put(`/orders/admin/${orderId}/status`, data);
     },
 
-    // Cancel order
     cancelOrder: async (
       orderId: number,
       reason: string
@@ -124,7 +113,6 @@ export const ordersService = {
       return api.post(`/orders/admin/${orderId}/cancel`, { reason });
     },
 
-    // Get orders by status
     getOrdersByStatus: async (
       status: string,
       filters: { page?: number; limit?: number } = {}
@@ -135,7 +123,6 @@ export const ordersService = {
           filters
         );
 
-        // Normalize the orders data
         if (response.orders && Array.isArray(response.orders)) {
           response.orders = response.orders.map(normalizeOrder);
         }
@@ -147,7 +134,6 @@ export const ordersService = {
       }
     },
 
-    // Get order statistics
     getOrderStatistics: async (params?: {
       start_date?: string;
       end_date?: string;
@@ -164,7 +150,6 @@ export const ordersService = {
       return api.get("/orders/admin/statistics", params);
     },
 
-    // Get order status history
     getOrderHistory: async (
       orderId: number
     ): Promise<{

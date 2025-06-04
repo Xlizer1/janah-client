@@ -35,7 +35,6 @@ import { toast } from "react-toastify";
 
 import { authService } from "@/services/auth.service";
 
-// Validation schema
 const resetPasswordSchema = yup.object({
   phone_number: yup
     .string()
@@ -88,7 +87,6 @@ function ResetPasswordContent() {
     },
   });
 
-  // Timer for code expiry
   useEffect(() => {
     if (timeLeft > 0) {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
@@ -98,14 +96,12 @@ function ResetPasswordContent() {
     }
   }, [timeLeft]);
 
-  // Auto-fill phone number from URL
   useEffect(() => {
     if (phoneFromUrl) {
       setValue("phone_number", phoneFromUrl);
     }
   }, [phoneFromUrl, setValue]);
 
-  // Reset password mutation
   const resetPasswordMutation = useMutation({
     mutationFn: authService.resetPassword,
     onSuccess: () => {
@@ -129,7 +125,6 @@ function ResetPasswordContent() {
     },
   });
 
-  // Resend code mutation
   const resendMutation = useMutation({
     mutationFn: (phone_number: string) =>
       authService.resendCode({ phone_number, type: "password_reset" }),

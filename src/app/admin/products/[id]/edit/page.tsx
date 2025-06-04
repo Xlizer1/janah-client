@@ -58,7 +58,6 @@ import { productsService } from "@/services/products.service";
 import { categoriesService } from "@/services/categories.service";
 import type { ProductEditFormData, ProductUpdateData } from "@/types";
 
-// Validation schema
 const productSchema = yup.object({
   product_id: yup.number().required(),
   name: yup
@@ -83,15 +82,13 @@ const productSchema = yup.object({
     .min(0, "Stock quantity must be positive")
     .integer("Stock quantity must be a whole number"),
   category_id: yup.number().optional(),
-  sku: yup.string().optional(),
   weight: yup.number().min(0, "Weight must be positive").optional(),
   dimensions: yup.string().optional(),
   is_featured: yup.boolean().optional(),
   is_active: yup.boolean().required(), // Required for edit
-  image_url: yup.string().url("Image URL must be valid").optional(),
+  image: yup.string().url("Image URL must be valid").optional(),
 });
 
-// Protect admin route
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
 
@@ -142,16 +139,14 @@ function EditProductContent() {
       price: 0,
       stock_quantity: 0,
       category_id: undefined,
-      sku: "",
-      weight: undefined,
-      dimensions: "",
+      weight: 1,
+      dimensions: "1x1x1",
       is_featured: false,
       is_active: true,
       image_url: "",
     },
   });
 
-  // Fetch product data
   const {
     data: productData,
     isLoading,
@@ -163,13 +158,11 @@ function EditProductContent() {
     enabled: !!productId,
   });
 
-  // Fetch categories
   const { data: categoriesData } = useQuery({
     queryKey: ["categories"],
     queryFn: () => categoriesService.getCategories(),
   });
 
-  // Update product mutation
   const updateProductMutation = useMutation({
     mutationFn: (data: ProductEditFormData) =>
       productsService.admin.updateProduct(productId, data),
@@ -183,7 +176,6 @@ function EditProductContent() {
     },
   });
 
-  // Update stock mutation
   const updateStockMutation = useMutation({
     mutationFn: (stock_quantity: number) =>
       productsService.admin.updateStock(productId, stock_quantity),
@@ -199,7 +191,6 @@ function EditProductContent() {
     },
   });
 
-  // Delete product mutation
   const deleteProductMutation = useMutation({
     mutationFn: () => productsService.admin.deleteProduct(productId),
     onSuccess: () => {
@@ -211,7 +202,6 @@ function EditProductContent() {
     },
   });
 
-  // Initialize form when product data loads
   useEffect(() => {
     if (productData?.product) {
       const product = productData.product;
@@ -222,9 +212,8 @@ function EditProductContent() {
         price: product.price,
         stock_quantity: product.stock_quantity,
         category_id: product.category_id || undefined,
-        sku: product.sku || "",
-        weight: product.weight || undefined,
-        dimensions: product.dimensions || "",
+        weight: product.weight || 1,
+        dimensions: product.dimensions || "1x1x1",
         is_featured: product.is_featured,
         is_active: product.is_active,
         image_url: product.image_url || "",
@@ -246,14 +235,7 @@ function EditProductContent() {
     updateStockMutation.mutate(newStockQuantity);
   };
 
-  const generateSKU = () => {
-    const timestamp = Date.now().toString().slice(-6);
-    const random = Math.random().toString(36).substring(2, 5).toUpperCase();
-    setValue("sku", `PRD-${timestamp}-${random}`, { shouldDirty: true });
-  };
-
   const handleImageUpload = () => {
-    // TODO: Implement image upload
     toast.info("Image upload functionality coming soon");
   };
 
@@ -454,32 +436,6 @@ function EditProductContent() {
                                   onClick={() => setStockUpdateDialog(true)}
                                   title="Quick stock update"
                                 >
-                                  <Refresh />
-                                </IconButton>
-                              </InputAdornment>
-                            ),
-                          }}
-                        />
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Controller
-                      name="sku"
-                      control={control}
-                      render={({ field }) => (
-                        <TextField
-                          {...field}
-                          label="SKU (Stock Keeping Unit)"
-                          fullWidth
-                          error={!!errors.sku}
-                          helperText={
-                            errors.sku?.message || "Unique product identifier"
-                          }
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <IconButton onClick={generateSKU}>
                                   <Refresh />
                                 </IconButton>
                               </InputAdornment>

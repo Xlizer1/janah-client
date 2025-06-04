@@ -65,7 +65,6 @@ import { useAuth } from "@/store/auth.store";
 import { format } from "date-fns";
 import Link from "next/link";
 
-// Protect admin route
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
 
@@ -103,21 +102,18 @@ function OrderDetailContent() {
   });
   const [cancelReason, setCancelReason] = useState("");
 
-  // Fetch order details
   const { data: orderData, isLoading } = useQuery({
     queryKey: ["adminOrder", orderId],
     queryFn: () => ordersService.admin.getOrder(orderId),
     enabled: !!orderId,
   });
 
-  // Fetch order history
   const { data: historyData } = useQuery({
     queryKey: ["orderHistory", orderId],
     queryFn: () => ordersService.admin.getOrderHistory(orderId),
     enabled: !!orderId,
   });
 
-  // Update order status mutation
   const updateStatusMutation = useMutation({
     mutationFn: (data: { status: string; notes?: string }) =>
       ordersService.admin.updateOrderStatus(orderId, data),
@@ -136,7 +132,6 @@ function OrderDetailContent() {
     },
   });
 
-  // Cancel order mutation
   const cancelOrderMutation = useMutation({
     mutationFn: (reason: string) =>
       ordersService.admin.cancelOrder(orderId, reason),

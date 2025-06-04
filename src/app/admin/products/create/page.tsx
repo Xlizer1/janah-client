@@ -1,4 +1,3 @@
-// src/app/admin/products/create/page.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -49,6 +48,8 @@ import { useAuth } from "@/store/auth.store";
 import { productsService } from "@/services/products.service";
 import { categoriesService } from "@/services/categories.service";
 import type { ProductCreateData, ProductCreateFormData } from "@/types";
+import { ImageUpload } from "@/components/ui/ImageUpload";
+import Image from "next/image";
 
 const productCreateSchema = yup.object({
   name: yup
@@ -77,14 +78,12 @@ const productCreateSchema = yup.object({
     .min(0, "Stock quantity must be positive")
     .integer("Stock quantity must be a whole number"),
   category_id: yup.number().optional(),
-  sku: yup.string().optional(),
   weight: yup.number().min(0, "Weight must be positive").optional(),
   dimensions: yup.string().optional(),
   is_featured: yup.boolean().optional(),
   image_url: yup.string().url("Image URL must be valid").optional(),
 });
 
-// Protect admin route
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
 
@@ -129,15 +128,13 @@ function CreateProductContent() {
       price: 0,
       stock_quantity: 0,
       category_id: 0,
-      sku: "",
-      weight: 0,
-      dimensions: "",
+      weight: 1,
+      dimensions: "1x1x1",
       is_featured: false,
       image_url: "",
     },
   });
 
-  // Watch name to auto-generate slug
   const watchName = watch("name");
   React.useEffect(() => {
     if (watchName) {
@@ -147,18 +144,16 @@ function CreateProductContent() {
         .replace(/\s+/g, "-")
         .replace(/-+/g, "-");
 
-      console.log(slug)
+      console.log(slug);
       setValue("slug", slug);
     }
   }, [watchName, setValue, getValues]);
 
-  // Fetch categories
   const { data: categoriesData } = useQuery({
     queryKey: ["categories"],
     queryFn: () => categoriesService.getCategories(),
   });
 
-  // Create product mutation
   const createProductMutation = useMutation({
     mutationFn: productsService.admin.createProduct,
     onSuccess: (data) => {
@@ -179,19 +174,12 @@ function CreateProductContent() {
     toast.info("Save as draft functionality coming soon");
   };
 
-  const generateSKU = () => {
-    const timestamp = Date.now().toString().slice(-6);
-    const random = Math.random().toString(36).substring(2, 5).toUpperCase();
-    setValue("sku", `PRD-${timestamp}-${random}`);
-  };
-
   const handleImageUpload = () => {
     toast.info("Image upload functionality coming soon");
   };
 
   return (
     <Box>
-      {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
           <Link href="/admin/products">
@@ -231,10 +219,8 @@ function CreateProductContent() {
       </Box>
 
       <Grid container spacing={3}>
-        {/* Main Content */}
         <Grid item xs={12} lg={8}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-            {/* Basic Information */}
             <Card>
               <CardHeader title="Basic Information" />
               <CardContent
@@ -307,7 +293,6 @@ function CreateProductContent() {
               </CardContent>
             </Card>
 
-            {/* Pricing & Inventory */}
             <Card>
               <CardHeader title="Pricing & Inventory" />
               <CardContent>
@@ -353,38 +338,10 @@ function CreateProductContent() {
                       )}
                     />
                   </Grid>
-                  <Grid item xs={12}>
-                    <Controller
-                      name="sku"
-                      control={control}
-                      render={({ field }) => (
-                        <TextField
-                          {...field}
-                          label="SKU (Stock Keeping Unit)"
-                          fullWidth
-                          error={!!errors.sku}
-                          helperText={
-                            errors.sku?.message || "Unique product identifier"
-                          }
-                          placeholder="SKU-12345"
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <IconButton onClick={generateSKU}>
-                                  <Add />
-                                </IconButton>
-                              </InputAdornment>
-                            ),
-                          }}
-                        />
-                      )}
-                    />
-                  </Grid>
                 </Grid>
               </CardContent>
             </Card>
 
-            {/* Product Details */}
             <Card>
               <CardHeader title="Product Details" />
               <CardContent>
@@ -432,11 +389,21 @@ function CreateProductContent() {
               </CardContent>
             </Card>
 
-            {/* Media */}
             <Card>
               <CardHeader title="Product Images" />
               <CardContent>
-                <Controller
+                {!watch("image_url") && (
+                  <ImageUpload
+                    value={watch("image_url")}
+                    onChange={(url) => setValue("image_url", url)}
+                    onError={(err) => console.error(err)}
+                    maxSize={2}
+                    label="Upload Product Image"
+                    helperText="Max 2MB, PNG or JPG"
+                    variant="dropzone"
+                  />
+                )}
+                {/* <Controller
                   name="image_url"
                   control={control}
                   render={({ field }) => (
@@ -463,11 +430,10 @@ function CreateProductContent() {
                   >
                     Upload Image
                   </Button>
-                </Box>
+                </Box> */}
 
-                {/* Image Preview */}
                 {watch("image_url") && (
-                  <Box sx={{ mt: 2 }}>
+                  <Box>
                     <Typography variant="subtitle2" sx={{ mb: 1 }}>
                       Image Preview:
                     </Typography>
@@ -483,6 +449,14 @@ function CreateProductContent() {
                         alignItems: "center",
                         justifyContent: "center",
                         bgcolor: "grey.50",
+                        position: "relative",
+                        ":hover": {
+                          opacity: 0.5,
+                          cursor: "pointer",
+                        },
+                      }}
+                      onClick={() => {
+                        setValue("image_url", "");
                       }}
                     >
                       <img
@@ -503,10 +477,8 @@ function CreateProductContent() {
           </Box>
         </Grid>
 
-        {/* Sidebar */}
         <Grid item xs={12} lg={4}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-            {/* Status */}
             <Card>
               <CardHeader title="Product Status" />
               <CardContent>
@@ -537,7 +509,6 @@ function CreateProductContent() {
               </CardContent>
             </Card>
 
-            {/* Category */}
             <Card>
               <CardHeader title="Organization" />
               <CardContent>
@@ -576,7 +547,6 @@ function CreateProductContent() {
               </CardContent>
             </Card>
 
-            {/* Quick Actions */}
             <Card>
               <CardHeader title="Quick Actions" />
               <CardContent>
@@ -601,7 +571,6 @@ function CreateProductContent() {
               </CardContent>
             </Card>
 
-            {/* Help */}
             <Card>
               <CardHeader title="Need Help?" />
               <CardContent>
@@ -631,7 +600,6 @@ function CreateProductContent() {
         </Grid>
       </Grid>
 
-      {/* Fixed Bottom Actions */}
       <Paper
         elevation={8}
         sx={{
@@ -669,7 +637,9 @@ function CreateProductContent() {
             <Button
               variant="contained"
               startIcon={<Save />}
-              onClick={handleSubmit(onSubmit)}
+              onClick={() => {
+                handleSubmit(onSubmit);
+              }}
               disabled={createProductMutation.isPending}
             >
               {createProductMutation.isPending
@@ -679,8 +649,6 @@ function CreateProductContent() {
           </Box>
         </Box>
       </Paper>
-
-      {/* Bottom spacing for fixed toolbar */}
       <Box sx={{ height: 80 }} />
     </Box>
   );

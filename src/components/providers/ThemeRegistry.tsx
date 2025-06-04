@@ -18,7 +18,6 @@ const cacheLtr = createCache({
   key: "muiltr",
 });
 
-// Create Material UI theme
 const createAppTheme = (direction: "ltr" | "rtl") =>
   createTheme({
     palette: {

@@ -81,7 +81,6 @@ function TabPanel({ children, value, index }: TabPanelProps) {
   );
 }
 
-// Protect admin route
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
 
@@ -114,7 +113,6 @@ function CategoryDetailsContent() {
   const [selectedTab, setSelectedTab] = useState(0);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  // Fetch category data
   const {
     data: categoryData,
     isLoading,
@@ -126,7 +124,6 @@ function CategoryDetailsContent() {
     enabled: !!categoryId,
   });
 
-  // Fetch category products
   const { data: productsData } = useQuery({
     queryKey: ["categoryProducts", categoryId],
     queryFn: () =>
@@ -134,7 +131,6 @@ function CategoryDetailsContent() {
     enabled: !!categoryId,
   });
 
-  // Delete category mutation
   const deleteCategoryMutation = useMutation({
     mutationFn: () => categoriesService.admin.deleteCategory(categoryId),
     onSuccess: () => {
@@ -191,7 +187,6 @@ function CategoryDetailsContent() {
   const category = categoryData.category;
   const products = productsData?.products || [];
 
-  // Mock analytics data (in real app, this would come from the API)
   const analyticsData = {
     totalProducts: category.product_count || 0,
     activeProducts: products.filter((p) => p.is_active).length,
@@ -209,7 +204,6 @@ function CategoryDetailsContent() {
     ).length,
   };
 
-  // Mock activity data
   const activityData = [
     {
       id: 1,

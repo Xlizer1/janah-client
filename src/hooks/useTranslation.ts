@@ -5,7 +5,6 @@ export const useTranslation = () => {
 
   const changeLanguage = (language: "en" | "ar") => {
     i18n.changeLanguage(language);
-    // Update document direction
     document.dir = language === "ar" ? "rtl" : "ltr";
     document.documentElement.lang = language;
   };

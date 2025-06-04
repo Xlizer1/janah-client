@@ -1,4 +1,3 @@
-// src/services/products.service.ts - Complete implementation with file uploads
 import { api, apiClient } from "@/lib/api-client";
 import type {
   Product,
@@ -12,7 +11,6 @@ import type {
 } from "@/types";
 
 export const productsService = {
-  // Get all products
   getProducts: async (
     filters: ProductFilters = {}
   ): Promise<ProductsResponse> => {
@@ -24,14 +22,12 @@ export const productsService = {
     return api.get("/products", cleanFilters);
   },
 
-  // Get featured products
   getFeaturedProducts: async (
     limit = 10
   ): Promise<{ products: Product[]; total: number }> => {
     return api.get("/products/featured", { limit });
   },
 
-  // Search products
   searchProducts: async (params: {
     q: string;
     sort_by?: string;
@@ -47,12 +43,10 @@ export const productsService = {
     return api.get("/products/search", cleanParams);
   },
 
-  // Get product categories
   getCategories: async (): Promise<{ categories: Category[] }> => {
     return api.get("/products/categories");
   },
 
-  // Get products by category (ID or slug)
   getProductsByCategory: async (
     identifier: string | number,
     filters: ProductFilters = {}
@@ -69,7 +63,6 @@ export const productsService = {
     return api.get(`/products/category/${identifier}`, cleanFilters);
   },
 
-  // Get products by category code
   getProductsByCategoryCode: async (
     categoryCode: string,
     filters: ProductFilters = {}
@@ -82,23 +75,19 @@ export const productsService = {
     return api.get(`/products/category-code/${categoryCode}`, cleanFilters);
   },
 
-  // Get single product by ID or slug
   getProduct: async (
     identifier: string | number
   ): Promise<{ product: Product }> => {
     return api.get(`/products/${identifier}`);
   },
 
-  // Get product by full code
   getProductByFullCode: async (
     fullCode: string
   ): Promise<{ product: Product }> => {
     return api.get(`/products/full-code/${fullCode}`);
   },
 
-  // Admin methods
   admin: {
-    // Get all products (admin view)
     getAllProducts: async (
       filters: ProductFilters = {}
     ): Promise<ProductsResponse> => {
@@ -110,18 +99,14 @@ export const productsService = {
       return api.get("/products/admin/all", cleanFilters);
     },
 
-    // Create product with form data (handles file uploads)
     createProduct: async (
       data: ProductCreateFormData
     ): Promise<{ product: Product }> => {
-      // Check if we have a file upload (base64 data URL) or just a URL
       const isImageFile = data.image_url?.startsWith("data:image/");
 
       if (isImageFile) {
-        // Convert base64 to file and create FormData
         const formData = new FormData();
 
-        // Convert base64 to blob/file
         const base64Data = data.image_url!.split(",")[1];
         const mimeType = data.image_url!.split(";")[0].split(":")[1];
         const byteCharacters = atob(base64Data);
@@ -139,14 +124,12 @@ export const productsService = {
           { type: mimeType }
         );
 
-        // Add form fields
         Object.entries(data).forEach(([key, value]) => {
           if (key !== "image_url" && value !== undefined && value !== null) {
             formData.append(key, String(value));
           }
         });
 
-        // Add the image file
         formData.append("image", file);
 
         const response = await apiClient.post("/products", formData, {
@@ -157,24 +140,19 @@ export const productsService = {
 
         return response.data.data;
       } else {
-        // Regular JSON submission
         return api.post("/products", data);
       }
     },
 
-    // Update product with form data (handles file uploads)
     updateProduct: async (
       id: number,
       data: ProductEditFormData
     ): Promise<{ product: Product }> => {
-      // Check if we have a file upload (base64 data URL) or just a URL
       const isImageFile = data.image_url?.startsWith("data:image/");
 
       if (isImageFile) {
-        // Convert base64 to file and create FormData
         const formData = new FormData();
 
-        // Convert base64 to blob/file
         const base64Data = data.image_url!.split(",")[1];
         const mimeType = data.image_url!.split(";")[0].split(":")[1];
         const byteCharacters = atob(base64Data);
@@ -192,14 +170,12 @@ export const productsService = {
           { type: mimeType }
         );
 
-        // Add form fields
         Object.entries(data).forEach(([key, value]) => {
           if (key !== "image_url" && value !== undefined && value !== null) {
             formData.append(key, String(value));
           }
         });
 
-        // Add the image file
         formData.append("image", file);
 
         const response = await apiClient.put(`/products/${id}`, formData, {
@@ -210,12 +186,10 @@ export const productsService = {
 
         return response.data.data;
       } else {
-        // Regular JSON submission
         return api.put(`/products/${id}`, data);
       }
     },
 
-    // Upload product image separately
     uploadProductImage: async (
       productId: number,
       file: File
@@ -236,14 +210,12 @@ export const productsService = {
       return response.data.data;
     },
 
-    // Remove product image
     removeProductImage: async (
       productId: number
     ): Promise<{ product: Product }> => {
       return api.delete(`/products/${productId}/image`);
     },
 
-    // Update stock
     updateStock: async (
       id: number,
       stock_quantity: number
@@ -255,7 +227,6 @@ export const productsService = {
       return api.patch(`/products/${id}/stock`, { stock_quantity });
     },
 
-    // Delete product
     deleteProduct: async (id: number): Promise<void> => {
       return api.delete(`/products/${id}`);
     },

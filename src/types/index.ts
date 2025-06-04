@@ -11,12 +11,10 @@ export interface PaginationMeta {
   totalPages: number;
 }
 
-// Generic paginated response structure
 export interface PaginatedResponse<T> {
   pagination: PaginationMeta;
 }
 
-// Specific response types that extend PaginatedResponse
 export interface ProductsResponse extends PaginatedResponse<Product> {
   products: Product[];
 }
@@ -25,12 +23,10 @@ export interface CategoriesResponse extends PaginatedResponse<Category> {
   categories: Category[];
 }
 
-// Users response for admin
 export interface UsersResponse extends PaginatedResponse<User> {
   users: User[];
 }
 
-// User types
 export interface User {
   id: number;
   phone_number: string;
@@ -51,7 +47,6 @@ export interface AuthResponse {
   token_type: string;
 }
 
-// Product types
 export interface Product {
   id: number;
   name: string;
@@ -62,7 +57,6 @@ export interface Product {
   category_id?: number;
   category_name?: string;
   category_slug?: string;
-  sku?: string;
   weight?: number;
   dimensions?: string;
   is_active: boolean;
@@ -79,7 +73,6 @@ export interface ProductCreateData {
   price: number;
   stock_quantity?: number;
   category_id?: number;
-  sku?: string;
   weight?: number;
   dimensions?: string;
   is_featured?: boolean;
@@ -90,7 +83,6 @@ export interface ProductUpdateData extends Partial<ProductCreateData> {
   is_active?: boolean;
 }
 
-// Category types
 export interface Category {
   id: number;
   name: string;
@@ -117,7 +109,6 @@ export interface CategoryOption {
   name: string;
 }
 
-// Search types
 export interface SearchSuggestion {
   suggestion: string;
   type: "product" | "category";
@@ -154,7 +145,6 @@ export interface FilterOptions {
   }>;
 }
 
-// Admin types
 export interface AdminStats {
   total_users: number;
   active_users: number;
@@ -172,7 +162,6 @@ export interface BulkUpdateResult {
   not_found: number[];
 }
 
-// Analytics types
 export interface CategoryAnalytics {
   id: number;
   category_name: string;
@@ -197,7 +186,6 @@ export interface InventoryData {
   avg_stock_per_product: number;
 }
 
-// Form types - Fixed email type
 export interface LoginFormData {
   phone_number: string;
   password: string;
@@ -236,7 +224,6 @@ export interface ProfileUpdateFormData {
   email?: string; // Changed to optional undefined, not nullable
 }
 
-// Query types
 export interface ProductFilters {
   page?: number;
   limit?: number;
@@ -256,14 +243,12 @@ export interface CategoryFilters {
   include_inactive?: boolean;
 }
 
-// Error types
 export interface ApiError {
   status: boolean;
   message: string;
   errors?: any;
 }
 
-// UI State types
 export interface LoadingStates {
   [key: string]: boolean;
 }
@@ -321,7 +306,6 @@ export interface ProductEditFormData {
   price: number;
   stock_quantity: number;
   category_id?: number;
-  sku?: string;
   weight?: number;
   dimensions?: string;
   is_featured?: boolean;
@@ -337,7 +321,6 @@ export interface ProductCreateFormData {
   price: number;
   stock_quantity: number;
   category_id?: number;
-  sku?: string;
   weight?: number;
   dimensions?: string;
   is_featured?: boolean;

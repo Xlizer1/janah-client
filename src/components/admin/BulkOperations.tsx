@@ -1,4 +1,3 @@
-// src/components/admin/BulkOperations.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -49,7 +48,6 @@ export function BulkOperations() {
   const [bulkData, setBulkData] = useState<string>("");
   const [confirmDialog, setConfirmDialog] = useState(false);
 
-  // Bulk update mutations
   const bulkUpdateCategoriesMutation = useMutation({
     mutationFn: adminService.bulk.updateCategories,
     onSuccess: (data) => {

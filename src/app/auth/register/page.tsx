@@ -34,7 +34,6 @@ import { toast } from "react-toastify";
 import { authService } from "@/services/auth.service";
 import type { RegisterFormData } from "@/types";
 
-// Validation schema
 const registerSchema = yup.object({
   phone_number: yup
     .string()

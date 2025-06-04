@@ -49,13 +49,11 @@ export default function CategoryDetailPage() {
     sort_order: "DESC",
   });
 
-  // Fetch category details
   const { data: categoryData, isLoading: categoryLoading } = useQuery({
     queryKey: ["category", slug],
     queryFn: () => categoriesService.getCategory(slug),
   });
 
-  // Fetch products in this category
   const { data: productsData, isLoading: productsLoading } = useQuery({
     queryKey: ["categoryProducts", slug, filters],
     queryFn: () =>

@@ -33,7 +33,6 @@ import { useAuth } from "@/store/auth.store";
 import { authService } from "@/services/auth.service";
 import type { LoginFormData } from "@/types";
 
-// Validation schema
 const loginSchema = yup.object({
   phone_number: yup
     .string()
@@ -62,10 +61,8 @@ export default function LoginPage() {
   const loginMutation = useMutation({
     mutationFn: authService.login,
     onSuccess: (data) => {
-      // Store user data in cookie for persistence
       Cookies.set("user", JSON.stringify(data.user), { expires: 7 });
 
-      // Update auth store
       login(data);
 
       toast.success("Login successful!");

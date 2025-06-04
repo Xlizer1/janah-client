@@ -6,7 +6,6 @@ import type { ApiResponse, ApiError } from "@/types";
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
-// Create axios instance
 export const apiClient = axios.create({
   baseURL: API_URL,
   timeout: 30000,
@@ -15,7 +14,6 @@ export const apiClient = axios.create({
   },
 });
 
-// Request interceptor to add auth token
 apiClient.interceptors.request.use(
   (config) => {
     const token = Cookies.get("auth_token");
@@ -29,15 +27,12 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Response interceptor for error handling
 apiClient.interceptors.response.use(
   (response: AxiosResponse<ApiResponse>) => {
     return response;
   },
   (error: AxiosError<ApiError>) => {
-    // Handle network errors
     if (!error.response) {
-      // Network error or server is down
       if (error.code === "ECONNABORTED") {
         toast.error("Request timeout. Please try again.");
       } else if (error.code === "ERR_NETWORK") {
@@ -53,17 +48,13 @@ apiClient.interceptors.response.use(
       error.response?.data?.message || error.message || "An error occurred";
 
     if (error.response?.status) {
-      // Handle specific error cases
       switch (error.response.status) {
         case 401:
-          // Unauthorized - clear token and redirect to login
           Cookies.remove("auth_token");
           Cookies.remove("user");
 
-          // Don't show toast for auth endpoints
           if (!error.config?.url?.includes("/auth/")) {
             toast.error("Session expired. Please log in again.");
-            // Only redirect in browser environment
             if (typeof window !== "undefined") {
               window.location.href = "/auth/login";
             }
@@ -75,7 +66,6 @@ apiClient.interceptors.response.use(
           break;
 
         case 404:
-          // Don't show toast for 404 errors on auth endpoints or specific resources
           if (
             !error.config?.url?.includes("/auth/") &&
             !error.config?.url?.includes("/products/") &&
@@ -86,7 +76,6 @@ apiClient.interceptors.response.use(
           break;
 
         case 422:
-          // Validation errors - don't show generic toast, let forms handle it
           break;
 
         case 429:
@@ -101,7 +90,6 @@ apiClient.interceptors.response.use(
           break;
 
         default:
-          // Don't show generic errors for auth endpoints as they're handled in forms
           if (!error.config?.url?.includes("/auth/")) {
             toast.error(message);
           }
@@ -112,7 +100,6 @@ apiClient.interceptors.response.use(
   }
 );
 
-// Generic API request function
 export async function apiRequest<T = any>(
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
   endpoint: string,
@@ -133,30 +120,23 @@ export async function apiRequest<T = any>(
   }
 }
 
-// Specific API methods
 export const api = {
-  // GET request
   get: <T = any>(endpoint: string, params?: any): Promise<T> =>
     apiRequest<T>("GET", endpoint, undefined, params),
 
-  // POST request
   post: <T = any>(endpoint: string, data?: any): Promise<T> =>
     apiRequest<T>("POST", endpoint, data),
 
-  // PUT request
   put: <T = any>(endpoint: string, data?: any): Promise<T> =>
     apiRequest<T>("PUT", endpoint, data),
 
-  // PATCH request
   patch: <T = any>(endpoint: string, data?: any): Promise<T> =>
     apiRequest<T>("PATCH", endpoint, data),
 
-  // DELETE request
   delete: <T = any>(endpoint: string): Promise<T> =>
     apiRequest<T>("DELETE", endpoint),
 };
 
-// Auth token management
 export const authUtils = {
   setToken: (token: string) => {
     if (typeof window !== "undefined") {

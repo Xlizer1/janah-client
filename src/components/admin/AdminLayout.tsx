@@ -1,4 +1,3 @@
-// src/components/admin/AdminLayout.tsx - Updated with Orders
 "use client";
 
 import React, { useState } from "react";

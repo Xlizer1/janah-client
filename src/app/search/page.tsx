@@ -46,7 +46,6 @@ function SearchPageContent() {
   const [selectedTab, setSelectedTab] = useState(0);
   const [sortBy, setSortBy] = useState("relevance");
 
-  // Fetch search results
   const {
     data: searchResults,
     isLoading,
@@ -142,7 +141,6 @@ function SearchPageContent() {
       </Box>
 
       {totalResults === 0 ? (
-        // No Results
         <Box sx={{ textAlign: "center", py: 8 }}>
           <Search sx={{ fontSize: 80, color: "grey.300", mb: 2 }} />
           <Typography variant="h5" sx={{ mb: 2 }}>

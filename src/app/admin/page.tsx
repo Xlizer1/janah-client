@@ -36,7 +36,6 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { adminService } from "@/services/admin.service";
 import { useAuth } from "@/store/auth.store";
 
-// Protect admin route
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
 
@@ -61,19 +60,16 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
 }
 
 function DashboardContent() {
-  // Fetch admin stats
   const { data: statsData, isLoading: statsLoading } = useQuery({
     queryKey: ["adminStats"],
     queryFn: () => adminService.getStats(),
   });
 
-  // Fetch top categories
   const { data: categoriesData } = useQuery({
     queryKey: ["topCategories"],
     queryFn: () => adminService.analytics.getTopCategories(5),
   });
 
-  // Fetch products needing attention
   const { data: attentionData } = useQuery({
     queryKey: ["productsNeedingAttention"],
     queryFn: () => adminService.analytics.getProductsNeedingAttention(),
@@ -81,7 +77,6 @@ function DashboardContent() {
 
   const stats = statsData?.stats;
 
-  // Mock data for additional metrics
   const metrics = [
     {
       title: "Total Revenue",

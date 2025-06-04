@@ -1,4 +1,3 @@
-// src/components/ui/ImageUpload.tsx
 "use client";
 
 import React, { useState, useRef } from "react";
@@ -49,12 +48,10 @@ export function ImageUpload({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const validateFile = (file: File): string | null => {
-    // Check file type
     if (!file.type.startsWith("image/")) {
       return "Please select an image file";
     }
 
-    // Check file size
     const sizeInMB = file.size / (1024 * 1024);
     if (sizeInMB > maxSize) {
       return `File size must be less than ${maxSize}MB`;
@@ -64,7 +61,6 @@ export function ImageUpload({
   };
 
   const uploadToCloudinary = async (file: File): Promise<string> => {
-    // Create FormData for Cloudinary upload
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", "janah_products"); // You'll need to create this preset
@@ -98,7 +94,6 @@ export function ImageUpload({
   const handleFileSelect = async (file: File) => {
     setError(null);
 
-    // Validate file
     const validationError = validateFile(file);
     if (validationError) {
       setError(validationError);
@@ -109,12 +104,7 @@ export function ImageUpload({
     setIsUploading(true);
 
     try {
-      // For demo purposes, convert to base64
-      // In production, you would upload to your server or cloud storage
       const base64Url = await convertToBase64(file);
-
-      // Alternatively, upload to Cloudinary (uncomment when configured):
-      // const imageUrl = await uploadToCloudinary(file);
 
       onChange(base64Url);
     } catch (error) {

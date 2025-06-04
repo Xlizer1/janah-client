@@ -84,7 +84,6 @@ function TabPanel({ children, value, index }: TabPanelProps) {
   );
 }
 
-// Protect admin route
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
 
@@ -119,7 +118,6 @@ function ProductDetailsContent() {
   const [stockUpdateDialog, setStockUpdateDialog] = useState(false);
   const [newStockQuantity, setNewStockQuantity] = useState(0);
 
-  // Fetch product data
   const {
     data: productData,
     isLoading,
@@ -131,7 +129,6 @@ function ProductDetailsContent() {
     enabled: !!productId,
   });
 
-  // Update stock mutation
   const updateStockMutation = useMutation({
     mutationFn: (stock_quantity: number) =>
       productsService.admin.updateStock(productId, stock_quantity),
@@ -147,7 +144,6 @@ function ProductDetailsContent() {
     },
   });
 
-  // Delete product mutation
   const deleteProductMutation = useMutation({
     mutationFn: () => productsService.admin.deleteProduct(productId),
     onSuccess: () => {
@@ -223,7 +219,6 @@ function ProductDetailsContent() {
 
   const product = productData.product;
 
-  // Mock analytics data
   const analyticsData = {
     views: 1250,
     sales: 47,
@@ -233,7 +228,6 @@ function ProductDetailsContent() {
     totalReviews: 23,
   };
 
-  // Mock activity data
   const activityData = [
     {
       id: 1,
@@ -259,10 +253,6 @@ function ProductDetailsContent() {
   ];
 
   console.log(product.stock_quantity)
-
-  // React.useEffect(() => {
-  //   setNewStockQuantity(product.stock_quantity);
-  // }, [product.stock_quantity]);
 
   return (
     <Box>
@@ -357,7 +347,7 @@ function ProductDetailsContent() {
                 )}
               </Box>
               <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-                ID: {product.id} • SKU: {product.sku || "N/A"} • Category:{" "}
+                ID: {product.id} • Category:{" "}
                 {product.category_name || "Uncategorized"}
               </Typography>
               <Box sx={{ display: "flex", gap: 1 }}>
@@ -561,15 +551,6 @@ function ProductDetailsContent() {
                             <ListItemText
                               primary="Dimensions"
                               secondary={product.dimensions || "Not specified"}
-                            />
-                          </ListItem>
-                          <ListItem>
-                            <ListItemIcon>
-                              <Inventory />
-                            </ListItemIcon>
-                            <ListItemText
-                              primary="SKU"
-                              secondary={product.sku || "Not assigned"}
                             />
                           </ListItem>
                         </List>

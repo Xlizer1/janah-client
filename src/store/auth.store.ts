@@ -10,7 +10,6 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
 
-  // Actions
   login: (authData: AuthResponse) => void;
   logout: () => void;
   updateUser: (user: User) => void;
@@ -29,7 +28,6 @@ export const useAuthStore = create<AuthState>()(
       login: (authData: AuthResponse) => {
         const { user, token } = authData;
 
-        // Set token in cookies
         authUtils.setToken(token);
 
         set({
@@ -41,7 +39,6 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
-        // Remove token from cookies
         authUtils.removeToken();
 
         set({
@@ -74,7 +71,6 @@ export const useAuthStore = create<AuthState>()(
               isLoading: false,
             });
           } catch (error) {
-            // Invalid user data, clear everything
             authUtils.removeToken();
             set({
               user: null,
@@ -97,10 +93,8 @@ export const useAuthStore = create<AuthState>()(
       name: "auth-storage",
       partialize: (state) => ({
         user: state.user,
-        // Don't persist token in localStorage, use cookies instead
       }),
       onRehydrateStorage: () => (state) => {
-        // Initialize auth state after rehydration
         if (state) {
           state.initialize();
         }
@@ -109,7 +103,6 @@ export const useAuthStore = create<AuthState>()(
   )
 );
 
-// Helper hooks
 export const useAuth = () => {
   const store = useAuthStore();
   return {

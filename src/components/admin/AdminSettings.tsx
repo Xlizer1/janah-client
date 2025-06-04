@@ -1,4 +1,3 @@
-// src/components/admin/AdminSettings.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -98,7 +97,6 @@ export function AdminSettings() {
   const [backupDialog, setBackupDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // General Settings Form
   const {
     control: generalControl,
     handleSubmit: handleGeneralSubmit,
@@ -116,7 +114,6 @@ export function AdminSettings() {
     },
   });
 
-  // Security Settings Form
   const {
     control: securityControl,
     handleSubmit: handleSecuritySubmit,
@@ -131,7 +128,6 @@ export function AdminSettings() {
     },
   });
 
-  // Notification Settings Form
   const {
     control: notificationControl,
     handleSubmit: handleNotificationSubmit,

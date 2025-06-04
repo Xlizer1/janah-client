@@ -1,4 +1,3 @@
-// src/services/server.service.ts - New service for server info
 import { api } from "@/lib/api-client";
 
 interface ServerVersion {
@@ -28,14 +27,11 @@ interface HealthStatus {
 }
 
 export const serverService = {
-  // Get server version and build info
   getVersion: async (): Promise<ServerVersion> => {
     return api.get("/");
   },
 
-  // Health check endpoint
   getHealth: async (): Promise<HealthStatus> => {
-    // Note: Health endpoint uses different base URL
     const healthUrl =
       process.env.NEXT_PUBLIC_API_URL?.replace("/api/v1", "") ||
       "http://localhost:8000";
@@ -45,7 +41,6 @@ export const serverService = {
       const data = await response.json();
       return data;
     } catch (error) {
-      // Return unhealthy status if health check fails
       return {
         status: "unhealthy",
         timestamp: new Date().toISOString(),
@@ -59,7 +54,6 @@ export const serverService = {
     }
   },
 
-  // Combined server info (useful for admin dashboard)
   getServerInfo: async (): Promise<{
     version: ServerVersion;
     health: HealthStatus;

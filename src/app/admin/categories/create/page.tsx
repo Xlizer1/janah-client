@@ -40,7 +40,6 @@ import { useAuth } from "@/store/auth.store";
 import { categoriesService } from "@/services/categories.service";
 import type { CategoryCreateData } from "@/types";
 
-// Validation schema
 const categorySchema = yup.object({
   name: yup
     .string()
@@ -66,7 +65,6 @@ const categorySchema = yup.object({
     .optional(),
 });
 
-// Protect admin route
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
 
@@ -112,7 +110,6 @@ function CreateCategoryContent() {
     },
   });
 
-  // Watch name to auto-generate slug
   const watchName = watch("name");
   React.useEffect(() => {
     if (watchName) {
@@ -125,7 +122,6 @@ function CreateCategoryContent() {
     }
   }, [watchName, setValue, getValues]);
 
-  // Create category mutation
   const createCategoryMutation = useMutation({
     mutationFn: categoriesService.admin.createCategory,
     onSuccess: (data) => {

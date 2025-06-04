@@ -7,7 +7,6 @@ import { useAuth } from "@/store/auth.store";
 import { Box, Typography } from "@mui/material";
 import React from "react";
 
-// Protect admin route
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
 

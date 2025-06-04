@@ -29,7 +29,6 @@ export function NewsletterSection() {
     setIsLoading(true);
 
     try {
-      // Simulate newsletter subscription
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       setIsSubscribed(true);

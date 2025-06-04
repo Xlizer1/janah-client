@@ -6,7 +6,6 @@ import type {
 } from "@/types";
 
 export const searchService = {
-  // Global search across products and categories
   globalSearch: async (params: {
     q: string;
     limit?: number;
@@ -14,7 +13,6 @@ export const searchService = {
     return api.get("/search/global", params);
   },
 
-  // Get search suggestions/autocomplete
   getSuggestions: async (params: {
     q: string;
     limit?: number;
@@ -22,7 +20,6 @@ export const searchService = {
     return api.get("/search/suggestions", params);
   },
 
-  // Get filter options for advanced search
   getFilterOptions: async (params?: {
     category_id?: number;
   }): Promise<FilterOptions> => {

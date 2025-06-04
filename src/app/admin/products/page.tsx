@@ -1,4 +1,3 @@
-// src/app/admin/products/page.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -71,7 +70,6 @@ import { productsService } from "@/services/products.service";
 import { categoriesService } from "@/services/categories.service";
 import type { ProductFilters, Product } from "@/types";
 
-// Protect admin route
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
 
@@ -117,7 +115,6 @@ function ProductsManagementContent() {
     action: "activate" | "deactivate" | "delete" | null;
   }>({ open: false, action: null });
 
-  // Fetch products
   const {
     data: productsData,
     isLoading,
@@ -127,13 +124,11 @@ function ProductsManagementContent() {
     queryFn: () => productsService.admin.getAllProducts(filters),
   });
 
-  // Fetch categories for filter
   const { data: categoriesData } = useQuery({
     queryKey: ["categories"],
     queryFn: () => categoriesService.getCategories(),
   });
 
-  // Delete product mutation
   const deleteProductMutation = useMutation({
     mutationFn: productsService.admin.deleteProduct,
     onSuccess: () => {
@@ -628,9 +623,6 @@ function ProductsManagementContent() {
                         }}
                       >
                         {product.name}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        ID: {product.id} • SKU: {product.sku || "N/A"}
                       </Typography>
                     </Box>
                   </Box>

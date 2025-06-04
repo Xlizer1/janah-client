@@ -29,7 +29,6 @@ export function CategoriesGrid() {
     );
   }
 
-  // Take first 6 categories for the home page
   const displayCategories = data.categories.slice(0, 6);
 
   return (

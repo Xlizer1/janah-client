@@ -46,7 +46,6 @@ import { useAuth } from "@/store/auth.store";
 import { categoriesService } from "@/services/categories.service";
 import type { CategoryCreateData, CategoryFormData } from "@/types";
 
-// Validation schema
 const categorySchema = yup.object({
   name: yup
     .string()
@@ -73,7 +72,6 @@ const categorySchema = yup.object({
   is_active: yup.boolean().required(),
 });
 
-// Protect admin route
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
 
@@ -124,7 +122,6 @@ function EditCategoryContent() {
     },
   });
 
-  // Fetch category data
   const {
     data: categoryData,
     isLoading,
@@ -136,7 +133,6 @@ function EditCategoryContent() {
     enabled: !!categoryId,
   });
 
-  // Update category mutation
   const updateCategoryMutation = useMutation({
     mutationFn: (data: CategoryCreateData & { is_active: boolean }) =>
       categoriesService.admin.updateCategory(categoryId, data),
@@ -150,7 +146,6 @@ function EditCategoryContent() {
     },
   });
 
-  // Delete category mutation
   const deleteCategoryMutation = useMutation({
     mutationFn: () => categoriesService.admin.deleteCategory(categoryId),
     onSuccess: () => {
@@ -162,7 +157,6 @@ function EditCategoryContent() {
     },
   });
 
-  // Initialize form when category data loads
   useEffect(() => {
     if (categoryData?.category) {
       const category = categoryData.category;

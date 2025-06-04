@@ -34,7 +34,6 @@ export default function CategoriesPage() {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Fetch all categories
   const { data, isLoading, error } = useQuery({
     queryKey: ["categoriesWithCounts"],
     queryFn: () => categoriesService.getCategoriesWithCounts(false),
@@ -42,7 +41,6 @@ export default function CategoriesPage() {
 
   const categories = data?.categories || [];
 
-  // Filter categories based on search
   const filteredCategories = categories.filter(
     (category) =>
       category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||

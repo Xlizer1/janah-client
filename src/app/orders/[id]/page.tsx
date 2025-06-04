@@ -1,4 +1,3 @@
-// src/app/orders/[id]/page.tsx
 "use client";
 
 import React from "react";
@@ -62,14 +61,12 @@ export default function OrderDetailPage() {
   const { isAuthenticated, user } = useAuth();
   const orderId = parseInt(params.id as string);
 
-  // Redirect if not authenticated
   React.useEffect(() => {
     if (!isAuthenticated) {
       router.push("/auth/login?redirect=/orders");
     }
   }, [isAuthenticated, router]);
 
-  // Fetch order details
   const { data, isLoading, error } = useQuery({
     queryKey: ["myOrder", orderId],
     queryFn: () => ordersService.customer.getMyOrder(orderId),
@@ -126,7 +123,6 @@ export default function OrderDetailPage() {
       .join(" ");
   };
 
-  // Order status steps
   const getOrderSteps = () => {
     const steps = [
       { key: "pending", label: "Order Placed", icon: <Receipt /> },

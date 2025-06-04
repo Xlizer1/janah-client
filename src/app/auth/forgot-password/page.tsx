@@ -24,7 +24,6 @@ import { toast } from "react-toastify";
 
 import { authService } from "@/services/auth.service";
 
-// Validation schema
 const forgotPasswordSchema = yup.object({
   phone_number: yup
     .string()

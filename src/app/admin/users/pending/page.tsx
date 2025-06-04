@@ -53,7 +53,6 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useAuth } from "@/store/auth.store";
 import { adminService } from "@/services/admin.service";
 
-// Protect admin route
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
 
@@ -89,7 +88,6 @@ function PendingUsersContent() {
   );
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
-  // Fetch pending users
   const {
     data: usersData,
     isLoading,
@@ -99,7 +97,6 @@ function PendingUsersContent() {
     queryFn: () => adminService.users.getPendingUsers({ page, limit: 12 }),
   });
 
-  // Mutations
   const activateUserMutation = useMutation({
     mutationFn: adminService.users.activateUser,
     onSuccess: () => {
@@ -133,7 +130,6 @@ function PendingUsersContent() {
   const users = usersData?.users || [];
   const pagination = usersData?.pagination;
 
-  // Filter users based on search
   const filteredUsers = users.filter(
     (user) =>
       user.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -512,7 +508,6 @@ function PendingUsersContent() {
           )}
         </>
       ) : (
-        // Empty State
         <Box sx={{ textAlign: "center", py: 8 }}>
           <Person sx={{ fontSize: 80, color: "grey.300", mb: 2 }} />
           <Typography variant="h6" sx={{ mb: 2 }}>

@@ -63,7 +63,6 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useAuth } from "@/store/auth.store";
 import { adminService } from "@/services/admin.service";
 
-// Types
 interface UserFilters {
   page: number;
   limit: number;
@@ -73,7 +72,6 @@ interface UserFilters {
   search?: string;
 }
 
-// Protect admin route
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
 
@@ -114,7 +112,6 @@ function UsersManagementContent() {
     action: "activate" | "deactivate" | null;
   }>({ open: false, action: null });
 
-  // Fetch users
   const {
     data: usersData,
     isLoading,
@@ -124,13 +121,11 @@ function UsersManagementContent() {
     queryFn: () => adminService.users.getAllUsers(filters),
   });
 
-  // Get stats
   const { data: statsData } = useQuery({
     queryKey: ["adminStats"],
     queryFn: () => adminService.getStats(),
   });
 
-  // Mutations
   const activateUserMutation = useMutation({
     mutationFn: adminService.users.activateUser,
     onSuccess: () => {

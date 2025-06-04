@@ -77,7 +77,6 @@ function TabPanel({ children, value, index }: TabPanelProps) {
   );
 }
 
-// Protect admin route
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
 
@@ -119,7 +118,6 @@ function UserDetailsContent() {
     type: "activate" | "deactivate" | null;
   }>({ open: false, type: null });
 
-  // Fetch user details
   const {
     data: userData,
     isLoading,
@@ -131,7 +129,6 @@ function UserDetailsContent() {
     enabled: !!userId,
   });
 
-  // Mutations
   const activateUserMutation = useMutation({
     mutationFn: adminService.users.activateUser,
     onSuccess: () => {
@@ -184,7 +181,6 @@ function UserDetailsContent() {
   };
 
   const handleSaveEdit = () => {
-    // TODO: Implement user profile update API call
     setIsEditing(false);
     toast.success("User details updated successfully");
   };
@@ -213,7 +209,6 @@ function UserDetailsContent() {
     return "Active";
   };
 
-  // Mock activity data (in real app, this would come from the API)
   const activityHistory = [
     {
       id: 1,

@@ -58,7 +58,6 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 export function AnalyticsDashboard() {
   const [dateRange, setDateRange] = useState("30d");
 
-  // Fetch analytics data
   const { data: categoryAnalytics, isLoading: categoryLoading } = useQuery({
     queryKey: ["categoryAnalytics", dateRange],
     queryFn: () => adminService.analytics.getCategoryAnalytics(),

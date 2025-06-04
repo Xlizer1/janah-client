@@ -1,4 +1,3 @@
-// src/app/checkout/page.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -52,7 +51,6 @@ import { useAuth } from "@/store/auth.store";
 import { ordersService } from "@/services/orders.service";
 import type { CheckoutFormData, OrderCreateData } from "@/types";
 
-// Validation schema
 const checkoutSchema = yup.object({
   delivery_address: yup
     .string()
@@ -84,7 +82,6 @@ export default function CheckoutPage() {
     },
   });
 
-  // Redirect if not authenticated
   useEffect(() => {
     if (!isAuthenticated) {
       router.push("/auth/login?redirect=/checkout");
@@ -92,7 +89,6 @@ export default function CheckoutPage() {
     }
   }, [isAuthenticated, router]);
 
-  // Redirect if cart is empty
   useEffect(() => {
     if (items.length === 0 && !orderSuccess) {
       router.push("/cart");
@@ -100,7 +96,6 @@ export default function CheckoutPage() {
     }
   }, [items.length, orderSuccess, router]);
 
-  // Create order mutation
   const createOrderMutation = useMutation({
     mutationFn: ordersService.customer.createOrder,
     onSuccess: (data) => {

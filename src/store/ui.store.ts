@@ -1,23 +1,17 @@
 import { create } from "zustand";
 
 interface UIState {
-  // Theme
   isDarkMode: boolean;
 
-  // Loading states
   loadingStates: Record<string, boolean>;
 
-  // Mobile navigation
   isMobileMenuOpen: boolean;
 
-  // Search
   isSearchOpen: boolean;
   searchQuery: string;
 
-  // Modals
   modals: Record<string, boolean>;
 
-  // Actions
   toggleDarkMode: () => void;
   setLoading: (key: string, loading: boolean) => void;
   clearAllLoading: () => void;
@@ -31,7 +25,6 @@ interface UIState {
 }
 
 export const useUIStore = create<UIState>((set, get) => ({
-  // Initial state
   isDarkMode: false,
   loadingStates: {},
   isMobileMenuOpen: false,
@@ -39,12 +32,10 @@ export const useUIStore = create<UIState>((set, get) => ({
   searchQuery: "",
   modals: {},
 
-  // Theme actions
   toggleDarkMode: () => {
     set((state) => ({ isDarkMode: !state.isDarkMode }));
   },
 
-  // Loading actions
   setLoading: (key: string, loading: boolean) => {
     set((state) => ({
       loadingStates: {
@@ -58,7 +49,6 @@ export const useUIStore = create<UIState>((set, get) => ({
     set({ loadingStates: {} });
   },
 
-  // Mobile menu actions
   toggleMobileMenu: () => {
     set((state) => ({ isMobileMenuOpen: !state.isMobileMenuOpen }));
   },
@@ -67,7 +57,6 @@ export const useUIStore = create<UIState>((set, get) => ({
     set({ isMobileMenuOpen: false });
   },
 
-  // Search actions
   toggleSearch: () => {
     set((state) => ({ isSearchOpen: !state.isSearchOpen }));
   },
@@ -76,7 +65,6 @@ export const useUIStore = create<UIState>((set, get) => ({
     set({ searchQuery: query });
   },
 
-  // Modal actions
   openModal: (modalKey: string) => {
     set((state) => ({
       modals: {
@@ -100,7 +88,6 @@ export const useUIStore = create<UIState>((set, get) => ({
   },
 }));
 
-// Helper hooks
 export const useUI = () => {
   const store = useUIStore();
   return {

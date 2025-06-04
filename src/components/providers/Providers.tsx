@@ -41,7 +41,6 @@ export function Providers({ children }: ProvidersProps) {
   }, []);
 
   if (!mounted) {
-    // Return a placeholder during SSR to avoid hydration mismatch
     return (
       <ThemeRegistry>
         <QueryClientProvider client={queryClient}>

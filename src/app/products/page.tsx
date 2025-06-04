@@ -48,13 +48,11 @@ function ProductsPageContent() {
     sort_order: (searchParams.get("sort_order") as any) || "DESC",
   });
 
-  // Fetch products
   const { data, isLoading, error } = useQuery({
     queryKey: ["products", filters],
     queryFn: () => productsService.getProducts(filters),
   });
 
-  // Fetch categories for filter
   const { data: categoriesData } = useQuery({
     queryKey: ["categories"],
     queryFn: () => productsService.getCategories(),

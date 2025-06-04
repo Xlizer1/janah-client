@@ -47,7 +47,6 @@ export default function CategoryViewPage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  // Handle both ID and slug - determine which one it is
   const identifier = params.id as string;
   const isNumeric = /^\d+$/.test(identifier);
 
@@ -60,7 +59,6 @@ export default function CategoryViewPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  // Fetch category data - use appropriate service based on identifier type
   const {
     data: categoryData,
     isLoading: categoryLoading,
@@ -69,17 +67,14 @@ export default function CategoryViewPage() {
     queryKey: ["category", identifier],
     queryFn: () => {
       if (isNumeric) {
-        // It's an ID, use admin service or regular service
         return categoriesService.getCategory(parseInt(identifier));
       } else {
-        // It's a slug, use regular service
         return categoriesService.getCategory(identifier);
       }
     },
     enabled: !!identifier,
   });
 
-  // Fetch all categories for filter
   const { data: categoriesData } = useQuery({
     queryKey: ["categories"],
     queryFn: () => categoriesService.getCategories(),
@@ -139,7 +134,6 @@ export default function CategoryViewPage() {
 
   const category = categoryData.category;
 
-  // Now fetch products using the category ID
   const { data: productsData } = useQuery({
     queryKey: ["categoryProducts", category.id, filters],
     queryFn: () => productsService.getProductsByCategory(category.id, filters),
@@ -160,7 +154,6 @@ export default function CategoryViewPage() {
 
   const currentSortValue = `${filters.sort_by}-${filters.sort_order}`;
 
-  // Rest of the component remains the same...
   return (
     <MainLayout>
       <Container maxWidth="xl" sx={{ py: 4 }}>

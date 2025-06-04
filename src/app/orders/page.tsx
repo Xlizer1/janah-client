@@ -57,14 +57,12 @@ export default function OrdersPage() {
     limit: 10,
   });
 
-  // Redirect if not authenticated
   React.useEffect(() => {
     if (!isAuthenticated) {
       router.push("/auth/login?redirect=/orders");
     }
   }, [isAuthenticated, router]);
 
-  // Fetch orders
   const { data, isLoading, error } = useQuery({
     queryKey: ["myOrders", filters],
     queryFn: () => ordersService.customer.getMyOrders(filters),

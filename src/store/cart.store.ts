@@ -7,11 +7,9 @@ interface CartState {
   items: CartItem[];
   isOpen: boolean;
 
-  // Computed values
   totalItems: number;
   totalPrice: number;
 
-  // Actions
   addItem: (product: Product, quantity?: number) => void;
   removeItem: (productId: number) => void;
   updateQuantity: (productId: number, quantity: number) => void;
@@ -42,10 +40,8 @@ export const useCartStore = create<CartState>()(
         );
 
         if (existingItem) {
-          // Update existing item
           const newQuantity = existingItem.quantity + quantity;
 
-          // Check stock
           if (newQuantity > product.stock_quantity) {
             toast.error(`Only ${product.stock_quantity} items available`);
             return;
@@ -65,7 +61,6 @@ export const useCartStore = create<CartState>()(
 
           toast.success(`Updated ${product.name} quantity`);
         } else {
-          // Add new item
           if (quantity > product.stock_quantity) {
             toast.error(`Only ${product.stock_quantity} items available`);
             return;
@@ -109,7 +104,6 @@ export const useCartStore = create<CartState>()(
 
         if (!item) return;
 
-        // Check stock
         if (quantity > item.product.stock_quantity) {
           toast.error(`Only ${item.product.stock_quantity} items available`);
           return;
@@ -154,7 +148,6 @@ export const useCartStore = create<CartState>()(
   )
 );
 
-// Helper hook
 export const useCart = () => {
   const store = useCartStore();
   return {

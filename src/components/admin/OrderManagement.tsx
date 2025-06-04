@@ -1,4 +1,3 @@
-// src/components/admin/OrderManagement.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -106,7 +105,6 @@ export function OrderManagement() {
   const [cancelReason, setCancelReason] = useState("");
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  // Build filters
   const filters: OrderFilters = {
     page: page + 1,
     limit: rowsPerPage,
@@ -114,15 +112,12 @@ export function OrderManagement() {
     ...(searchQuery && { search: searchQuery }),
   };
 
-  // Get orders based on tab
   const { data: ordersData, isLoading } = useQuery({
     queryKey: ["adminOrders", selectedTab, filters],
     queryFn: () => {
       if (selectedTab === 0) {
-        // All orders
         return ordersService.admin.getAllOrders(filters);
       } else {
-        // Specific status
         const statusMap = {
           1: "pending",
           2: "confirmed",
@@ -140,13 +135,11 @@ export function OrderManagement() {
     },
   });
 
-  // Get order statistics
   const { data: statsData } = useQuery({
     queryKey: ["orderStatistics"],
     queryFn: () => ordersService.admin.getOrderStatistics(),
   });
 
-  // Update order status mutation
   const updateStatusMutation = useMutation({
     mutationFn: ({
       orderId,
@@ -169,7 +162,6 @@ export function OrderManagement() {
     },
   });
 
-  // Cancel order mutation
   const cancelOrderMutation = useMutation({
     mutationFn: ({ orderId, reason }: { orderId: number; reason: string }) =>
       ordersService.admin.cancelOrder(orderId, reason),

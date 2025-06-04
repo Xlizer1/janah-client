@@ -1,4 +1,3 @@
-// src/components/admin/UserManagement.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -78,15 +77,12 @@ export function UserManagement() {
     userId: number | null;
   }>({ open: false, type: null, userId: null });
 
-  // Fetch users based on selected tab
   const { data: usersData, isLoading } = useQuery({
     queryKey: ["adminUsers", selectedTab, statusFilter],
     queryFn: () => {
       if (selectedTab === 1) {
-        // Pending users
         return adminService.users.getPendingUsers({ limit: 10 });
       } else {
-        // All users
         return adminService.users.getAllUsers({
           limit: 10,
           is_active:
@@ -100,13 +96,11 @@ export function UserManagement() {
     },
   });
 
-  // Get admin stats
   const { data: statsData } = useQuery({
     queryKey: ["adminStats"],
     queryFn: () => adminService.getStats(),
   });
 
-  // Mutations
   const activateUserMutation = useMutation({
     mutationFn: adminService.users.activateUser,
     onSuccess: () => {

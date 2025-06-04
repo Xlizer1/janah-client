@@ -28,7 +28,6 @@ export function SearchBar() {
   const debouncedQuery = useDebounce(query, 300);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  // Get search suggestions
   const { data: suggestions, isLoading } = useQuery({
     queryKey: ["searchSuggestions", debouncedQuery],
     queryFn: () =>
@@ -36,7 +35,6 @@ export function SearchBar() {
     enabled: debouncedQuery.length >= 2,
   });
 
-  // Popular searches (mock data - you can replace with actual data)
   const popularSearches = [
     "iPhone 15",
     "MacBook Air",
@@ -63,7 +61,6 @@ export function SearchBar() {
     handleSearch(suggestion);
   };
 
-  // Close suggestions when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (

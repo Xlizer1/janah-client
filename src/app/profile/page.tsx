@@ -67,7 +67,6 @@ function TabPanel({ children, value, index }: TabPanelProps) {
   );
 }
 
-// Validation schemas
 const profileUpdateSchema = yup.object({
   first_name: yup.string().min(2, "First name must be at least 2 characters"),
   last_name: yup.string().min(2, "Last name must be at least 2 characters"),
@@ -93,7 +92,6 @@ export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
-  // Validation schemas (updated email handling)
   const profileUpdateSchema = yup.object({
     first_name: yup
       .string()
@@ -111,7 +109,6 @@ export default function ProfilePage() {
       .transform((value) => (value === null ? undefined : value)),
   });
 
-  // Alternative approach - simpler schema that matches backend exactly:
   const profileUpdateSchemaSimple = yup.object({
     first_name: yup
       .string()
@@ -124,7 +121,6 @@ export default function ProfilePage() {
     email: yup.string().email("Please enter a valid email address").optional(),
   });
 
-  // Profile update form
   const {
     register: registerProfile,
     handleSubmit: handleSubmitProfile,
@@ -139,7 +135,6 @@ export default function ProfilePage() {
     },
   });
 
-  // Change password form
   const {
     register: registerPassword,
     handleSubmit: handleSubmitPassword,
@@ -149,14 +144,12 @@ export default function ProfilePage() {
     resolver: yupResolver(changePasswordSchema),
   });
 
-  // Fetch user profile
   const { data: profileData, refetch } = useQuery({
     queryKey: ["userProfile"],
     queryFn: () => authService.getProfile(),
     enabled: isAuthenticated,
   });
 
-  // Update profile mutation
   const updateProfileMutation = useMutation({
     mutationFn: authService.updateProfile,
     onSuccess: (data) => {
@@ -170,7 +163,6 @@ export default function ProfilePage() {
     },
   });
 
-  // Change password mutation
   const changePasswordMutation = useMutation({
     mutationFn: authService.changePassword,
     onSuccess: () => {
@@ -183,17 +175,14 @@ export default function ProfilePage() {
     },
   });
 
-  // Handle profile update
   const onSubmitProfile = (data: ProfileUpdateFormData) => {
     updateProfileMutation.mutate(data);
   };
 
-  // Handle password change
   const onSubmitPassword = (data: ChangePasswordFormData) => {
     changePasswordMutation.mutate(data);
   };
 
-  // Handle logout
   const handleLogout = async () => {
     try {
       await logout();
@@ -204,7 +193,6 @@ export default function ProfilePage() {
     }
   };
 
-  // Redirect if not authenticated
   if (!isAuthenticated) {
     router.push("/auth/login");
     return null;

@@ -1,4 +1,3 @@
-// src/app/orders/track/[orderNumber]/page.tsx
 "use client";
 
 import React from "react";
@@ -51,14 +50,12 @@ export default function OrderTrackingPage() {
   const { isAuthenticated, user } = useAuth();
   const orderNumber = params.orderNumber as string;
 
-  // Redirect if not authenticated
   React.useEffect(() => {
     if (!isAuthenticated) {
       router.push("/auth/login?redirect=/orders");
     }
   }, [isAuthenticated, router]);
 
-  // Fetch order tracking info
   const { data, isLoading, error } = useQuery({
     queryKey: ["trackOrder", orderNumber],
     queryFn: () => ordersService.customer.trackOrder(orderNumber),

@@ -74,7 +74,6 @@ export default function ProductDetailPage() {
 
   const slug = params.slug as string;
 
-  // Fetch product details
   const {
     data: productData,
     isLoading,
@@ -84,7 +83,6 @@ export default function ProductDetailPage() {
     queryFn: () => productsService.getProduct(slug),
   });
 
-  // Fetch related products (same category)
   const { data: relatedProductsData } = useQuery({
     queryKey: ["relatedProducts", productData?.product.category_id],
     queryFn: () =>
@@ -122,7 +120,6 @@ export default function ProductDetailPage() {
           url: window.location.href,
         });
       } catch (error) {
-        // Fallback to clipboard
         navigator.clipboard.writeText(window.location.href);
         toast.success("Link copied to clipboard");
       }
@@ -168,7 +165,6 @@ export default function ProductDetailPage() {
   const isOutOfStock = product.stock_quantity === 0;
   const isLowStock = product.stock_quantity > 0 && product.stock_quantity <= 5;
 
-  // Mock images for demo
   const productImages = product.image_url
     ? [product.image_url, product.image_url, product.image_url]
     : [];
@@ -334,9 +330,6 @@ export default function ProductDetailPage() {
                     variant="filled"
                   />
                 )}
-                {product.sku && (
-                  <Chip label={`SKU: ${product.sku}`} variant="outlined" />
-                )}
               </Box>
 
               {/* Quantity and Add to Cart */}
@@ -469,14 +462,6 @@ export default function ProductDetailPage() {
                     Dimensions
                   </Typography>
                   <Typography variant="body1">{product.dimensions}</Typography>
-                </Grid>
-              )}
-              {product.sku && (
-                <Grid item xs={6} sm={4}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    SKU
-                  </Typography>
-                  <Typography variant="body1">{product.sku}</Typography>
                 </Grid>
               )}
             </Grid>

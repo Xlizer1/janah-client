@@ -66,7 +66,6 @@ import { useAuth } from "@/store/auth.store";
 import { categoriesService } from "@/services/categories.service";
 import type { CategoryFilters, Category } from "@/types";
 
-// Protect admin route
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
 
@@ -110,7 +109,6 @@ function CategoriesManagementContent() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Fetch categories
   const {
     data: categoriesData,
     isLoading,
@@ -120,7 +118,6 @@ function CategoriesManagementContent() {
     queryFn: () => categoriesService.getCategories(filters),
   });
 
-  // Delete category mutation
   const deleteCategoryMutation = useMutation({
     mutationFn: categoriesService.admin.deleteCategory,
     onSuccess: () => {
@@ -133,7 +130,6 @@ function CategoriesManagementContent() {
     },
   });
 
-  // Search categories
   const { data: searchResults } = useQuery({
     queryKey: ["searchCategories", searchQuery],
     queryFn: () => categoriesService.searchCategories(searchQuery),
