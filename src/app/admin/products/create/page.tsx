@@ -395,7 +395,9 @@ function CreateProductContent() {
                 {!watch("image_url") && (
                   <ImageUpload
                     value={watch("image_url")}
-                    onChange={(url) => setValue("image_url", url)}
+                    onChange={(url) =>
+                      setValue("image_url", url, { shouldValidate: true })
+                    }
                     onError={(err) => console.error(err)}
                     maxSize={2}
                     label="Upload Product Image"
@@ -637,9 +639,7 @@ function CreateProductContent() {
             <Button
               variant="contained"
               startIcon={<Save />}
-              onClick={() => {
-                handleSubmit(onSubmit);
-              }}
+              onClick={handleSubmit(onSubmit)}
               disabled={createProductMutation.isPending}
             >
               {createProductMutation.isPending
