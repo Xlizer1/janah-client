@@ -412,7 +412,7 @@ export default function OrderTrackingPage() {
               >
                 <Typography variant="body2">Items:</Typography>
                 <Typography variant="body2">
-                  {order.items.length} item(s)
+                  {order.items?.length} item(s)
                 </Typography>
               </Box>
 

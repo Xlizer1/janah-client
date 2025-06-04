@@ -283,10 +283,10 @@ export default function OrderDetailPage() {
             {/* Order Items */}
             <Paper sx={{ p: 3, mb: 4 }}>
               <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-                Order Items ({order.items.length})
+                Order Items ({order.items?.length || 0})
               </Typography>
               <List>
-                {order.items.map((item, index) => (
+                {(order.items || []).map((item, index) => (
                   <React.Fragment key={item.id}>
                     <ListItem sx={{ px: 0, py: 2 }}>
                       <ListItemAvatar sx={{ mr: 2 }}>
@@ -354,7 +354,7 @@ export default function OrderDetailPage() {
                         </Button>
                       )}
                     </ListItem>
-                    {index < order.items.length - 1 && <Divider />}
+                    {index < (order.items?.length || 0) - 1 && <Divider />}
                   </React.Fragment>
                 ))}
               </List>
@@ -425,7 +425,7 @@ export default function OrderDetailPage() {
               <Box
                 sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
               >
-                <Typography>Items ({order.items.length}):</Typography>
+                <Typography>Items ({order.items?.length}):</Typography>
                 <Typography>{formatPrice(order.total_amount)}</Typography>
               </Box>
 
