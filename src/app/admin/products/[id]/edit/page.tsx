@@ -61,6 +61,7 @@ import { productsService } from "@/services/products.service";
 import { categoriesService } from "@/services/categories.service";
 import type { ProductEditFormData } from "@/types";
 import { ImageUpload } from "@/components/ui/ImageUpload";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const productSchema = yup.object({
   product_id: yup.number().required(),
@@ -129,6 +130,7 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
 function EditProductContent() {
   const params = useParams();
   const router = useRouter();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const productId = parseInt(params.id as string);
 

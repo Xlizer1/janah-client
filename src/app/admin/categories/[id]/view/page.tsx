@@ -41,10 +41,12 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { productsService } from "@/services/products.service";
 import { categoriesService } from "@/services/categories.service";
 import type { ProductFilters as ProductFiltersType } from "@/types";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function CategoryViewPage() {
   const params = useParams();
   const theme = useTheme();
+  const { t } = useTranslation();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const identifier = params.id as string;

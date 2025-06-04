@@ -62,6 +62,7 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useAuth } from "@/store/auth.store";
 import { adminService } from "@/services/admin.service";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface UserFilters {
   page: number;
@@ -97,6 +98,7 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
 
 function UsersManagementContent() {
   const router = useRouter();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [filters, setFilters] = useState<UserFilters>({
     page: 1,

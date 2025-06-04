@@ -35,6 +35,7 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { adminService } from "@/services/admin.service";
 import { useAuth } from "@/store/auth.store";
+import { useTranslation } from "@/hooks/useTranslation";
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
@@ -60,6 +61,7 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
 }
 
 function DashboardContent() {
+  const { t } = useTranslation();
   const { data: statsData, isLoading: statsLoading } = useQuery({
     queryKey: ["adminStats"],
     queryFn: () => adminService.getStats(),

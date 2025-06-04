@@ -53,6 +53,7 @@ import { categoriesService } from "@/services/categories.service";
 import type { ProductCreateFormData } from "@/types";
 import { ImageUpload } from "@/components/ui/ImageUpload";
 import Image from "next/image";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const productCreateSchema = yup.object({
   name: yup
@@ -118,6 +119,7 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
 
 function CreateProductContent() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [isDraft, setIsDraft] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 

@@ -50,6 +50,7 @@ import { useCart } from "@/store/cart.store";
 import { useAuth } from "@/store/auth.store";
 import { ordersService } from "@/services/orders.service";
 import type { CheckoutFormData, OrderCreateData } from "@/types";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const checkoutSchema = yup.object({
   delivery_address: yup
@@ -64,6 +65,7 @@ const steps = ["Review Items", "Delivery Info", "Payment", "Confirmation"];
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { items, totalItems, totalPrice, clearCart } = useCart();
   const { user, isAuthenticated } = useAuth();
   const [activeStep, setActiveStep] = useState(0);

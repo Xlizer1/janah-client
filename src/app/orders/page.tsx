@@ -1,4 +1,3 @@
-// src/app/orders/page.tsx - Fixed version
 "use client";
 
 import React, { useState } from "react";
@@ -47,9 +46,11 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useAuth } from "@/store/auth.store";
 import { ordersService } from "@/services/orders.service";
 import type { OrderFilters } from "@/types";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function OrdersPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<OrderFilters>({
@@ -418,9 +419,11 @@ export default function OrdersPage() {
                                     }
                                   />
                                 </ListItem>
-                                {index < Math.min((order.items?.length || 0) - 1, 2) && (
-                                  <Divider />
-                                )}
+                                {index <
+                                  Math.min(
+                                    (order.items?.length || 0) - 1,
+                                    2
+                                  ) && <Divider />}
                               </React.Fragment>
                             ))
                           ) : (
@@ -436,7 +439,7 @@ export default function OrdersPage() {
                               </ListItemText>
                             </ListItem>
                           )}
-                          
+
                           {/* Show "more items" message only if items exist and length > 3 */}
                           {order.items && order.items.length > 3 && (
                             <ListItem sx={{ px: 0, py: 1 }}>

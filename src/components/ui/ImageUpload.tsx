@@ -16,6 +16,7 @@ import {
   Image as ImageIcon,
 } from "@mui/icons-material";
 import Image from "next/image";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface ImageUploadProps {
   value?: string; // Current image URL
@@ -42,6 +43,7 @@ export function ImageUpload({
   showPreview = true,
   variant = "dropzone",
 }: ImageUploadProps) {
+  const { t } = useTranslation();
   const [isUploading, setIsUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);

@@ -23,6 +23,7 @@ import {
 } from "@mui/icons-material";
 import { useCart } from "@/store/cart.store";
 import type { Product } from "@/types";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface ProductCardProps {
   product: Product;
@@ -34,6 +35,7 @@ export function ProductCard({
   showQuickView = true,
 }: ProductCardProps) {
   const { addItem } = useCart();
+  const { t } = useTranslation();
   const [isFavorite, setIsFavorite] = React.useState(false);
 
   const handleAddToCart = (e: React.MouseEvent) => {

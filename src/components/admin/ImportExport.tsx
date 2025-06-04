@@ -42,6 +42,7 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { adminService } from "@/services/admin.service";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface ImportResult {
   total: number;
@@ -51,6 +52,7 @@ interface ImportResult {
 }
 
 export function ImportExport() {
+  const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [importType, setImportType] = useState<"products" | "categories">(

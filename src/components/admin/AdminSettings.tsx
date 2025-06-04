@@ -50,6 +50,7 @@ import {
 } from "@mui/icons-material";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "react-toastify";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -93,6 +94,7 @@ interface NotificationSettings {
 }
 
 export function AdminSettings() {
+  const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState(0);
   const [backupDialog, setBackupDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

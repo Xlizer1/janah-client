@@ -43,9 +43,11 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useAuth } from "@/store/auth.store";
 import { ordersService } from "@/services/orders.service";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function OrderTrackingPage() {
   const params = useParams();
+  const { t } = useTranslation();
   const router = useRouter();
   const { isAuthenticated, user } = useAuth();
   const orderNumber = params.orderNumber as string;

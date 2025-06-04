@@ -42,6 +42,7 @@ import { ImageUpload } from "@/components/ui/ImageUpload";
 import { useAuth } from "@/store/auth.store";
 import { categoriesService } from "@/services/categories.service";
 import type { CategoryCreateFormData } from "@/types";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const categorySchema = yup.object({
   name: yup
@@ -102,6 +103,7 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
 
 function CreateCategoryContent() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [isDraft, setIsDraft] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 

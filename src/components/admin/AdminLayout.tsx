@@ -40,6 +40,7 @@ import {
 } from "@mui/icons-material";
 import { useAuth } from "@/store/auth.store";
 import { toast } from "react-toastify";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const drawerWidth = 260;
 
@@ -49,6 +50,7 @@ interface AdminLayoutProps {
 
 export function AdminLayout({ children }: AdminLayoutProps) {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const pathname = usePathname();
   const router = useRouter();

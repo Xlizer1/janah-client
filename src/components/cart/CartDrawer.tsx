@@ -25,8 +25,10 @@ import {
   ArrowForward,
 } from "@mui/icons-material";
 import { useCart } from "@/store/cart.store";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function CartDrawer() {
+  const { t } = useTranslation();
   const {
     isOpen,
     closeCart,

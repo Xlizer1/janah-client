@@ -23,8 +23,10 @@ import {
   LocationOn,
   ArrowUpward,
 } from "@mui/icons-material";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function Footer() {
+  const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 

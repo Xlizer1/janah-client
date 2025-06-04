@@ -1,4 +1,3 @@
-// src/components/admin/AnalyticsDashboard.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -52,10 +51,12 @@ import {
   Cell,
 } from "recharts";
 import { adminService } from "@/services/admin.service";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
 export function AnalyticsDashboard() {
+  const { t } = useTranslation();
   const [dateRange, setDateRange] = useState("30d");
 
   const { data: categoryAnalytics, isLoading: categoryLoading } = useQuery({

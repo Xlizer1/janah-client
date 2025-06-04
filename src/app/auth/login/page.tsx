@@ -32,6 +32,7 @@ import Cookies from "js-cookie";
 import { useAuth } from "@/store/auth.store";
 import { authService } from "@/services/auth.service";
 import type { LoginFormData } from "@/types";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const loginSchema = yup.object({
   phone_number: yup
@@ -47,6 +48,7 @@ const loginSchema = yup.object({
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -65,8 +67,13 @@ export default function LoginPage() {
 
       login(data);
 
-      toast.success("Login successful!");
-      router.push("/");
+      if (data.user.role === "admin") {
+        router.push("/admin");
+        toast.success(`Welcome back, ${data.user.first_name}!`);
+      } else {
+        router.push("/");
+        toast.success("Login successful!");
+      }
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || "Login failed";

@@ -36,9 +36,11 @@ import {
 import { useAuth } from "@/store/auth.store";
 import { useUI } from "@/store/ui.store";
 import { toast } from "react-toastify";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function MobileMenu() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { user, isAuthenticated, logout, isAdmin } = useAuth();
   const { isMobileMenuOpen, closeMobileMenu } = useUI();
   const [categoriesOpen, setCategoriesOpen] = React.useState(false);

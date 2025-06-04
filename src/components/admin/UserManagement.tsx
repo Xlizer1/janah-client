@@ -50,6 +50,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { adminService } from "@/services/admin.service";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -67,6 +68,7 @@ function TabPanel({ children, value, index }: TabPanelProps) {
 
 export function UserManagement() {
   const router = useRouter();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [selectedTab, setSelectedTab] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");

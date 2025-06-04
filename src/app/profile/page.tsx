@@ -52,6 +52,7 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useAuth } from "@/store/auth.store";
 import { authService } from "@/services/auth.service";
 import type { ProfileUpdateFormData, ChangePasswordFormData } from "@/types";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -87,6 +88,7 @@ const changePasswordSchema = yup.object({
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { user, updateUser, logout, isAuthenticated } = useAuth();
   const [selectedTab, setSelectedTab] = useState(0);
   const [isEditing, setIsEditing] = useState(false);

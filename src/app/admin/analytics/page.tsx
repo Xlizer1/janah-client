@@ -3,12 +3,14 @@
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/store/auth.store";
 import { Box, Typography } from "@mui/material";
 import React from "react";
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
+  const { t } = useTranslation();
 
   if (isLoading) {
     return <LoadingSpinner fullHeight />;

@@ -50,6 +50,7 @@ import { ImageUpload } from "@/components/ui/ImageUpload";
 import { useAuth } from "@/store/auth.store";
 import { categoriesService } from "@/services/categories.service";
 import type { CategoryCreateData, CategoryFormData } from "@/types";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const categorySchema = yup.object({
   name: yup
@@ -112,6 +113,7 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
 function EditCategoryContent() {
   const params = useParams();
   const router = useRouter();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const categoryId = parseInt(params.id as string);
 

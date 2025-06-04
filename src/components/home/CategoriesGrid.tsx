@@ -8,8 +8,10 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowForward, Category } from "@mui/icons-material";
 import { categoriesService } from "@/services/categories.service";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function CategoriesGrid() {
+  const { t } = useTranslation();
   const { data, isLoading, error } = useQuery({
     queryKey: ["categoriesWithCounts"],
     queryFn: () => categoriesService.getCategoriesWithCounts(false),

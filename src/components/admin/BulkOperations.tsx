@@ -41,9 +41,11 @@ import {
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { adminService } from "@/services/admin.service";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function BulkOperations() {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const [selectedOperation, setSelectedOperation] = useState<string>("");
   const [bulkData, setBulkData] = useState<string>("");
   const [confirmDialog, setConfirmDialog] = useState(false);

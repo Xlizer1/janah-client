@@ -8,8 +8,10 @@ import { ArrowForward, Star } from "@mui/icons-material";
 import { productsService } from "@/services/products.service";
 import { ProductCard } from "@/components/products/ProductCard";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function FeaturedProducts() {
+  const { t } = useTranslation();
   const { data, isLoading, error } = useQuery({
     queryKey: ["featuredProducts"],
     queryFn: () => productsService.getFeaturedProducts(8),

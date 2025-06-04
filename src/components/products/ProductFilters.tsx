@@ -29,6 +29,7 @@ import {
   Category as CategoryIcon,
 } from "@mui/icons-material";
 import type { ProductFilters as ProductFiltersType, Category } from "@/types";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface ProductFiltersProps {
   filters: ProductFiltersType;
@@ -41,6 +42,7 @@ export function ProductFilters({
   onFiltersChange,
   categories,
 }: ProductFiltersProps) {
+  const { t } = useTranslation();
   const [priceRange, setPriceRange] = useState<number[]>([
     filters.min_price || 0,
     filters.max_price || 1000,

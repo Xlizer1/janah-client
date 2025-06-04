@@ -69,6 +69,7 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useAuth } from "@/store/auth.store";
 import { productsService } from "@/services/products.service";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -110,6 +111,7 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
 function ProductDetailsContent() {
   const params = useParams();
   const router = useRouter();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const productId = parseInt(params.id as string);
 
@@ -252,7 +254,7 @@ function ProductDetailsContent() {
     },
   ];
 
-  console.log(product.stock_quantity)
+  console.log(product.stock_quantity);
 
   return (
     <Box>

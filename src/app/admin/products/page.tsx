@@ -69,6 +69,7 @@ import { useAuth } from "@/store/auth.store";
 import { productsService } from "@/services/products.service";
 import { categoriesService } from "@/services/categories.service";
 import type { ProductFilters, Product } from "@/types";
+import { useTranslation } from "@/hooks/useTranslation";
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
@@ -95,6 +96,7 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
 
 function ProductsManagementContent() {
   const router = useRouter();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const [filters, setFilters] = useState<ProductFilters>({

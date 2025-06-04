@@ -25,6 +25,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { ProductCard } from "@/components/products/ProductCard";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { searchService } from "@/services/search.service";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -42,6 +43,7 @@ function TabPanel({ children, value, index }: TabPanelProps) {
 
 function SearchPageContent() {
   const searchParams = useSearchParams();
+  const { t } = useTranslation();
   const query = searchParams.get("q") || "";
   const [selectedTab, setSelectedTab] = useState(0);
   const [sortBy, setSortBy] = useState("relevance");

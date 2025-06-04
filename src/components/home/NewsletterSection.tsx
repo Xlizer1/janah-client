@@ -12,8 +12,10 @@ import {
 } from "@mui/material";
 import { Email, Send, CheckCircle } from "@mui/icons-material";
 import { toast } from "react-toastify";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function NewsletterSection() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);

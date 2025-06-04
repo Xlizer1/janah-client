@@ -28,9 +28,11 @@ import { ProductFilters } from "@/components/products/ProductFilters";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { productsService } from "@/services/products.service";
 import type { ProductFilters as ProductFiltersType } from "@/types";
+import { useTranslation } from "@/hooks/useTranslation";
 
 function ProductsPageContent() {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const searchParams = useSearchParams();
 

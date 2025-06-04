@@ -65,6 +65,7 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useAuth } from "@/store/auth.store";
 import { categoriesService } from "@/services/categories.service";
 import type { CategoryFilters, Category } from "@/types";
+import { useTranslation } from "@/hooks/useTranslation";
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
@@ -91,6 +92,7 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
 
 function CategoriesManagementContent() {
   const router = useRouter();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const [filters, setFilters] = useState<CategoryFilters>({

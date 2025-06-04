@@ -68,6 +68,7 @@ import { toast } from "react-toastify";
 import { ordersService } from "@/services/orders.service";
 import type { Order, OrderFilters } from "@/types";
 import { format } from "date-fns";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -85,6 +86,7 @@ function TabPanel({ children, value, index }: TabPanelProps) {
 
 export function OrderManagement() {
   const router = useRouter();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [selectedTab, setSelectedTab] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");

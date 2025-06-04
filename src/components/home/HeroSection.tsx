@@ -12,9 +12,11 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { ShoppingBag, TrendingUp, Star } from "@mui/icons-material";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function HeroSection() {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   return (

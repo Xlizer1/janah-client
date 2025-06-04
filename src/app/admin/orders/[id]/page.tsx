@@ -64,6 +64,7 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useAuth } from "@/store/auth.store";
 import { format } from "date-fns";
 import Link from "next/link";
+import { useTranslation } from "@/hooks/useTranslation";
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
@@ -91,6 +92,7 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
 function OrderDetailContent() {
   const params = useParams();
   const router = useRouter();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const orderId = Number(params.id);
 

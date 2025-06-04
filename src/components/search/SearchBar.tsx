@@ -19,9 +19,11 @@ import { useQuery } from "@tanstack/react-query";
 import { searchService } from "@/services/search.service";
 import { useUI } from "@/store/ui.store";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function SearchBar() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { setSearchQuery } = useUI();
   const [query, setQuery] = useState("");
   const [isFocused, setIsFocused] = useState(false);

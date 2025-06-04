@@ -66,6 +66,7 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useAuth } from "@/store/auth.store";
 import { categoriesService } from "@/services/categories.service";
 import { productsService } from "@/services/products.service";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -107,6 +108,7 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
 function CategoryDetailsContent() {
   const params = useParams();
   const router = useRouter();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const categoryId = parseInt(params.id as string);
 
