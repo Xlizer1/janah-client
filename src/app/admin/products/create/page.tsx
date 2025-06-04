@@ -24,6 +24,7 @@ import {
   InputAdornment,
   IconButton,
   Chip,
+  CircularProgress,
 } from "@mui/material";
 import {
   ArrowBack,
@@ -35,6 +36,8 @@ import {
   Remove,
   PhotoCamera,
   Info,
+  Warning,
+  CheckCircle,
 } from "@mui/icons-material";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -47,7 +50,7 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useAuth } from "@/store/auth.store";
 import { productsService } from "@/services/products.service";
 import { categoriesService } from "@/services/categories.service";
-import type { ProductCreateData, ProductCreateFormData } from "@/types";
+import type { ProductCreateFormData } from "@/types";
 import { ImageUpload } from "@/components/ui/ImageUpload";
 import Image from "next/image";
 
@@ -71,17 +74,23 @@ const productCreateSchema = yup.object({
   price: yup
     .number()
     .required("Price is required")
-    .min(0, "Price must be positive"),
+    .min(0.01, "Price must be greater than 0")
+    .max(999999.99, "Price is too high"),
   stock_quantity: yup
     .number()
     .required("Stock quantity is required")
-    .min(0, "Stock quantity must be positive")
-    .integer("Stock quantity must be a whole number"),
+    .min(0, "Stock quantity cannot be negative")
+    .integer("Stock quantity must be a whole number")
+    .max(999999, "Stock quantity is too high"),
   category_id: yup.number().optional(),
-  weight: yup.number().min(0, "Weight must be positive").optional(),
+  weight: yup
+    .number()
+    .min(0, "Weight must be positive")
+    .max(9999, "Weight is too high")
+    .optional(),
   dimensions: yup.string().optional(),
   is_featured: yup.boolean().optional(),
-  image_url: yup.string().url("Image URL must be valid").optional(),
+  image_url: yup.string().optional(),
 });
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
@@ -110,14 +119,17 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
 function CreateProductContent() {
   const router = useRouter();
   const [isDraft, setIsDraft] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting, isDirty },
     watch,
     setValue,
     getValues,
+    clearErrors,
+    setError,
   } = useForm<ProductCreateFormData>({
     resolver: yupResolver(productCreateSchema),
     defaultValues: {
@@ -127,7 +139,7 @@ function CreateProductContent() {
       description: "",
       price: 0,
       stock_quantity: 0,
-      category_id: 0,
+      category_id: undefined,
       weight: 1,
       dimensions: "1x1x1",
       is_featured: false,
@@ -137,19 +149,21 @@ function CreateProductContent() {
 
   const watchName = watch("name");
   React.useEffect(() => {
-    if (watchName) {
+    if (watchName && watchName.length > 0) {
       const slug = watchName
         .toLowerCase()
         .replace(/[^a-z0-9\s-]/g, "")
         .replace(/\s+/g, "-")
-        .replace(/-+/g, "-");
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "");
 
-      console.log(slug);
-      setValue("slug", slug);
+      if (slug !== getValues("slug")) {
+        setValue("slug", slug);
+      }
     }
   }, [watchName, setValue, getValues]);
 
-  const { data: categoriesData } = useQuery({
+  const { data: categoriesData, isLoading: categoriesLoading } = useQuery({
     queryKey: ["categories"],
     queryFn: () => categoriesService.getCategories(),
   });
@@ -161,12 +175,103 @@ function CreateProductContent() {
       router.push(`/admin/products/${data.product.id}`);
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to create product");
+      console.error("Product creation error:", error);
+
+      // Handle validation errors
+      if (error.response?.data?.errors) {
+        const serverErrors = error.response.data.errors;
+        Object.keys(serverErrors).forEach((field) => {
+          setError(field as keyof ProductCreateFormData, {
+            type: "server",
+            message: Array.isArray(serverErrors[field])
+              ? serverErrors[field][0]
+              : serverErrors[field],
+          });
+        });
+      }
+
+      const errorMessage =
+        error.message ||
+        error.response?.data?.message ||
+        "Failed to create product";
+      toast.error(errorMessage);
     },
   });
 
-  const onSubmit = (data: ProductCreateFormData) => {
-    createProductMutation.mutate(data);
+  const validateForm = (data: ProductCreateFormData): string[] => {
+    const errors: string[] = [];
+
+    if (!data.name?.trim()) {
+      errors.push("Product name is required");
+    }
+
+    if (!data.code?.trim()) {
+      errors.push("Product code is required");
+    }
+
+    if (!data.price || data.price <= 0) {
+      errors.push("Valid price is required");
+    }
+
+    if (data.stock_quantity === undefined || data.stock_quantity < 0) {
+      errors.push("Valid stock quantity is required");
+    }
+
+    if (data.weight && data.weight < 0) {
+      errors.push("Weight cannot be negative");
+    }
+
+    // Validate image if provided
+    if (data.image_url && data.image_url.startsWith("data:image/")) {
+      try {
+        const base64Data = data.image_url.split(",")[1];
+        if (!base64Data || base64Data.length === 0) {
+          errors.push("Invalid image data");
+        }
+
+        // Check if base64 is valid
+        atob(base64Data);
+
+        // Check image size (approximate)
+        const sizeInBytes = (base64Data.length * 3) / 4;
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        if (sizeInBytes > maxSize) {
+          errors.push("Image size too large (max 10MB)");
+        }
+      } catch (e) {
+        errors.push("Invalid image format");
+      }
+    }
+
+    return errors;
+  };
+
+  const onSubmit = async (data: ProductCreateFormData) => {
+    try {
+      // Clear previous validation errors
+      setValidationErrors([]);
+      clearErrors();
+
+      // Validate form data
+      const errors = validateForm(data);
+      if (errors.length > 0) {
+        setValidationErrors(errors);
+        toast.error("Please fix the validation errors");
+        return;
+      }
+
+      console.log("Submitting product data:", data);
+
+      // Show loading toast for image uploads
+      if (data.image_url && data.image_url.startsWith("data:image/")) {
+        toast.info("Uploading image, please wait...");
+      }
+
+      await createProductMutation.mutateAsync(data);
+    } catch (error) {
+      console.error("Form submission error:", error);
+      // Error handling is done in the mutation's onError
+    }
   };
 
   const handleSaveAsDraft = () => {
@@ -175,7 +280,21 @@ function CreateProductContent() {
   };
 
   const handleImageUpload = () => {
-    toast.info("Image upload functionality coming soon");
+    toast.info("Use the image upload component below");
+  };
+
+  const handleImageError = (error: string) => {
+    console.error("Image upload error:", error);
+    toast.error(error);
+    setError("image_url", {
+      type: "manual",
+      message: error,
+    });
+  };
+
+  const handleImageChange = (imageUrl: string) => {
+    setValue("image_url", imageUrl, { shouldValidate: true });
+    clearErrors("image_url");
   };
 
   return (
@@ -194,23 +313,24 @@ function CreateProductContent() {
             variant="outlined"
             startIcon={<Preview />}
             onClick={() => toast.info("Preview functionality coming soon")}
+            disabled={isSubmitting}
           >
             Preview
           </Button>
           <Button
             variant="outlined"
             onClick={handleSaveAsDraft}
-            disabled={createProductMutation.isPending}
+            disabled={isSubmitting}
           >
             Save as Draft
           </Button>
           <Button
             variant="contained"
-            startIcon={<Save />}
+            startIcon={isSubmitting ? <CircularProgress size={20} /> : <Save />}
             onClick={handleSubmit(onSubmit)}
-            disabled={createProductMutation.isPending}
+            disabled={isSubmitting || !isDirty}
           >
-            {createProductMutation.isPending ? "Creating..." : "Create Product"}
+            {isSubmitting ? "Creating..." : "Create Product"}
           </Button>
         </Box>
         <Typography variant="body1" color="text.secondary">
@@ -218,9 +338,39 @@ function CreateProductContent() {
         </Typography>
       </Box>
 
+      {/* Validation Errors */}
+      {validationErrors.length > 0 && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+            Please fix the following errors:
+          </Typography>
+          <ul style={{ margin: 0, paddingLeft: 20 }}>
+            {validationErrors.map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ul>
+        </Alert>
+      )}
+
+      {/* Loading State */}
+      {isSubmitting && (
+        <Alert severity="info" sx={{ mb: 3 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <CircularProgress size={20} />
+            <Typography>
+              {watch("image_url") &&
+              watch("image_url")?.startsWith("data:image/")
+                ? "Creating product and uploading image..."
+                : "Creating product..."}
+            </Typography>
+          </Box>
+        </Alert>
+      )}
+
       <Grid container spacing={3}>
         <Grid item xs={12} lg={8}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+            {/* Basic Information */}
             <Card>
               <CardHeader title="Basic Information" />
               <CardContent
@@ -234,9 +384,11 @@ function CreateProductContent() {
                       {...field}
                       label="Product Name"
                       fullWidth
+                      required
                       error={!!errors.name}
                       helperText={errors.name?.message}
                       placeholder="Enter product name"
+                      disabled={isSubmitting}
                     />
                   )}
                 />
@@ -249,9 +401,14 @@ function CreateProductContent() {
                       {...field}
                       label="Product Code"
                       fullWidth
+                      required
                       error={!!errors.code}
-                      helperText={errors.code?.message}
-                      placeholder="Enter product code"
+                      helperText={
+                        errors.code?.message ||
+                        "Unique identifier for the product"
+                      }
+                      placeholder="Enter product code (e.g., PROD001)"
+                      disabled={isSubmitting}
                     />
                   )}
                 />
@@ -270,6 +427,7 @@ function CreateProductContent() {
                         "URL-friendly version of the name (auto-generated)"
                       }
                       placeholder="product-name"
+                      disabled={isSubmitting}
                     />
                   )}
                 />
@@ -287,12 +445,14 @@ function CreateProductContent() {
                       error={!!errors.description}
                       helperText={errors.description?.message}
                       placeholder="Describe your product in detail..."
+                      disabled={isSubmitting}
                     />
                   )}
                 />
               </CardContent>
             </Card>
 
+            {/* Pricing & Inventory */}
             <Card>
               <CardHeader title="Pricing & Inventory" />
               <CardContent>
@@ -306,6 +466,7 @@ function CreateProductContent() {
                           {...field}
                           label="Price"
                           fullWidth
+                          required
                           type="number"
                           error={!!errors.price}
                           helperText={errors.price?.message}
@@ -316,7 +477,8 @@ function CreateProductContent() {
                               </InputAdornment>
                             ),
                           }}
-                          inputProps={{ min: 0, step: 0.01 }}
+                          inputProps={{ min: 0.01, step: 0.01, max: 999999.99 }}
+                          disabled={isSubmitting}
                         />
                       )}
                     />
@@ -330,10 +492,12 @@ function CreateProductContent() {
                           {...field}
                           label="Stock Quantity"
                           fullWidth
+                          required
                           type="number"
                           error={!!errors.stock_quantity}
                           helperText={errors.stock_quantity?.message}
-                          inputProps={{ min: 0 }}
+                          inputProps={{ min: 0, max: 999999 }}
+                          disabled={isSubmitting}
                         />
                       )}
                     />
@@ -342,6 +506,7 @@ function CreateProductContent() {
               </CardContent>
             </Card>
 
+            {/* Product Details */}
             <Card>
               <CardHeader title="Product Details" />
               <CardContent>
@@ -355,7 +520,6 @@ function CreateProductContent() {
                           {...field}
                           label="Weight"
                           fullWidth
-                          value={getValues().weight || ""}
                           type="number"
                           error={!!errors.weight}
                           helperText={errors.weight?.message}
@@ -364,7 +528,8 @@ function CreateProductContent() {
                               <InputAdornment position="end">kg</InputAdornment>
                             ),
                           }}
-                          inputProps={{ min: 0, step: 0.01 }}
+                          inputProps={{ min: 0, step: 0.01, max: 9999 }}
+                          disabled={isSubmitting}
                         />
                       )}
                     />
@@ -381,6 +546,7 @@ function CreateProductContent() {
                           error={!!errors.dimensions}
                           helperText={errors.dimensions?.message}
                           placeholder="L x W x H (cm)"
+                          disabled={isSubmitting}
                         />
                       )}
                     />
@@ -389,98 +555,35 @@ function CreateProductContent() {
               </CardContent>
             </Card>
 
+            {/* Media */}
             <Card>
               <CardHeader title="Product Images" />
               <CardContent>
-                {!watch("image_url") && (
-                  <ImageUpload
-                    value={watch("image_url")}
-                    onChange={(url) =>
-                      setValue("image_url", url, { shouldValidate: true })
-                    }
-                    onError={(err) => console.error(err)}
-                    maxSize={2}
-                    label="Upload Product Image"
-                    helperText="Max 2MB, PNG or JPG"
-                    variant="dropzone"
-                  />
-                )}
-                {/* <Controller
-                  name="image_url"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Image URL"
-                      fullWidth
-                      error={!!errors.image_url}
-                      helperText={
-                        errors.image_url?.message ||
-                        "Enter image URL or upload below"
-                      }
-                      placeholder="https://example.com/image.jpg"
-                    />
-                  )}
+                <ImageUpload
+                  value={watch("image_url")}
+                  onChange={handleImageChange}
+                  onError={handleImageError}
+                  maxSize={10}
+                  label="Upload Product Image"
+                  helperText="Max 10MB, PNG or JPG format recommended"
+                  variant="dropzone"
+                  disabled={isSubmitting}
                 />
 
-                <Box sx={{ mt: 2 }}>
-                  <Button
-                    variant="outlined"
-                    startIcon={<CloudUpload />}
-                    onClick={handleImageUpload}
-                    fullWidth
-                  >
-                    Upload Image
-                  </Button>
-                </Box> */}
-
-                {watch("image_url") && (
-                  <Box>
-                    <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                      Image Preview:
-                    </Typography>
-                    <Box
-                      sx={{
-                        width: 200,
-                        height: 200,
-                        border: 1,
-                        borderColor: "divider",
-                        borderRadius: 2,
-                        overflow: "hidden",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        bgcolor: "grey.50",
-                        position: "relative",
-                        ":hover": {
-                          opacity: 0.5,
-                          cursor: "pointer",
-                        },
-                      }}
-                      onClick={() => {
-                        setValue("image_url", "");
-                      }}
-                    >
-                      <img
-                        src={watch("image_url")}
-                        alt="Product preview"
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                        onError={() => toast.error("Invalid image URL")}
-                      />
-                    </Box>
-                  </Box>
+                {errors.image_url && (
+                  <Alert severity="error" sx={{ mt: 2 }}>
+                    {errors.image_url.message}
+                  </Alert>
                 )}
               </CardContent>
             </Card>
           </Box>
         </Grid>
 
+        {/* Sidebar */}
         <Grid item xs={12} lg={4}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+            {/* Status */}
             <Card>
               <CardHeader title="Product Status" />
               <CardContent>
@@ -494,6 +597,7 @@ function CreateProductContent() {
                           <Switch
                             checked={field.value}
                             onChange={field.onChange}
+                            disabled={isSubmitting}
                           />
                         }
                         label="Featured Product"
@@ -504,13 +608,14 @@ function CreateProductContent() {
                   <Alert severity="info" sx={{ mt: 2 }}>
                     <Typography variant="body2">
                       New products are active by default. You can change this
-                      later.
+                      later in the edit page.
                     </Typography>
                   </Alert>
                 </Box>
               </CardContent>
             </Card>
 
+            {/* Category */}
             <Card>
               <CardHeader title="Organization" />
               <CardContent>
@@ -524,6 +629,7 @@ function CreateProductContent() {
                         {...field}
                         value={field.value || ""}
                         label="Category"
+                        disabled={isSubmitting || categoriesLoading}
                       >
                         <MenuItem value="">
                           <em>No Category</em>
@@ -549,6 +655,7 @@ function CreateProductContent() {
               </CardContent>
             </Card>
 
+            {/* Quick Actions */}
             <Card>
               <CardHeader title="Quick Actions" />
               <CardContent>
@@ -558,6 +665,7 @@ function CreateProductContent() {
                     startIcon={<PhotoCamera />}
                     onClick={handleImageUpload}
                     fullWidth
+                    disabled={isSubmitting}
                   >
                     Add Image
                   </Button>
@@ -566,6 +674,7 @@ function CreateProductContent() {
                     startIcon={<Preview />}
                     onClick={() => toast.info("Preview coming soon")}
                     fullWidth
+                    disabled={isSubmitting}
                   >
                     Preview Product
                   </Button>
@@ -573,6 +682,75 @@ function CreateProductContent() {
               </CardContent>
             </Card>
 
+            {/* Validation Status */}
+            <Card>
+              <CardHeader title="Validation Status" />
+              <CardContent>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    {watch("name") ? (
+                      <CheckCircle
+                        sx={{ fontSize: 16, color: "success.main" }}
+                      />
+                    ) : (
+                      <Warning sx={{ fontSize: 16, color: "warning.main" }} />
+                    )}
+                    <Typography variant="body2">
+                      Product Name {watch("name") ? "✓" : "(Required)"}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    {watch("code") ? (
+                      <CheckCircle
+                        sx={{ fontSize: 16, color: "success.main" }}
+                      />
+                    ) : (
+                      <Warning sx={{ fontSize: 16, color: "warning.main" }} />
+                    )}
+                    <Typography variant="body2">
+                      Product Code {watch("code") ? "✓" : "(Required)"}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    {watch("price") && watch("price") > 0 ? (
+                      <CheckCircle
+                        sx={{ fontSize: 16, color: "success.main" }}
+                      />
+                    ) : (
+                      <Warning sx={{ fontSize: 16, color: "warning.main" }} />
+                    )}
+                    <Typography variant="body2">
+                      Price{" "}
+                      {watch("price") && watch("price") > 0
+                        ? "✓"
+                        : "(Required)"}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    {watch("stock_quantity") !== undefined &&
+                    watch("stock_quantity") >= 0 ? (
+                      <CheckCircle
+                        sx={{ fontSize: 16, color: "success.main" }}
+                      />
+                    ) : (
+                      <Warning sx={{ fontSize: 16, color: "warning.main" }} />
+                    )}
+                    <Typography variant="body2">
+                      Stock Quantity{" "}
+                      {watch("stock_quantity") !== undefined &&
+                      watch("stock_quantity") >= 0
+                        ? "✓"
+                        : "(Required)"}
+                    </Typography>
+                  </Box>
+                </Box>
+              </CardContent>
+            </Card>
+
+            {/* Need Help? */}
             <Card>
               <CardHeader title="Need Help?" />
               <CardContent>
@@ -602,6 +780,7 @@ function CreateProductContent() {
         </Grid>
       </Grid>
 
+      {/* Fixed Bottom Actions */}
       <Paper
         elevation={8}
         sx={{
@@ -626,29 +805,36 @@ function CreateProductContent() {
           }}
         >
           <Link href="/admin/products">
-            <Button startIcon={<ArrowBack />}>Back to Products</Button>
-          </Link>
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <Button
-              variant="outlined"
-              onClick={handleSaveAsDraft}
-              disabled={createProductMutation.isPending}
-            >
-              Save as Draft
+            <Button startIcon={<ArrowBack />} disabled={isSubmitting}>
+              Back to Products
             </Button>
+          </Link>
+          <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+            {isDirty && !isSubmitting && (
+              <Typography variant="body2" color="warning.main">
+                You have unsaved changes
+              </Typography>
+            )}
+            {isSubmitting && (
+              <Typography variant="body2" color="info.main">
+                Creating product...
+              </Typography>
+            )}
             <Button
               variant="contained"
-              startIcon={<Save />}
+              startIcon={
+                isSubmitting ? <CircularProgress size={20} /> : <Save />
+              }
               onClick={handleSubmit(onSubmit)}
-              disabled={createProductMutation.isPending}
+              disabled={isSubmitting || !isDirty}
             >
-              {createProductMutation.isPending
-                ? "Creating..."
-                : "Create Product"}
+              {isSubmitting ? "Creating..." : "Create Product"}
             </Button>
           </Box>
         </Box>
       </Paper>
+
+      {/* Bottom spacing for fixed toolbar */}
       <Box sx={{ height: 80 }} />
     </Box>
   );

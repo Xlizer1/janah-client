@@ -28,6 +28,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  CircularProgress,
+  Breadcrumbs,
 } from "@mui/material";
 import {
   ArrowBack,
@@ -44,6 +46,7 @@ import {
   Refresh,
   ToggleOn,
   ToggleOff,
+  CheckCircle,
 } from "@mui/icons-material";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -56,7 +59,8 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useAuth } from "@/store/auth.store";
 import { productsService } from "@/services/products.service";
 import { categoriesService } from "@/services/categories.service";
-import type { ProductEditFormData, ProductUpdateData } from "@/types";
+import type { ProductEditFormData } from "@/types";
+import { ImageUpload } from "@/components/ui/ImageUpload";
 
 const productSchema = yup.object({
   product_id: yup.number().required(),
@@ -64,6 +68,10 @@ const productSchema = yup.object({
     .string()
     .required("Product name is required")
     .min(3, "Product name must be at least 3 characters"),
+  code: yup
+    .string()
+    .required("Product code is required")
+    .min(3, "Product code must be at least 3 characters"),
   slug: yup
     .string()
     .matches(
@@ -75,18 +83,24 @@ const productSchema = yup.object({
   price: yup
     .number()
     .required("Price is required")
-    .min(0, "Price must be positive"),
+    .min(0.01, "Price must be greater than 0")
+    .max(999999.99, "Price is too high"),
   stock_quantity: yup
     .number()
     .required("Stock quantity is required")
-    .min(0, "Stock quantity must be positive")
-    .integer("Stock quantity must be a whole number"),
+    .min(0, "Stock quantity cannot be negative")
+    .integer("Stock quantity must be a whole number")
+    .max(999999, "Stock quantity is too high"),
   category_id: yup.number().optional(),
-  weight: yup.number().min(0, "Weight must be positive").optional(),
+  weight: yup
+    .number()
+    .min(0, "Weight must be positive")
+    .max(9999, "Weight is too high")
+    .optional(),
   dimensions: yup.string().optional(),
   is_featured: yup.boolean().optional(),
-  is_active: yup.boolean().required(), // Required for edit
-  image: yup.string().url("Image URL must be valid").optional(),
+  is_active: yup.boolean().required(),
+  image_url: yup.string().optional(),
 });
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
@@ -121,19 +135,23 @@ function EditProductContent() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [stockUpdateDialog, setStockUpdateDialog] = useState(false);
   const [newStockQuantity, setNewStockQuantity] = useState(0);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   const {
     control,
     handleSubmit,
-    formState: { errors, isDirty },
+    formState: { errors, isDirty, isSubmitting },
     watch,
     setValue,
     reset,
+    clearErrors,
+    setError,
   } = useForm<ProductEditFormData>({
     resolver: yupResolver(productSchema),
     defaultValues: {
-      product_id: undefined,
+      product_id: productId,
       name: "",
+      code: "",
       slug: "",
       description: "",
       price: 0,
@@ -158,7 +176,7 @@ function EditProductContent() {
     enabled: !!productId,
   });
 
-  const { data: categoriesData } = useQuery({
+  const { data: categoriesData, isLoading: categoriesLoading } = useQuery({
     queryKey: ["categories"],
     queryFn: () => categoriesService.getCategories(),
   });
@@ -172,7 +190,26 @@ function EditProductContent() {
       queryClient.invalidateQueries({ queryKey: ["adminProducts"] });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to update product");
+      console.error("Product update error:", error);
+
+      // Handle validation errors
+      if (error.response?.data?.errors) {
+        const serverErrors = error.response.data.errors;
+        Object.keys(serverErrors).forEach((field) => {
+          setError(field as keyof ProductEditFormData, {
+            type: "server",
+            message: Array.isArray(serverErrors[field])
+              ? serverErrors[field][0]
+              : serverErrors[field],
+          });
+        });
+      }
+
+      const errorMessage =
+        error.message ||
+        error.response?.data?.message ||
+        "Failed to update product";
+      toast.error(errorMessage);
     },
   });
 
@@ -206,7 +243,9 @@ function EditProductContent() {
     if (productData?.product) {
       const product = productData.product;
       reset({
+        product_id: productId,
         name: product.name,
+        code: product.code || "", // Handle missing code
         slug: product.slug,
         description: product.description || "",
         price: product.price,
@@ -220,10 +259,82 @@ function EditProductContent() {
       });
       setNewStockQuantity(product.stock_quantity);
     }
-  }, [productData, reset]);
+  }, [productData, reset, productId]);
 
-  const onSubmit = (data: ProductEditFormData) => {
-    updateProductMutation.mutate(data);
+  const validateForm = (data: ProductEditFormData): string[] => {
+    const errors: string[] = [];
+
+    if (!data.name?.trim()) {
+      errors.push("Product name is required");
+    }
+
+    if (!data.code?.trim()) {
+      errors.push("Product code is required");
+    }
+
+    if (!data.price || data.price <= 0) {
+      errors.push("Valid price is required");
+    }
+
+    if (data.stock_quantity === undefined || data.stock_quantity < 0) {
+      errors.push("Valid stock quantity is required");
+    }
+
+    if (data.weight && data.weight < 0) {
+      errors.push("Weight cannot be negative");
+    }
+
+    // Validate image if provided
+    if (data.image_url && data.image_url.startsWith("data:image/")) {
+      try {
+        const base64Data = data.image_url.split(",")[1];
+        if (!base64Data || base64Data.length === 0) {
+          errors.push("Invalid image data");
+        }
+
+        // Check if base64 is valid
+        atob(base64Data);
+
+        // Check image size (approximate)
+        const sizeInBytes = (base64Data.length * 3) / 4;
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        if (sizeInBytes > maxSize) {
+          errors.push("Image size too large (max 10MB)");
+        }
+      } catch (e) {
+        errors.push("Invalid image format");
+      }
+    }
+
+    return errors;
+  };
+
+  const onSubmit = async (data: ProductEditFormData) => {
+    try {
+      // Clear previous validation errors
+      setValidationErrors([]);
+      clearErrors();
+
+      // Validate form data
+      const errors = validateForm(data);
+      if (errors.length > 0) {
+        setValidationErrors(errors);
+        toast.error("Please fix the validation errors");
+        return;
+      }
+
+      console.log("Submitting product update:", data);
+
+      // Show loading toast for image uploads
+      if (data.image_url && data.image_url.startsWith("data:image/")) {
+        toast.info("Uploading image, please wait...");
+      }
+
+      await updateProductMutation.mutateAsync(data);
+    } catch (error) {
+      console.error("Form submission error:", error);
+      // Error handling is done in the mutation's onError
+    }
   };
 
   const handleDeleteProduct = () => {
@@ -236,7 +347,21 @@ function EditProductContent() {
   };
 
   const handleImageUpload = () => {
-    toast.info("Image upload functionality coming soon");
+    toast.info("Use the image upload component below");
+  };
+
+  const handleImageError = (error: string) => {
+    console.error("Image upload error:", error);
+    toast.error(error);
+    setError("image_url", {
+      type: "manual",
+      message: error,
+    });
+  };
+
+  const handleImageChange = (imageUrl: string) => {
+    setValue("image_url", imageUrl, { shouldValidate: true });
+    clearErrors("image_url");
   };
 
   const getStatusColor = (product: any) => {
@@ -279,54 +404,116 @@ function EditProductContent() {
     <Box>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-          <Link href="/admin/products">
-            <IconButton>
-              <ArrowBack />
-            </IconButton>
+        <Breadcrumbs sx={{ mb: 2 }}>
+          <Link href="/admin">
+            <Typography color="text.secondary" sx={{ cursor: "pointer" }}>
+              Admin
+            </Typography>
           </Link>
-          <Typography variant="h4" sx={{ fontWeight: 700, flex: 1 }}>
-            Edit Product
-          </Typography>
-          <Button
-            variant="outlined"
-            startIcon={<Visibility />}
-            onClick={() =>
-              router.push(`/products/${product.slug || product.id}`)
-            }
-          >
-            View Live
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<Refresh />}
-            onClick={() => refetch()}
-          >
-            Refresh
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<Save />}
-            onClick={handleSubmit(onSubmit)}
-            disabled={updateProductMutation.isPending || !isDirty}
-          >
-            {updateProductMutation.isPending ? "Saving..." : "Save Changes"}
-          </Button>
-        </Box>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Typography variant="body1" color="text.secondary">
-            Product ID: {product.id}
-          </Typography>
-          <Chip
-            label={getStatusText(product)}
-            color={getStatusColor(product)}
-            size="small"
-          />
-          {product.is_featured && (
-            <Chip label="Featured" color="warning" size="small" />
-          )}
+          <Link href="/admin/products">
+            <Typography color="text.secondary" sx={{ cursor: "pointer" }}>
+              Products
+            </Typography>
+          </Link>
+          <Typography color="primary.main">{product.name}</Typography>
+        </Breadcrumbs>
+
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexDirection: { xs: "column", md: "row" },
+            gap: 2,
+            mb: 2,
+          }}
+        >
+          <Box>
+            <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+              Edit Product
+            </Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <Chip
+                label={getStatusText(product)}
+                color={getStatusColor(product) as any}
+                size="medium"
+                sx={{ fontWeight: 600 }}
+              />
+              {product.is_featured && (
+                <Chip label="Featured" color="warning" size="small" />
+              )}
+              <Typography variant="body2" color="text.secondary">
+                ID: {product.id}
+              </Typography>
+            </Box>
+          </Box>
+
+          <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+            <Button
+              variant="outlined"
+              startIcon={<ArrowBack />}
+              onClick={() => router.push("/admin/products")}
+            >
+              Back to Products
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<Visibility />}
+              onClick={() =>
+                router.push(`/products/${product.slug || product.id}`)
+              }
+            >
+              View Live
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<Refresh />}
+              onClick={() => refetch()}
+            >
+              Refresh
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={
+                isSubmitting ? <CircularProgress size={20} /> : <Save />
+              }
+              onClick={handleSubmit(onSubmit)}
+              disabled={isSubmitting || !isDirty}
+            >
+              {isSubmitting ? "Saving..." : "Save Changes"}
+            </Button>
+          </Box>
         </Box>
       </Box>
+
+      {/* Validation Errors */}
+      {validationErrors.length > 0 && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+            Please fix the following errors:
+          </Typography>
+          <ul style={{ margin: 0, paddingLeft: 20 }}>
+            {validationErrors.map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ul>
+        </Alert>
+      )}
+
+      {/* Loading State */}
+      {isSubmitting && (
+        <Alert severity="info" sx={{ mb: 3 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <CircularProgress size={20} />
+            <Typography>
+              {watch("image_url") &&
+              watch("image_url")?.startsWith("data:image/")
+                ? "Updating product and uploading image..."
+                : "Updating product..."}
+            </Typography>
+          </Box>
+        </Alert>
+      )}
 
       <Grid container spacing={3}>
         {/* Main Content */}
@@ -346,8 +533,29 @@ function EditProductContent() {
                       {...field}
                       label="Product Name"
                       fullWidth
+                      required
                       error={!!errors.name}
                       helperText={errors.name?.message}
+                      disabled={isSubmitting}
+                    />
+                  )}
+                />
+
+                <Controller
+                  name="code"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Product Code"
+                      fullWidth
+                      required
+                      error={!!errors.code}
+                      helperText={
+                        errors.code?.message ||
+                        "Unique identifier for the product"
+                      }
+                      disabled={isSubmitting}
                     />
                   )}
                 />
@@ -365,6 +573,7 @@ function EditProductContent() {
                         errors.slug?.message ||
                         "URL-friendly version of the name"
                       }
+                      disabled={isSubmitting}
                     />
                   )}
                 />
@@ -381,6 +590,7 @@ function EditProductContent() {
                       rows={4}
                       error={!!errors.description}
                       helperText={errors.description?.message}
+                      disabled={isSubmitting}
                     />
                   )}
                 />
@@ -401,6 +611,7 @@ function EditProductContent() {
                           {...field}
                           label="Price"
                           fullWidth
+                          required
                           type="number"
                           error={!!errors.price}
                           helperText={errors.price?.message}
@@ -411,7 +622,8 @@ function EditProductContent() {
                               </InputAdornment>
                             ),
                           }}
-                          inputProps={{ min: 0, step: 0.01 }}
+                          inputProps={{ min: 0.01, step: 0.01, max: 999999.99 }}
+                          disabled={isSubmitting}
                         />
                       )}
                     />
@@ -425,22 +637,25 @@ function EditProductContent() {
                           {...field}
                           label="Stock Quantity"
                           fullWidth
+                          required
                           type="number"
                           error={!!errors.stock_quantity}
                           helperText={errors.stock_quantity?.message}
-                          inputProps={{ min: 0 }}
+                          inputProps={{ min: 0, max: 999999 }}
                           InputProps={{
                             endAdornment: (
                               <InputAdornment position="end">
                                 <IconButton
                                   onClick={() => setStockUpdateDialog(true)}
                                   title="Quick stock update"
+                                  disabled={isSubmitting}
                                 >
                                   <Refresh />
                                 </IconButton>
                               </InputAdornment>
                             ),
                           }}
+                          disabled={isSubmitting}
                         />
                       )}
                     />
@@ -471,7 +686,8 @@ function EditProductContent() {
                               <InputAdornment position="end">kg</InputAdornment>
                             ),
                           }}
-                          inputProps={{ min: 0, step: 0.01 }}
+                          inputProps={{ min: 0, step: 0.01, max: 9999 }}
+                          disabled={isSubmitting}
                         />
                       )}
                     />
@@ -488,6 +704,7 @@ function EditProductContent() {
                           error={!!errors.dimensions}
                           helperText={errors.dimensions?.message}
                           placeholder="L x W x H (cm)"
+                          disabled={isSubmitting}
                         />
                       )}
                     />
@@ -500,63 +717,98 @@ function EditProductContent() {
             <Card>
               <CardHeader title="Product Images" />
               <CardContent>
-                <Controller
-                  name="image_url"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Image URL"
-                      fullWidth
-                      error={!!errors.image_url}
-                      helperText={errors.image_url?.message}
-                    />
-                  )}
-                />
-
-                <Box sx={{ mt: 2 }}>
-                  <Button
-                    variant="outlined"
-                    startIcon={<CloudUpload />}
-                    onClick={handleImageUpload}
-                    fullWidth
-                  >
-                    Upload New Image
-                  </Button>
-                </Box>
-
-                {/* Image Preview */}
-                {watch("image_url") && (
-                  <Box sx={{ mt: 2 }}>
-                    <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                      Current Image:
-                    </Typography>
-                    <Box
-                      sx={{
-                        width: 200,
-                        height: 200,
-                        border: 1,
-                        borderColor: "divider",
-                        borderRadius: 2,
-                        overflow: "hidden",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        bgcolor: "grey.50",
-                      }}
-                    >
-                      <img
-                        src={watch("image_url")}
-                        alt="Product preview"
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
+                {/* Show existing image if it's an HTTP URL */}
+                {watch("image_url") &&
+                  !watch("image_url")?.startsWith("data:image/") && (
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                        Current Image:
+                      </Typography>
+                      <Box
+                        sx={{
+                          width: 200,
+                          height: 200,
+                          border: 1,
+                          borderColor: "divider",
+                          borderRadius: 2,
+                          overflow: "hidden",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          bgcolor: "grey.50",
+                          position: "relative",
                         }}
-                        onError={() => toast.error("Invalid image URL")}
-                      />
+                      >
+                        <img
+                          src={watch("image_url")}
+                          alt="Current product image"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                          onError={() => console.error("Failed to load image")}
+                        />
+                        <IconButton
+                          onClick={() => setValue("image_url", "")}
+                          sx={{
+                            position: "absolute",
+                            top: 8,
+                            right: 8,
+                            bgcolor: "rgba(255,255,255,0.9)",
+                            color: "error.main",
+                            "&:hover": {
+                              bgcolor: "rgba(255,255,255,1)",
+                              color: "error.dark",
+                            },
+                          }}
+                          size="small"
+                          disabled={isSubmitting}
+                        >
+                          <Delete fontSize="small" />
+                        </IconButton>
+                      </Box>
                     </Box>
-                  </Box>
+                  )}
+
+                {/* Only show ImageUpload component if no existing image or user wants to change it */}
+                {(!watch("image_url") ||
+                  watch("image_url")?.startsWith("data:image/")) && (
+                  <ImageUpload
+                    value={
+                      watch("image_url")?.startsWith("data:image/")
+                        ? watch("image_url")
+                        : ""
+                    }
+                    onChange={handleImageChange}
+                    onError={handleImageError}
+                    maxSize={10}
+                    label="Upload Product Image"
+                    helperText="Max 10MB, PNG or JPG format recommended"
+                    variant="dropzone"
+                    disabled={isSubmitting}
+                  />
+                )}
+
+                {/* Button to change existing image */}
+                {watch("image_url") &&
+                  !watch("image_url")?.startsWith("data:image/") && (
+                    <Button
+                      variant="outlined"
+                      startIcon={<PhotoCamera />}
+                      onClick={() => setValue("image_url", "")}
+                      fullWidth
+                      disabled={isSubmitting}
+                      sx={{ mt: 2 }}
+                    >
+                      Change Image
+                    </Button>
+                  )}
+
+                {errors.image_url && (
+                  <Alert severity="error" sx={{ mt: 2 }}>
+                    {errors.image_url.message}
+                  </Alert>
                 )}
               </CardContent>
             </Card>
@@ -580,6 +832,7 @@ function EditProductContent() {
                           <Switch
                             checked={field.value}
                             onChange={field.onChange}
+                            disabled={isSubmitting}
                           />
                         }
                         label="Product Active"
@@ -596,6 +849,7 @@ function EditProductContent() {
                           <Switch
                             checked={field.value}
                             onChange={field.onChange}
+                            disabled={isSubmitting}
                           />
                         }
                         label="Featured Product"
@@ -634,6 +888,7 @@ function EditProductContent() {
                         {...field}
                         value={field.value || ""}
                         label="Category"
+                        disabled={isSubmitting || categoriesLoading}
                       >
                         <MenuItem value="">
                           <em>No Category</em>
@@ -669,6 +924,7 @@ function EditProductContent() {
                     startIcon={<Refresh />}
                     onClick={() => setStockUpdateDialog(true)}
                     fullWidth
+                    disabled={isSubmitting}
                   >
                     Update Stock
                   </Button>
@@ -679,6 +935,7 @@ function EditProductContent() {
                       router.push(`/products/${product.slug || product.id}`)
                     }
                     fullWidth
+                    disabled={isSubmitting}
                   >
                     View Live Product
                   </Button>
@@ -687,9 +944,78 @@ function EditProductContent() {
                     startIcon={<PhotoCamera />}
                     onClick={handleImageUpload}
                     fullWidth
+                    disabled={isSubmitting}
                   >
                     Change Image
                   </Button>
+                </Box>
+              </CardContent>
+            </Card>
+
+            {/* Validation Status */}
+            <Card>
+              <CardHeader title="Validation Status" />
+              <CardContent>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    {watch("name") ? (
+                      <CheckCircle
+                        sx={{ fontSize: 16, color: "success.main" }}
+                      />
+                    ) : (
+                      <Warning sx={{ fontSize: 16, color: "warning.main" }} />
+                    )}
+                    <Typography variant="body2">
+                      Product Name {watch("name") ? "✓" : "(Required)"}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    {watch("code") ? (
+                      <CheckCircle
+                        sx={{ fontSize: 16, color: "success.main" }}
+                      />
+                    ) : (
+                      <Warning sx={{ fontSize: 16, color: "warning.main" }} />
+                    )}
+                    <Typography variant="body2">
+                      Product Code {watch("code") ? "✓" : "(Required)"}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    {watch("price") && watch("price") > 0 ? (
+                      <CheckCircle
+                        sx={{ fontSize: 16, color: "success.main" }}
+                      />
+                    ) : (
+                      <Warning sx={{ fontSize: 16, color: "warning.main" }} />
+                    )}
+                    <Typography variant="body2">
+                      Price{" "}
+                      {watch("price") && watch("price") > 0
+                        ? "✓"
+                        : "(Required)"}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    {watch("stock_quantity") !== undefined &&
+                    watch("stock_quantity") >= 0 ? (
+                      <CheckCircle
+                        sx={{ fontSize: 16, color: "success.main" }}
+                      />
+                    ) : (
+                      <Warning sx={{ fontSize: 16, color: "warning.main" }} />
+                    )}
+                    <Typography variant="body2">
+                      Stock Quantity{" "}
+                      {watch("stock_quantity") !== undefined &&
+                      watch("stock_quantity") >= 0
+                        ? "✓"
+                        : "(Required)"}
+                    </Typography>
+                  </Box>
                 </Box>
               </CardContent>
             </Card>
@@ -744,6 +1070,7 @@ function EditProductContent() {
                   startIcon={<Delete />}
                   onClick={() => setDeleteDialogOpen(true)}
                   fullWidth
+                  disabled={isSubmitting}
                 >
                   Delete Product
                 </Button>
@@ -838,23 +1165,30 @@ function EditProductContent() {
           }}
         >
           <Link href="/admin/products">
-            <Button startIcon={<ArrowBack />}>Back to Products</Button>
+            <Button startIcon={<ArrowBack />} disabled={isSubmitting}>
+              Back to Products
+            </Button>
           </Link>
           <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-            {isDirty && (
+            {isDirty && !isSubmitting && (
               <Typography variant="body2" color="warning.main">
                 You have unsaved changes
               </Typography>
             )}
+            {isSubmitting && (
+              <Typography variant="body2" color="info.main">
+                Updating product...
+              </Typography>
+            )}
             <Button
               variant="contained"
-              startIcon={<Save />}
-              onClick={() => {
-                handleSubmit(onSubmit)
-              }}
-              disabled={updateProductMutation.isPending || !isDirty}
+              startIcon={
+                isSubmitting ? <CircularProgress size={20} /> : <Save />
+              }
+              onClick={handleSubmit(onSubmit)}
+              disabled={isSubmitting || !isDirty}
             >
-              {updateProductMutation.isPending ? "Saving..." : "Save Changes"}
+              {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
           </Box>
         </Box>

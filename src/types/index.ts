@@ -32,7 +32,7 @@ export interface User {
   phone_number: string;
   first_name: string;
   last_name: string;
-  email?: string; // Changed from nullable to optional
+  email?: string;
   is_phone_verified: boolean;
   is_active: boolean;
   role: "user" | "admin";
@@ -50,6 +50,7 @@ export interface AuthResponse {
 export interface Product {
   id: number;
   name: string;
+  code: string; // Fixed: Added missing code field
   slug: string;
   description?: string;
   price: number;
@@ -68,6 +69,7 @@ export interface Product {
 
 export interface ProductCreateData {
   name: string;
+  code: string; // Fixed: Added missing code field
   slug?: string;
   description?: string;
   price: number;
@@ -80,6 +82,7 @@ export interface ProductCreateData {
 }
 
 export interface ProductUpdateData extends Partial<ProductCreateData> {
+  code?: string; // FIXED: Added code field
   is_active?: boolean;
 }
 
@@ -197,7 +200,7 @@ export interface RegisterFormData {
   confirm_password: string;
   first_name: string;
   last_name: string;
-  email?: string; // Changed from optional to required optional
+  email?: string;
 }
 
 export interface VerifyPhoneFormData {
@@ -221,7 +224,7 @@ export interface ChangePasswordFormData {
 export interface ProfileUpdateFormData {
   first_name?: string;
   last_name?: string;
-  email?: string; // Changed to optional undefined, not nullable
+  email?: string;
 }
 
 export interface ProductFilters {
@@ -268,13 +271,6 @@ export interface ForgotPasswordFormData {
   phone_number: string;
 }
 
-export interface ResetPasswordFormData {
-  phone_number: string;
-  verification_code: string;
-  new_password: string;
-  confirm_password: string;
-}
-
 export interface ResendCodeFormData {
   phone_number: string;
   type?: "registration" | "password_reset";
@@ -286,7 +282,7 @@ export interface CategoryFormData {
   description?: string;
   image_url?: string;
   sort_order?: number;
-  is_active: boolean; // Required for edit forms
+  is_active: boolean;
 }
 
 export interface CategoryCreateFormData {
@@ -295,12 +291,12 @@ export interface CategoryCreateFormData {
   description?: string;
   image_url?: string;
   sort_order?: number;
-  // is_active not included for create forms - defaults to true
 }
 
 export interface ProductEditFormData {
-  product_id: number;
+  product_id: number; // Keep for form identification, but don't send to API
   name: string;
+  code: string; // FIXED: Added missing code field
   slug?: string;
   description?: string;
   price: number;
@@ -313,9 +309,10 @@ export interface ProductEditFormData {
   image_url?: string;
 }
 
+// Fixed: Made ProductCreateFormData consistent with ProductCreateData
 export interface ProductCreateFormData {
   name: string;
-  code: string;
+  code: string; // Fixed: Added missing code field
   slug?: string;
   description?: string;
   price: number;
@@ -325,7 +322,6 @@ export interface ProductCreateFormData {
   dimensions?: string;
   is_featured?: boolean;
   image_url?: string;
-  // is_active not included for create forms - defaults to true
 }
 
 export interface Order {
@@ -343,8 +339,8 @@ export interface Order {
   total_amount: number;
   delivery_address: string;
   delivery_notes?: string;
-  items?: OrderItem[]; // Made optional for list views
-  items_count?: number; // Added for list views that might only show count
+  items?: OrderItem[];
+  items_count?: number;
   created_at: string;
   updated_at: string;
   confirmed_at?: string;
