@@ -69,6 +69,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
+  const { t } = useTranslation();
 
   if (isLoading) {
     return <LoadingSpinner fullHeight />;
@@ -78,10 +79,10 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
     return (
       <Box sx={{ p: 8, textAlign: "center" }}>
         <Typography variant="h5" color="error">
-          Access Denied
+          {t("admin.accessDenied")}
         </Typography>
         <Typography variant="body1" sx={{ mt: 2 }}>
-          You don't have permission to access this page.
+          {t("admin.noPermission")}
         </Typography>
       </Box>
     );
@@ -123,12 +124,12 @@ function CategoriesManagementContent() {
   const deleteCategoryMutation = useMutation({
     mutationFn: categoriesService.admin.deleteCategory,
     onSuccess: () => {
-      toast.success("Category deleted successfully");
+      toast.success(t("admin.success"));
       queryClient.invalidateQueries({ queryKey: ["adminCategories"] });
       setDeleteDialogOpen(false);
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to delete category");
+      toast.error(error.response?.data?.message || t("admin.error"));
     },
   });
 
@@ -178,7 +179,7 @@ function CategoriesManagementContent() {
         setDeleteDialogOpen(true);
         break;
       case "duplicate":
-        toast.info("Category duplication coming soon");
+        toast.info(t("admin.comingSoon"));
         break;
     }
     handleActionMenuClose();
@@ -218,15 +219,11 @@ function CategoriesManagementContent() {
       : categoriesData?.categories || [];
 
   if (isLoading) {
-    return <LoadingSpinner message="Loading categories..." />;
+    return <LoadingSpinner message={t("admin.categories.loadingCategory")} />;
   }
 
   if (error) {
-    return (
-      <Alert severity="error">
-        Failed to load categories. Please try again.
-      </Alert>
-    );
+    return <Alert severity="error">{t("admin.error")}</Alert>;
   }
 
   const pagination = categoriesData?.pagination;
@@ -244,10 +241,10 @@ function CategoriesManagementContent() {
       >
         <Box>
           <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-            Category Management
+            {t("admin.categories.management")}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Manage your product categories and organization
+            {t("admin.categories.subtitle")}
           </Typography>
         </Box>
         <Box sx={{ display: "flex", gap: 2 }}>
@@ -258,18 +255,18 @@ function CategoriesManagementContent() {
               queryClient.invalidateQueries({ queryKey: ["adminCategories"] })
             }
           >
-            Refresh
+            {t("common.refresh")}
           </Button>
           <Button
             variant="outlined"
             startIcon={<Sort />}
-            onClick={() => toast.info("Sort management coming soon")}
+            onClick={() => toast.info(t("admin.comingSoon"))}
           >
-            Manage Order
+            {t("admin.categories.manageOrder")}
           </Button>
           <Link href="/admin/categories/create">
             <Button variant="contained" startIcon={<Add />}>
-              Add Category
+              {t("admin.categories.addCategory")}
             </Button>
           </Link>
         </Box>
@@ -289,7 +286,7 @@ function CategoriesManagementContent() {
                     {categoriesData?.pagination?.total || 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Total Categories
+                    {t("admin.categories.totalCategories")}
                   </Typography>
                 </Box>
               </Box>
@@ -308,7 +305,7 @@ function CategoriesManagementContent() {
                     {displayCategories.filter((c) => c.is_active).length}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Active Categories
+                    {t("admin.categories.activeCategories")}
                   </Typography>
                 </Box>
               </Box>
@@ -327,7 +324,7 @@ function CategoriesManagementContent() {
                     {displayCategories.filter((c) => !c.is_active).length}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Inactive Categories
+                    {t("admin.categories.inactiveCategories")}
                   </Typography>
                 </Box>
               </Box>
@@ -349,7 +346,7 @@ function CategoriesManagementContent() {
                     )}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Total Products
+                    {t("admin.categories.totalProducts")}
                   </Typography>
                 </Box>
               </Box>
@@ -364,7 +361,7 @@ function CategoriesManagementContent() {
           <Grid item xs={12} md={6}>
             <TextField
               fullWidth
-              placeholder="Search categories..."
+              placeholder={t("admin.categories.searchCategories")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               InputProps={{
@@ -378,18 +375,22 @@ function CategoriesManagementContent() {
           </Grid>
           <Grid item xs={12} md={3}>
             <FormControl fullWidth>
-              <InputLabel>Status</InputLabel>
+              <InputLabel>{t("common.status")}</InputLabel>
               <Select
                 value={filters.include_inactive ? "all" : "active"}
-                label="Status"
+                label={t("common.status")}
                 onChange={(e) =>
                   handleFilterChange({
                     include_inactive: e.target.value === "all",
                   })
                 }
               >
-                <MenuItem value="all">All Categories</MenuItem>
-                <MenuItem value="active">Active Only</MenuItem>
+                <MenuItem value="all">
+                  {t("admin.categories.allCategories")}
+                </MenuItem>
+                <MenuItem value="active">
+                  {t("admin.categories.activeOnly")}
+                </MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -418,28 +419,28 @@ function CategoriesManagementContent() {
         <Paper sx={{ p: 2, mb: 3, bgcolor: "primary.50" }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Typography variant="body1" sx={{ fontWeight: 600 }}>
-              {selectedCategories.length} categories selected
+              {selectedCategories.length} {t("admin.categories.selected")}
             </Typography>
             <Button
               variant="contained"
               size="small"
-              onClick={() => toast.info("Bulk actions coming soon")}
+              onClick={() => toast.info(t("admin.comingSoon"))}
             >
-              Bulk Activate
+              {t("admin.categories.bulkActivate")}
             </Button>
             <Button
               variant="contained"
               size="small"
-              onClick={() => toast.info("Bulk actions coming soon")}
+              onClick={() => toast.info(t("admin.comingSoon"))}
             >
-              Bulk Deactivate
+              {t("admin.categories.bulkDeactivate")}
             </Button>
             <Button
               variant="outlined"
               size="small"
               onClick={() => setSelectedCategories([])}
             >
-              Clear Selection
+              {t("admin.categories.clearSelection")}
             </Button>
           </Box>
         </Paper>
@@ -466,14 +467,14 @@ function CategoriesManagementContent() {
               <TableCell>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <DragIndicator sx={{ color: "action.disabled" }} />
-                  Order
+                  {t("admin.categories.order")}
                 </Box>
               </TableCell>
-              <TableCell>Category</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Products</TableCell>
-              <TableCell>Created</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell>{t("common.category")}</TableCell>
+              <TableCell>{t("common.status")}</TableCell>
+              <TableCell>{t("admin.categories.productCount")}</TableCell>
+              <TableCell>{t("admin.categories.created")}</TableCell>
+              <TableCell align="right">{t("common.actions")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -552,14 +553,19 @@ function CategoriesManagementContent() {
                 </TableCell>
                 <TableCell>
                   <Chip
-                    label={category.is_active ? "Active" : "Inactive"}
+                    label={
+                      category.is_active
+                        ? t("admin.products.active")
+                        : t("admin.products.inactive")
+                    }
                     color={category.is_active ? "success" : "default"}
                     size="small"
                   />
                 </TableCell>
                 <TableCell>
                   <Typography variant="body2">
-                    {category.product_count || 0} products
+                    {category.product_count || 0}{" "}
+                    {t("admin.categories.productCount")}
                   </Typography>
                 </TableCell>
                 <TableCell>
@@ -568,7 +574,7 @@ function CategoriesManagementContent() {
                   </Typography>
                 </TableCell>
                 <TableCell align="right">
-                  <Tooltip title="More actions">
+                  <Tooltip title={t("admin.moreActions")}>
                     <IconButton
                       onClick={(e) => handleActionMenuOpen(e, category.id)}
                     >
@@ -614,25 +620,25 @@ function CategoriesManagementContent() {
           <ListItemIcon>
             <Visibility fontSize="small" />
           </ListItemIcon>
-          <ListItemText>View Category</ListItemText>
+          <ListItemText>{t("admin.categories.viewCategory")}</ListItemText>
         </MenuItem>
         <MenuItem onClick={() => handleCategoryAction("edit")}>
           <ListItemIcon>
             <Edit fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Edit Category</ListItemText>
+          <ListItemText>{t("admin.categories.editCategory")}</ListItemText>
         </MenuItem>
         <MenuItem onClick={() => handleCategoryAction("duplicate")}>
           <ListItemIcon>
             <ContentCopy fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Duplicate</ListItemText>
+          <ListItemText>{t("admin.categories.duplicate")}</ListItemText>
         </MenuItem>
         <MenuItem onClick={() => handleCategoryAction("delete")}>
           <ListItemIcon>
             <Delete fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Delete</ListItemText>
+          <ListItemText>{t("common.delete")}</ListItemText>
         </MenuItem>
       </Menu>
 
@@ -641,26 +647,30 @@ function CategoriesManagementContent() {
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
       >
-        <DialogTitle>Delete Category</DialogTitle>
+        <DialogTitle>{t("admin.categories.deleteCategory")}</DialogTitle>
         <DialogContent>
           <Alert severity="warning" sx={{ mb: 2 }}>
-            This action cannot be undone!
+            {t("admin.categories.deleteConfirmationText")}
           </Alert>
           <Typography>
-            Are you sure you want to delete
+            {t("admin.categories.deleteConfirmationQuestion", {
+              name: getCategory(selectedCategoryId || 0)?.name,
+            })}
             {getCategory(selectedCategoryId || 0)?.product_count &&
               getCategory(selectedCategoryId || 0)!.product_count! > 0 && (
                 <span>
                   {" "}
-                  This category contains{" "}
-                  {getCategory(selectedCategoryId || 0)?.product_count} products
-                  that will be moved to "Uncategorized".
+                  {t("admin.categories.deleteWithProducts", {
+                    count: getCategory(selectedCategoryId || 0)?.product_count,
+                  })}
                 </span>
               )}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+          <Button onClick={() => setDeleteDialogOpen(false)}>
+            {t("common.cancel")}
+          </Button>
           <Button
             onClick={handleDeleteCategory}
             color="error"
@@ -668,8 +678,8 @@ function CategoriesManagementContent() {
             disabled={deleteCategoryMutation.isPending}
           >
             {deleteCategoryMutation.isPending
-              ? "Deleting..."
-              : "Delete Category"}
+              ? t("admin.categories.deleting")
+              : t("admin.categories.deleteCategory")}
           </Button>
         </DialogActions>
       </Dialog>

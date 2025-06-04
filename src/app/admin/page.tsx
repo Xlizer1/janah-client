@@ -39,6 +39,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
+  const { t } = useTranslation();
 
   if (isLoading) {
     return <LoadingSpinner fullHeight />;
@@ -48,10 +49,10 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
     return (
       <Box sx={{ p: 8, textAlign: "center" }}>
         <Typography variant="h5" color="error">
-          Access Denied
+          {t("admin.accessDenied")}
         </Typography>
         <Typography variant="body1" sx={{ mt: 2 }}>
-          You don't have permission to access this page.
+          {t("admin.noPermission")}
         </Typography>
       </Box>
     );
@@ -81,7 +82,7 @@ function DashboardContent() {
 
   const metrics = [
     {
-      title: "Total Revenue",
+      title: t("admin.dashboard.totalRevenue"),
       value: "$45,231",
       change: "+12.5%",
       trend: "up",
@@ -89,7 +90,7 @@ function DashboardContent() {
       icon: TrendingUp,
     },
     {
-      title: "Total Orders",
+      title: t("orders.management"),
       value: "1,234",
       change: "+8.2%",
       trend: "up",
@@ -97,7 +98,7 @@ function DashboardContent() {
       icon: ShoppingCart,
     },
     {
-      title: "Products Sold",
+      title: t("admin.dashboard.productsSold"),
       value: "3,456",
       change: "-2.4%",
       trend: "down",
@@ -105,7 +106,7 @@ function DashboardContent() {
       icon: Inventory,
     },
     {
-      title: "Conversion Rate",
+      title: t("admin.dashboard.conversionRate"),
       value: "3.2%",
       change: "+0.5%",
       trend: "up",
@@ -115,7 +116,7 @@ function DashboardContent() {
   ];
 
   if (statsLoading) {
-    return <LoadingSpinner message="Loading dashboard..." />;
+    return <LoadingSpinner message={t("admin.dashboard.loading")} />;
   }
 
   return (
@@ -130,7 +131,7 @@ function DashboardContent() {
         }}
       >
         <Typography variant="h4" sx={{ fontWeight: 700 }}>
-          Dashboard Overview
+          {t("admin.dashboard.overview")}
         </Typography>
         <IconButton>
           <Refresh />
@@ -151,7 +152,7 @@ function DashboardContent() {
                     {stats?.total_users || 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Total Users
+                    {t("admin.dashboard.totalUsers")}
                   </Typography>
                 </Box>
               </Box>
@@ -163,7 +164,7 @@ function DashboardContent() {
                 sx={{ mb: 1 }}
               />
               <Typography variant="caption" color="text.secondary">
-                {stats?.active_users || 0} active users
+                {stats?.active_users || 0} {t("admin.dashboard.activeUsers")}
               </Typography>
             </CardContent>
           </Card>
@@ -181,12 +182,12 @@ function DashboardContent() {
                     {stats?.pending_activation || 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Pending Approval
+                    {t("admin.dashboard.pendingActivation")}
                   </Typography>
                 </Box>
               </Box>
               <Typography variant="body2" color="warning.main">
-                Requires admin action
+                {t("admin.dashboard.requiresAdminAction")}
               </Typography>
             </CardContent>
           </Card>
@@ -204,12 +205,12 @@ function DashboardContent() {
                     {stats?.activation_rate || 0}%
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Activation Rate
+                    {t("admin.dashboard.activationRate")}
                   </Typography>
                 </Box>
               </Box>
               <Typography variant="body2" color="success.main">
-                User activation success
+                {t("admin.dashboard.userActivationSuccess")}
               </Typography>
             </CardContent>
           </Card>
@@ -227,12 +228,12 @@ function DashboardContent() {
                     {stats?.unverified_phone || 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Unverified Phone
+                    {t("admin.dashboard.unverifiedPhone")}
                   </Typography>
                 </Box>
               </Box>
               <Typography variant="body2" color="error.main">
-                Need phone verification
+                {t("admin.dashboard.needPhoneVerification")}
               </Typography>
             </CardContent>
           </Card>
@@ -273,14 +274,16 @@ function DashboardContent() {
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-              Top Categories
+              {t("admin.dashboard.topCategories")}
             </Typography>
             <List>
               {categoriesData?.categories.slice(0, 5).map((category) => (
                 <ListItem key={category.id}>
                   <ListItemText
                     primary={category.category_name}
-                    secondary={`${category.total_products} products`}
+                    secondary={`${category.total_products} ${t(
+                      "admin.categories.productCount"
+                    )}`}
                   />
                   <ListItemSecondaryAction>
                     <Typography variant="body2" color="primary.main">
@@ -305,7 +308,7 @@ function DashboardContent() {
               }}
             >
               <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                Products Need Attention
+                {t("admin.dashboard.productsNeedingAttention")}
               </Typography>
               <IconButton size="small">
                 <MoreVert />
@@ -341,7 +344,7 @@ function DashboardContent() {
         <Grid item xs={12}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-              Recent Activity
+              {t("admin.dashboard.recentActivity")}
             </Typography>
             <List>
               <ListItem>

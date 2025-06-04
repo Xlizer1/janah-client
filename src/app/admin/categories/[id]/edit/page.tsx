@@ -89,6 +89,7 @@ const categorySchema = yup.object({
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
+  const { t } = useTranslation();
 
   if (isLoading) {
     return <LoadingSpinner fullHeight />;
@@ -98,10 +99,10 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
     return (
       <Box sx={{ p: 8, textAlign: "center" }}>
         <Typography variant="h5" color="error">
-          Access Denied
+          {t("admin.accessDenied")}
         </Typography>
         <Typography variant="body1" sx={{ mt: 2 }}>
-          You don't have permission to access this page.
+          {t("admin.noPermission")}
         </Typography>
       </Box>
     );
@@ -303,7 +304,7 @@ function EditCategoryContent() {
       }
     },
     onSuccess: (data) => {
-      toast.success("Category updated successfully!");
+      toast.success(t("admin.success"));
       queryClient.invalidateQueries({ queryKey: ["category", categoryId] });
       queryClient.invalidateQueries({ queryKey: ["adminCategories"] });
     },
@@ -334,7 +335,7 @@ function EditCategoryContent() {
   const deleteCategoryMutation = useMutation({
     mutationFn: () => categoriesService.admin.deleteCategory(categoryId),
     onSuccess: () => {
-      toast.success("Category deleted successfully!");
+      toast.success(t("admin.success"));
       router.push("/admin/categories");
     },
     onError: (error: any) => {
@@ -418,20 +419,27 @@ function EditCategoryContent() {
   };
 
   if (isLoading) {
-    return <LoadingSpinner fullHeight message="Loading category..." />;
+    return (
+      <LoadingSpinner
+        fullHeight
+        message={t("admin.categories.loadingCategory")}
+      />
+    );
   }
 
   if (error || !categoryData?.category) {
     return (
       <Box sx={{ p: 8, textAlign: "center" }}>
         <Typography variant="h5" color="error" sx={{ mb: 2 }}>
-          Category not found
+          {t("admin.categories.categoryNotFound")}
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-          The category you're looking for doesn't exist or has been removed.
+          {t("admin.categories.categoryNotFoundText")}
         </Typography>
         <Link href="/admin/categories">
-          <Button variant="contained">Back to Categories</Button>
+          <Button variant="contained">
+            {t("admin.categories.backToCategories")}
+          </Button>
         </Link>
       </Box>
     );
@@ -450,7 +458,7 @@ function EditCategoryContent() {
             </IconButton>
           </Link>
           <Typography variant="h4" sx={{ fontWeight: 700, flex: 1 }}>
-            Edit Category
+            {t("admin.categories.editCategory")}
           </Typography>
           <Button
             variant="outlined"
@@ -458,7 +466,7 @@ function EditCategoryContent() {
             onClick={handlePreview}
             disabled={isSubmitting}
           >
-            View Live
+            {t("admin.categories.viewLive")}
           </Button>
           <Button
             variant="outlined"
@@ -466,7 +474,7 @@ function EditCategoryContent() {
             onClick={() => refetch()}
             disabled={isSubmitting}
           >
-            Refresh
+            {t("common.refresh")}
           </Button>
           <Button
             variant="contained"
@@ -474,18 +482,21 @@ function EditCategoryContent() {
             onClick={handleSubmit(onSubmit)}
             disabled={isSubmitting || !isDirty}
           >
-            {isSubmitting ? "Saving..." : "Save Changes"}
+            {isSubmitting
+              ? t("admin.categories.saving")
+              : t("admin.categories.saveChanges")}
           </Button>
         </Box>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Typography variant="body1" color="text.secondary">
-            Category ID: {category.id}
+            {t("admin.categories.categoryId")}: {category.id}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Created: {new Date(category.created_at).toLocaleDateString()}
+            {t("admin.categories.created")}:{" "}
+            {new Date(category.created_at).toLocaleDateString()}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Products: {category.product_count || 0}
+            {t("admin.categories.productCount")}: {category.product_count || 0}
           </Typography>
         </Box>
       </Box>
@@ -525,7 +536,7 @@ function EditCategoryContent() {
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
             {/* Basic Information */}
             <Card>
-              <CardHeader title="Basic Information" />
+              <CardHeader title={t("admin.categories.basicInformation")} />
               <CardContent
                 sx={{ display: "flex", flexDirection: "column", gap: 3 }}
               >
@@ -535,7 +546,7 @@ function EditCategoryContent() {
                   render={({ field }) => (
                     <TextField
                       {...field}
-                      label="Category Name"
+                      label={t("admin.categories.categoryName")}
                       fullWidth
                       required
                       error={!!errors.name}
@@ -583,12 +594,12 @@ function EditCategoryContent() {
                   render={({ field }) => (
                     <TextField
                       {...field}
-                      label="URL Slug"
+                      label={t("admin.categories.urlSlug")}
                       fullWidth
                       error={!!errors.slug}
                       helperText={
                         errors.slug?.message ||
-                        "URL-friendly version of the name"
+                        t("admin.categories.urlSlugHelp")
                       }
                       placeholder="category-name"
                       disabled={isSubmitting}
@@ -602,16 +613,16 @@ function EditCategoryContent() {
                   render={({ field }) => (
                     <TextField
                       {...field}
-                      label="Description"
+                      label={t("common.description")}
                       fullWidth
                       multiline
                       rows={4}
                       error={!!errors.description}
                       helperText={
                         errors.description?.message ||
-                        "Optional description for this category"
+                        t("admin.categories.descriptionHelp")
                       }
-                      placeholder="Describe this category and what products it contains..."
+                      placeholder={t("admin.categories.descriptionPlaceholder")}
                       disabled={isSubmitting}
                     />
                   )}
@@ -621,7 +632,7 @@ function EditCategoryContent() {
 
             {/* Category Image */}
             <Card>
-              <CardHeader title="Category Image" />
+              <CardHeader title={t("admin.categories.categoryImage")} />
               <CardContent>
                 {/* Show existing image if it's an HTTP URL */}
                 {watch("image_url") &&
@@ -689,7 +700,7 @@ function EditCategoryContent() {
                     onChange={handleImageChange}
                     onError={handleImageError}
                     maxSize={10}
-                    label="Upload Category Image"
+                    label={t("admin.categories.uploadImage")}
                     helperText="Max 10MB, PNG or JPG format recommended. Category images should be at least 400x400px"
                     variant="dropzone"
                     disabled={isSubmitting}
@@ -707,7 +718,7 @@ function EditCategoryContent() {
                       disabled={isSubmitting}
                       sx={{ mt: 2 }}
                     >
-                      Change Image
+                      {t("admin.categories.changeImage")}
                     </Button>
                   )}
 
@@ -726,7 +737,7 @@ function EditCategoryContent() {
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
             {/* Status */}
             <Card>
-              <CardHeader title="Category Status" />
+              <CardHeader title={t("admin.categories.categoryStatus")} />
               <CardContent>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                   <Controller
@@ -741,15 +752,14 @@ function EditCategoryContent() {
                             disabled={isSubmitting}
                           />
                         }
-                        label="Category Active"
+                        label={t("admin.categories.categoryActive")}
                       />
                     )}
                   />
 
                   <Alert severity="info" sx={{ mt: 2 }}>
                     <Typography variant="body2">
-                      Inactive categories won't be displayed to customers but
-                      products remain accessible via direct links.
+                      {t("admin.categories.inactiveWarning")}
                     </Typography>
                   </Alert>
                 </Box>
@@ -758,7 +768,7 @@ function EditCategoryContent() {
 
             {/* Organization */}
             <Card>
-              <CardHeader title="Organization" />
+              <CardHeader title={t("admin.categories.organization")} />
               <CardContent>
                 <Controller
                   name="sort_order"
@@ -766,13 +776,13 @@ function EditCategoryContent() {
                   render={({ field }) => (
                     <TextField
                       {...field}
-                      label="Sort Order"
+                      label={t("admin.categories.sortOrder")}
                       type="number"
                       fullWidth
                       error={!!errors.sort_order}
                       helperText={
                         errors.sort_order?.message ||
-                        "Lower numbers appear first"
+                        t("admin.categories.sortOrderHelp")
                       }
                       inputProps={{ min: 0 }}
                       disabled={isSubmitting}
@@ -796,7 +806,8 @@ function EditCategoryContent() {
                       <Warning sx={{ fontSize: 16, color: "warning.main" }} />
                     )}
                     <Typography variant="body2">
-                      Category Name {watch("name") ? "✓" : "(Required)"}
+                      {t("admin.categories.categoryName")}{" "}
+                      {watch("name") ? "✓" : "(Required)"}
                     </Typography>
                   </Box>
 
@@ -822,7 +833,8 @@ function EditCategoryContent() {
                       <Info sx={{ fontSize: 16, color: "info.main" }} />
                     )}
                     <Typography variant="body2">
-                      URL Slug {watch("slug") ? "✓" : "(Optional)"}
+                      {t("admin.categories.urlSlug")}{" "}
+                      {watch("slug") ? "✓" : "(Optional)"}
                     </Typography>
                   </Box>
 
@@ -835,7 +847,8 @@ function EditCategoryContent() {
                       <Info sx={{ fontSize: 16, color: "info.main" }} />
                     )}
                     <Typography variant="body2">
-                      Category Image {watch("image_url") ? "✓" : "(Optional)"}
+                      {t("admin.categories.categoryImage")}{" "}
+                      {watch("image_url") ? "✓" : "(Optional)"}
                     </Typography>
                   </Box>
 
@@ -849,7 +862,7 @@ function EditCategoryContent() {
                       <Info sx={{ fontSize: 16, color: "info.main" }} />
                     )}
                     <Typography variant="body2">
-                      Sort Order{" "}
+                      {t("admin.categories.sortOrder")}{" "}
                       {watch("sort_order") != null && watch("sort_order")! >= 0
                         ? "✓"
                         : "(Optional)"}
@@ -861,12 +874,12 @@ function EditCategoryContent() {
 
             {/* Category Info */}
             <Card>
-              <CardHeader title="Category Information" />
+              <CardHeader title={t("admin.categories.categoryInfo")} />
               <CardContent>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                   <Box>
                     <Typography variant="caption" color="text.secondary">
-                      Created
+                      {t("admin.categories.created")}
                     </Typography>
                     <Typography variant="body2">
                       {new Date(category.created_at).toLocaleDateString()}
@@ -874,7 +887,7 @@ function EditCategoryContent() {
                   </Box>
                   <Box>
                     <Typography variant="caption" color="text.secondary">
-                      Last Updated
+                      {t("admin.categories.lastUpdated")}
                     </Typography>
                     <Typography variant="body2">
                       {new Date(category.updated_at).toLocaleDateString()}
@@ -885,7 +898,8 @@ function EditCategoryContent() {
                       Total Products
                     </Typography>
                     <Typography variant="body2">
-                      {category.product_count || 0} products
+                      {category.product_count || 0}{" "}
+                      {t("admin.categories.productCount")}
                     </Typography>
                   </Box>
                 </Box>
@@ -894,7 +908,7 @@ function EditCategoryContent() {
 
             {/* Quick Actions */}
             <Card>
-              <CardHeader title="Quick Actions" />
+              <CardHeader title={t("admin.categories.quickActions")} />
               <CardContent>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                   <Button
@@ -904,7 +918,7 @@ function EditCategoryContent() {
                     fullWidth
                     disabled={isSubmitting}
                   >
-                    Change Image
+                    {t("admin.categories.changeImage")}
                   </Button>
                   <Button
                     variant="outlined"
@@ -913,7 +927,7 @@ function EditCategoryContent() {
                     fullWidth
                     disabled={isSubmitting}
                   >
-                    Preview Category
+                    {t("admin.categories.previewCategory")}
                   </Button>
                   <Button
                     variant="outlined"
@@ -924,7 +938,7 @@ function EditCategoryContent() {
                     fullWidth
                     disabled={isSubmitting}
                   >
-                    View Details
+                    {t("admin.categories.viewDetails")}
                   </Button>
                 </Box>
               </CardContent>
@@ -933,13 +947,12 @@ function EditCategoryContent() {
             {/* Danger Zone */}
             <Card sx={{ border: 1, borderColor: "error.main" }}>
               <CardHeader
-                title="Danger Zone"
+                title={t("admin.categories.dangerZone")}
                 titleTypographyProps={{ color: "error.main" }}
               />
               <CardContent>
                 <Typography variant="body2" sx={{ mb: 2 }}>
-                  Deleting this category will permanently remove it. Products
-                  will be moved to "Uncategorized".
+                  {t("admin.categories.deleteWarning")}
                 </Typography>
                 <Button
                   variant="outlined"
@@ -949,7 +962,7 @@ function EditCategoryContent() {
                   fullWidth
                   disabled={isSubmitting}
                 >
-                  Delete Category
+                  {t("admin.categories.deleteCategory")}
                 </Button>
               </CardContent>
             </Card>
@@ -962,24 +975,29 @@ function EditCategoryContent() {
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
       >
-        <DialogTitle>Delete Category</DialogTitle>
+        <DialogTitle>{t("admin.categories.deleteCategory")}</DialogTitle>
         <DialogContent>
           <Alert severity="warning" sx={{ mb: 2 }}>
-            This action cannot be undone!
+            {t("admin.categories.deleteConfirmationText")}
           </Alert>
           <Typography>
-            Are you sure you want to delete "{category.name}"?
+            {t("admin.categories.deleteConfirmationQuestion", {
+              name: category.name,
+            })}
             {category.product_count && category.product_count > 0 && (
               <span>
                 {" "}
-                This category contains {category.product_count} products that
-                will be moved to "Uncategorized".
+                {t("admin.categories.deleteWithProducts", {
+                  count: category.product_count,
+                })}
               </span>
             )}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+          <Button onClick={() => setDeleteDialogOpen(false)}>
+            {t("common.cancel")}
+          </Button>
           <Button
             onClick={handleDeleteCategory}
             color="error"
@@ -987,8 +1005,8 @@ function EditCategoryContent() {
             disabled={deleteCategoryMutation.isPending}
           >
             {deleteCategoryMutation.isPending
-              ? "Deleting..."
-              : "Delete Category"}
+              ? t("admin.categories.deleting")
+              : t("admin.categories.deleteCategory")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1019,7 +1037,7 @@ function EditCategoryContent() {
         >
           <Link href="/admin/categories">
             <Button startIcon={<ArrowBack />} disabled={isSubmitting}>
-              Back to Categories
+              {t("admin.categories.backToCategories")}
             </Button>
           </Link>
           <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
@@ -1041,7 +1059,9 @@ function EditCategoryContent() {
               onClick={handleSubmit(onSubmit)}
               disabled={isSubmitting || !isDirty}
             >
-              {isSubmitting ? "Saving..." : "Save Changes"}
+              {isSubmitting
+                ? t("admin.categories.saving")
+                : t("admin.categories.saveChanges")}
             </Button>
           </Box>
         </Box>

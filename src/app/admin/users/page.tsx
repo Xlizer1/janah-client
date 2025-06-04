@@ -75,6 +75,7 @@ interface UserFilters {
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
+  const { t } = useTranslation();
 
   if (isLoading) {
     return <LoadingSpinner fullHeight />;
@@ -84,10 +85,10 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
     return (
       <Box sx={{ p: 8, textAlign: "center" }}>
         <Typography variant="h5" color="error">
-          Access Denied
+          {t("admin.accessDenied")}
         </Typography>
         <Typography variant="body1" sx={{ mt: 2 }}>
-          You don't have permission to access this page.
+          {t("admin.noPermission")}
         </Typography>
       </Box>
     );
@@ -131,24 +132,28 @@ function UsersManagementContent() {
   const activateUserMutation = useMutation({
     mutationFn: adminService.users.activateUser,
     onSuccess: () => {
-      toast.success("User activated successfully");
+      toast.success(t("admin.users.userActivated"));
       queryClient.invalidateQueries({ queryKey: ["adminUsers"] });
       queryClient.invalidateQueries({ queryKey: ["adminStats"] });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to activate user");
+      toast.error(
+        error.response?.data?.message || t("admin.users.activationFailed")
+      );
     },
   });
 
   const deactivateUserMutation = useMutation({
     mutationFn: adminService.users.deactivateUser,
     onSuccess: () => {
-      toast.success("User deactivated successfully");
+      toast.success(t("admin.users.userDeactivated"));
       queryClient.invalidateQueries({ queryKey: ["adminUsers"] });
       queryClient.invalidateQueries({ queryKey: ["adminStats"] });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to deactivate user");
+      toast.error(
+        error.response?.data?.message || t("admin.users.deactivationFailed")
+      );
     },
   });
 
@@ -252,19 +257,17 @@ function UsersManagementContent() {
   };
 
   const getUserStatusText = (user: any) => {
-    if (!user.is_phone_verified) return "Phone Not Verified";
-    if (!user.is_active) return "Pending Activation";
-    return "Active";
+    if (!user.is_phone_verified) return t("admin.users.phoneNotVerified");
+    if (!user.is_active) return t("admin.users.pendingActivation");
+    return t("admin.users.active");
   };
 
   if (isLoading) {
-    return <LoadingSpinner message="Loading users..." />;
+    return <LoadingSpinner message={t("admin.loading")} />;
   }
 
   if (error) {
-    return (
-      <Alert severity="error">Failed to load users. Please try again.</Alert>
-    );
+    return <Alert severity="error">{t("admin.error")}</Alert>;
   }
 
   const users = usersData?.users || [];
@@ -283,10 +286,10 @@ function UsersManagementContent() {
       >
         <Box>
           <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-            User Management
+            {t("admin.users.management")}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Manage user accounts, activations, and permissions
+            {t("admin.users.subtitle")}
           </Typography>
         </Box>
         <Box sx={{ display: "flex", gap: 2 }}>
@@ -297,11 +300,12 @@ function UsersManagementContent() {
               queryClient.invalidateQueries({ queryKey: ["adminUsers"] })
             }
           >
-            Refresh
+            {t("common.refresh")}
           </Button>
           <Link href="/admin/users/pending">
             <Button variant="contained" startIcon={<PersonAdd />}>
-              Pending Users ({statsData?.stats?.pending_activation || 0})
+              {t("admin.users.pendingUsers")} (
+              {statsData?.stats?.pending_activation || 0})
             </Button>
           </Link>
         </Box>
@@ -321,7 +325,7 @@ function UsersManagementContent() {
                     {statsData?.stats?.total_users || 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Total Users
+                    {t("admin.users.totalUsers")}
                   </Typography>
                 </Box>
               </Box>
@@ -340,7 +344,7 @@ function UsersManagementContent() {
                     {statsData?.stats?.active_users || 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Active Users
+                    {t("admin.users.activeUsers")}
                   </Typography>
                 </Box>
               </Box>
@@ -359,7 +363,7 @@ function UsersManagementContent() {
                     {statsData?.stats?.pending_activation || 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Pending Activation
+                    {t("admin.users.pendingActivation")}
                   </Typography>
                 </Box>
               </Box>
@@ -378,7 +382,7 @@ function UsersManagementContent() {
                     {statsData?.stats?.unverified_phone || 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Unverified Phone
+                    {t("admin.users.unverifiedPhone")}
                   </Typography>
                 </Box>
               </Box>
@@ -393,7 +397,7 @@ function UsersManagementContent() {
           <Grid item xs={12} md={4}>
             <TextField
               fullWidth
-              placeholder="Search users..."
+              placeholder={t("admin.users.searchUsers")}
               value={filters.search || ""}
               onChange={(e) => handleFilterChange({ search: e.target.value })}
               InputProps={{
@@ -407,32 +411,32 @@ function UsersManagementContent() {
           </Grid>
           <Grid item xs={12} md={2}>
             <FormControl fullWidth>
-              <InputLabel>Role</InputLabel>
+              <InputLabel>{t("admin.users.role")}</InputLabel>
               <Select
                 value={filters.role || ""}
-                label="Role"
+                label={t("admin.users.role")}
                 onChange={(e) =>
                   handleFilterChange({
                     role: e.target.value as "user" | "admin" | undefined,
                   })
                 }
               >
-                <MenuItem value="">All Roles</MenuItem>
-                <MenuItem value="user">User</MenuItem>
-                <MenuItem value="admin">Admin</MenuItem>
+                <MenuItem value="">{t("admin.users.allRoles")}</MenuItem>
+                <MenuItem value="user">{t("admin.users.userRole")}</MenuItem>
+                <MenuItem value="admin">{t("admin.users.adminRole")}</MenuItem>
               </Select>
             </FormControl>
           </Grid>
           <Grid item xs={12} md={2}>
             <FormControl fullWidth>
-              <InputLabel>Status</InputLabel>
+              <InputLabel>{t("common.status")}</InputLabel>
               <Select
                 value={
                   filters.is_active !== undefined
                     ? filters.is_active.toString()
                     : ""
                 }
-                label="Status"
+                label={t("common.status")}
                 onChange={(e) =>
                   handleFilterChange({
                     is_active:
@@ -442,22 +446,24 @@ function UsersManagementContent() {
                   })
                 }
               >
-                <MenuItem value="">All Status</MenuItem>
-                <MenuItem value="true">Active</MenuItem>
-                <MenuItem value="false">Inactive</MenuItem>
+                <MenuItem value="">{t("admin.users.allStatus")}</MenuItem>
+                <MenuItem value="true">{t("admin.users.activeOnly")}</MenuItem>
+                <MenuItem value="false">
+                  {t("admin.users.inactiveOnly")}
+                </MenuItem>
               </Select>
             </FormControl>
           </Grid>
           <Grid item xs={12} md={2}>
             <FormControl fullWidth>
-              <InputLabel>Phone Verified</InputLabel>
+              <InputLabel>{t("admin.users.phoneVerified")}</InputLabel>
               <Select
                 value={
                   filters.is_phone_verified !== undefined
                     ? filters.is_phone_verified.toString()
                     : ""
                 }
-                label="Phone Verified"
+                label={t("admin.users.phoneVerified")}
                 onChange={(e) =>
                   handleFilterChange({
                     is_phone_verified:
@@ -468,8 +474,10 @@ function UsersManagementContent() {
                 }
               >
                 <MenuItem value="">All</MenuItem>
-                <MenuItem value="true">Verified</MenuItem>
-                <MenuItem value="false">Not Verified</MenuItem>
+                <MenuItem value="true">{t("admin.users.verified")}</MenuItem>
+                <MenuItem value="false">
+                  {t("admin.users.notVerified")}
+                </MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -498,7 +506,7 @@ function UsersManagementContent() {
         <Paper sx={{ p: 2, mb: 3, bgcolor: "primary.50" }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Typography variant="body1" sx={{ fontWeight: 600 }}>
-              {selectedUsers.length} users selected
+              {selectedUsers.length} {t("admin.users.usersSelected")}
             </Typography>
             <Button
               variant="contained"
@@ -506,14 +514,14 @@ function UsersManagementContent() {
               onClick={() => handleBulkAction("activate")}
               disabled={bulkActivateMutation.isPending}
             >
-              Bulk Activate
+              {t("admin.users.bulkActivation")}
             </Button>
             <Button
               variant="outlined"
               size="small"
               onClick={() => setSelectedUsers([])}
             >
-              Clear Selection
+              {t("admin.clearSelection")}
             </Button>
           </Box>
         </Paper>
@@ -536,12 +544,12 @@ function UsersManagementContent() {
                   onChange={handleSelectAll}
                 />
               </TableCell>
-              <TableCell>User</TableCell>
-              <TableCell>Contact</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Role</TableCell>
-              <TableCell>Joined</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell>{t("admin.users.user")}</TableCell>
+              <TableCell>{t("admin.users.contact")}</TableCell>
+              <TableCell>{t("common.status")}</TableCell>
+              <TableCell>{t("admin.users.role")}</TableCell>
+              <TableCell>{t("admin.users.joined")}</TableCell>
+              <TableCell align="right">{t("common.actions")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -622,7 +630,7 @@ function UsersManagementContent() {
                   </Box>
                 </TableCell>
                 <TableCell align="right">
-                  <Tooltip title="More actions">
+                  <Tooltip title={t("admin.moreActions")}>
                     <IconButton
                       onClick={(e) => handleActionMenuOpen(e, user.id)}
                     >
@@ -658,25 +666,25 @@ function UsersManagementContent() {
           <ListItemIcon>
             <Visibility fontSize="small" />
           </ListItemIcon>
-          <ListItemText>View Details</ListItemText>
+          <ListItemText>{t("admin.users.viewDetails")}</ListItemText>
         </MenuItem>
         <MenuItem onClick={() => handleUserAction("edit")}>
           <ListItemIcon>
             <Edit fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Edit User</ListItemText>
+          <ListItemText>{t("admin.users.editUser")}</ListItemText>
         </MenuItem>
         <MenuItem onClick={() => handleUserAction("activate")}>
           <ListItemIcon>
             <CheckCircle fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Activate</ListItemText>
+          <ListItemText>{t("admin.users.activate")}</ListItemText>
         </MenuItem>
         <MenuItem onClick={() => handleUserAction("deactivate")}>
           <ListItemIcon>
             <Cancel fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Deactivate</ListItemText>
+          <ListItemText>{t("admin.users.deactivate")}</ListItemText>
         </MenuItem>
       </Menu>
 
@@ -685,30 +693,26 @@ function UsersManagementContent() {
         open={bulkActionDialog.open}
         onClose={() => setBulkActionDialog({ open: false, action: null })}
       >
-        <DialogTitle>
-          Confirm Bulk{" "}
-          {bulkActionDialog.action === "activate"
-            ? "Activation"
-            : "Deactivation"}
-        </DialogTitle>
+        <DialogTitle>{t("admin.users.confirmBulkActivation")}</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to {bulkActionDialog.action}{" "}
-            {selectedUsers.length} selected users?
+            {t("admin.users.bulkActivationQuestion", {
+              count: selectedUsers.length,
+            })}
           </Typography>
         </DialogContent>
         <DialogActions>
           <Button
             onClick={() => setBulkActionDialog({ open: false, action: null })}
           >
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button
             onClick={confirmBulkAction}
             variant="contained"
             disabled={bulkActivateMutation.isPending}
           >
-            Confirm
+            {t("common.confirm")}
           </Button>
         </DialogActions>
       </Dialog>

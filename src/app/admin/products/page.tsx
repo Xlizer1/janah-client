@@ -73,6 +73,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
+  const { t } = useTranslation();
 
   if (isLoading) {
     return <LoadingSpinner fullHeight />;
@@ -82,10 +83,10 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
     return (
       <Box sx={{ p: 8, textAlign: "center" }}>
         <Typography variant="h5" color="error">
-          Access Denied
+          {t("admin.accessDenied")}
         </Typography>
         <Typography variant="body1" sx={{ mt: 2 }}>
-          You don't have permission to access this page.
+          {t("admin.noPermission")}
         </Typography>
       </Box>
     );
@@ -134,11 +135,11 @@ function ProductsManagementContent() {
   const deleteProductMutation = useMutation({
     mutationFn: productsService.admin.deleteProduct,
     onSuccess: () => {
-      toast.success("Product deleted successfully");
+      toast.success(t("admin.success"));
       queryClient.invalidateQueries({ queryKey: ["adminProducts"] });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to delete product");
+      toast.error(error.response?.data?.message || t("admin.error"));
     },
   });
 
@@ -184,10 +185,10 @@ function ProductsManagementContent() {
         }
         break;
       case "duplicate":
-        toast.info("Product duplication coming soon");
+        toast.info(t("admin.comingSoon"));
         break;
       case "toggle_featured":
-        toast.info("Toggle featured coming soon");
+        toast.info(t("admin.comingSoon"));
         break;
     }
     handleActionMenuClose();
@@ -220,7 +221,7 @@ function ProductsManagementContent() {
   };
 
   const confirmBulkAction = () => {
-    toast.info("Bulk actions coming soon");
+    toast.info(t("admin.comingSoon"));
     setBulkActionDialog({ open: false, action: null });
   };
 
@@ -232,10 +233,10 @@ function ProductsManagementContent() {
   };
 
   const getStatusText = (product: Product) => {
-    if (!product.is_active) return "Inactive";
-    if (product.stock_quantity === 0) return "Out of Stock";
-    if (product.stock_quantity <= 5) return "Low Stock";
-    return "In Stock";
+    if (!product.is_active) return t("admin.products.inactive");
+    if (product.stock_quantity === 0) return t("products.outOfStock");
+    if (product.stock_quantity <= 5) return t("products.lowStock");
+    return t("products.inStock");
   };
 
   const formatPrice = (price: number) => {
@@ -246,13 +247,11 @@ function ProductsManagementContent() {
   };
 
   if (isLoading) {
-    return <LoadingSpinner message="Loading products..." />;
+    return <LoadingSpinner message={t("admin.loading")} />;
   }
 
   if (error) {
-    return (
-      <Alert severity="error">Failed to load products. Please try again.</Alert>
-    );
+    return <Alert severity="error">{t("admin.error")}</Alert>;
   }
 
   const products = productsData?.products || [];
@@ -271,30 +270,30 @@ function ProductsManagementContent() {
       >
         <Box>
           <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-            Product Management
+            {t("admin.products.management")}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Manage your product catalog, inventory, and settings
+            {t("admin.products.subtitle")}
           </Typography>
         </Box>
         <Box sx={{ display: "flex", gap: 2 }}>
           <Button
             variant="outlined"
             startIcon={<GetApp />}
-            onClick={() => toast.info("Export coming soon")}
+            onClick={() => toast.info(t("admin.comingSoon"))}
           >
-            Export
+            {t("admin.products.export")}
           </Button>
           <Button
             variant="outlined"
             startIcon={<CloudUpload />}
-            onClick={() => toast.info("Import coming soon")}
+            onClick={() => toast.info(t("admin.comingSoon"))}
           >
-            Import
+            {t("admin.products.import")}
           </Button>
           <Link href="/admin/products/create">
             <Button variant="contained" startIcon={<Add />}>
-              Add Product
+              {t("admin.products.addProduct")}
             </Button>
           </Link>
         </Box>
@@ -314,7 +313,7 @@ function ProductsManagementContent() {
                     {pagination?.total || 0}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Total Products
+                    {t("admin.products.totalProducts")}
                   </Typography>
                 </Box>
               </Box>
@@ -337,7 +336,7 @@ function ProductsManagementContent() {
                     }
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    In Stock
+                    {t("admin.products.inStock")}
                   </Typography>
                 </Box>
               </Box>
@@ -360,7 +359,7 @@ function ProductsManagementContent() {
                     }
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Low Stock
+                    {t("admin.products.lowStock")}
                   </Typography>
                 </Box>
               </Box>
@@ -379,7 +378,7 @@ function ProductsManagementContent() {
                     {products.filter((p) => p.is_featured).length}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Featured
+                    {t("admin.products.featured")}
                   </Typography>
                 </Box>
               </Box>
@@ -394,7 +393,7 @@ function ProductsManagementContent() {
           <Grid item xs={12} md={4}>
             <TextField
               fullWidth
-              placeholder="Search products..."
+              placeholder={t("search.searchProducts")}
               value={filters.search || ""}
               onChange={(e) => handleFilterChange({ search: e.target.value })}
               InputProps={{
@@ -408,10 +407,10 @@ function ProductsManagementContent() {
           </Grid>
           <Grid item xs={12} md={2}>
             <FormControl fullWidth>
-              <InputLabel>Category</InputLabel>
+              <InputLabel>{t("common.category")}</InputLabel>
               <Select
                 value={filters.category_id || ""}
-                label="Category"
+                label={t("common.category")}
                 onChange={(e) =>
                   handleFilterChange({
                     category_id: e.target.value
@@ -420,7 +419,9 @@ function ProductsManagementContent() {
                   })
                 }
               >
-                <MenuItem value="">All Categories</MenuItem>
+                <MenuItem value="">
+                  {t("admin.products.allCategories")}
+                </MenuItem>
                 {categoriesData?.categories.map((category) => (
                   <MenuItem key={category.id} value={category.id}>
                     {category.name}
@@ -431,14 +432,14 @@ function ProductsManagementContent() {
           </Grid>
           <Grid item xs={12} md={2}>
             <FormControl fullWidth>
-              <InputLabel>Status</InputLabel>
+              <InputLabel>{t("common.status")}</InputLabel>
               <Select
                 value={
                   filters.is_active !== undefined
                     ? filters.is_active.toString()
                     : ""
                 }
-                label="Status"
+                label={t("common.status")}
                 onChange={(e) =>
                   handleFilterChange({
                     is_active:
@@ -448,9 +449,11 @@ function ProductsManagementContent() {
                   })
                 }
               >
-                <MenuItem value="">All Status</MenuItem>
-                <MenuItem value="true">Active</MenuItem>
-                <MenuItem value="false">Inactive</MenuItem>
+                <MenuItem value="">{t("admin.products.allStatus")}</MenuItem>
+                <MenuItem value="true">{t("admin.products.active")}</MenuItem>
+                <MenuItem value="false">
+                  {t("admin.products.inactive")}
+                </MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -481,10 +484,10 @@ function ProductsManagementContent() {
           </Grid>
           <Grid item xs={12} md={2}>
             <FormControl fullWidth>
-              <InputLabel>Per Page</InputLabel>
+              <InputLabel>{t("admin.products.perPage")}</InputLabel>
               <Select
                 value={filters.limit}
-                label="Per Page"
+                label={t("admin.products.perPage")}
                 onChange={(e) =>
                   handleFilterChange({ limit: e.target.value as number })
                 }
@@ -504,21 +507,21 @@ function ProductsManagementContent() {
         <Paper sx={{ p: 2, mb: 3, bgcolor: "primary.50" }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Typography variant="body1" sx={{ fontWeight: 600 }}>
-              {selectedProducts.length} products selected
+              {selectedProducts.length} {t("admin.products.selected")}
             </Typography>
             <Button
               variant="contained"
               size="small"
               onClick={() => handleBulkAction("activate")}
             >
-              Bulk Activate
+              {t("admin.products.bulkActivate")}
             </Button>
             <Button
               variant="contained"
               size="small"
               onClick={() => handleBulkAction("deactivate")}
             >
-              Bulk Deactivate
+              {t("admin.products.bulkDeactivate")}
             </Button>
             <Button
               variant="contained"
@@ -526,14 +529,14 @@ function ProductsManagementContent() {
               size="small"
               onClick={() => handleBulkAction("delete")}
             >
-              Bulk Delete
+              {t("admin.products.bulkDelete")}
             </Button>
             <Button
               variant="outlined"
               size="small"
               onClick={() => setSelectedProducts([])}
             >
-              Clear Selection
+              {t("admin.products.clearSelection")}
             </Button>
           </Box>
         </Paper>
@@ -557,14 +560,14 @@ function ProductsManagementContent() {
                   onChange={handleSelectAll}
                 />
               </TableCell>
-              <TableCell>Product</TableCell>
-              <TableCell>Category</TableCell>
-              <TableCell>Price</TableCell>
+              <TableCell>{t("admin.products.productName")}</TableCell>
+              <TableCell>{t("common.category")}</TableCell>
+              <TableCell>{t("common.price")}</TableCell>
               <TableCell>Stock</TableCell>
-              <TableCell>Status</TableCell>
+              <TableCell>{t("common.status")}</TableCell>
               <TableCell>Featured</TableCell>
-              <TableCell>Created</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell>{t("common.date")}</TableCell>
+              <TableCell align="right">{t("common.actions")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -608,7 +611,9 @@ function ProductsManagementContent() {
                             color: "text.secondary",
                           }}
                         >
-                          <Typography variant="caption">No Image</Typography>
+                          <Typography variant="caption">
+                            {t("admin.products.noImage")}
+                          </Typography>
                         </Box>
                       )}
                     </Box>
@@ -671,7 +676,7 @@ function ProductsManagementContent() {
                   </Typography>
                 </TableCell>
                 <TableCell align="right">
-                  <Tooltip title="More actions">
+                  <Tooltip title={t("admin.moreActions")}>
                     <IconButton
                       onClick={(e) => handleActionMenuOpen(e, product.id)}
                     >
@@ -717,31 +722,31 @@ function ProductsManagementContent() {
           <ListItemIcon>
             <Visibility fontSize="small" />
           </ListItemIcon>
-          <ListItemText>View Details</ListItemText>
+          <ListItemText>{t("admin.products.viewDetails")}</ListItemText>
         </MenuItem>
         <MenuItem onClick={() => handleProductAction("edit")}>
           <ListItemIcon>
             <Edit fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Edit Product</ListItemText>
+          <ListItemText>{t("admin.products.editProduct")}</ListItemText>
         </MenuItem>
         <MenuItem onClick={() => handleProductAction("duplicate")}>
           <ListItemIcon>
             <ContentCopy fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Duplicate</ListItemText>
+          <ListItemText>{t("admin.products.duplicate")}</ListItemText>
         </MenuItem>
         <MenuItem onClick={() => handleProductAction("toggle_featured")}>
           <ListItemIcon>
             <Star fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Toggle Featured</ListItemText>
+          <ListItemText>{t("admin.products.toggleFeatured")}</ListItemText>
         </MenuItem>
         <MenuItem onClick={() => handleProductAction("delete")}>
           <ListItemIcon>
             <Delete fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Delete</ListItemText>
+          <ListItemText>{t("common.delete")}</ListItemText>
         </MenuItem>
       </Menu>
 
@@ -750,21 +755,27 @@ function ProductsManagementContent() {
         open={bulkActionDialog.open}
         onClose={() => setBulkActionDialog({ open: false, action: null })}
       >
-        <DialogTitle>Confirm Bulk {bulkActionDialog.action}</DialogTitle>
+        <DialogTitle>
+          {t("admin.products.confirmBulkAction", {
+            action: bulkActionDialog.action,
+          })}
+        </DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to {bulkActionDialog.action}{" "}
-            {selectedProducts.length} selected products?
+            {t("admin.products.bulkActionQuestion", {
+              action: bulkActionDialog.action,
+              count: selectedProducts.length,
+            })}
           </Typography>
         </DialogContent>
         <DialogActions>
           <Button
             onClick={() => setBulkActionDialog({ open: false, action: null })}
           >
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button onClick={confirmBulkAction} variant="contained">
-            Confirm
+            {t("common.confirm")}
           </Button>
         </DialogActions>
       </Dialog>
