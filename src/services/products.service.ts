@@ -1,5 +1,5 @@
-// src/services/products.service.ts - Complete implementation
-import { api } from "@/lib/api-client";
+// src/services/products.service.ts - Complete implementation with file uploads
+import { api, apiClient } from "@/lib/api-client";
 import type {
   Product,
   ProductCreateData,
@@ -69,7 +69,7 @@ export const productsService = {
     return api.get(`/products/category/${identifier}`, cleanFilters);
   },
 
-  // 🆕 Get products by category code
+  // Get products by category code
   getProductsByCategoryCode: async (
     categoryCode: string,
     filters: ProductFilters = {}
@@ -89,7 +89,7 @@ export const productsService = {
     return api.get(`/products/${identifier}`);
   },
 
-  // 🆕 Get product by full code
+  // Get product by full code
   getProductByFullCode: async (
     fullCode: string
   ): Promise<{ product: Product }> => {
@@ -110,19 +110,137 @@ export const productsService = {
       return api.get("/products/admin/all", cleanFilters);
     },
 
-    // Create product
+    // Create product with form data (handles file uploads)
     createProduct: async (
       data: ProductCreateFormData
     ): Promise<{ product: Product }> => {
-      return api.post("/products", data);
+      // Check if we have a file upload (base64 data URL) or just a URL
+      const isImageFile = data.image_url?.startsWith("data:image/");
+
+      if (isImageFile) {
+        // Convert base64 to file and create FormData
+        const formData = new FormData();
+
+        // Convert base64 to blob/file
+        const base64Data = data.image_url!.split(",")[1];
+        const mimeType = data.image_url!.split(";")[0].split(":")[1];
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: mimeType });
+        const file = new File(
+          [blob],
+          `product-image.${mimeType.split("/")[1]}`,
+          { type: mimeType }
+        );
+
+        // Add form fields
+        Object.entries(data).forEach(([key, value]) => {
+          if (key !== "image_url" && value !== undefined && value !== null) {
+            formData.append(key, String(value));
+          }
+        });
+
+        // Add the image file
+        formData.append("image", file);
+
+        const response = await apiClient.post("/products", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        return response.data.data;
+      } else {
+        // Regular JSON submission
+        return api.post("/products", data);
+      }
     },
 
-    // Update product
+    // Update product with form data (handles file uploads)
     updateProduct: async (
       id: number,
       data: ProductEditFormData
     ): Promise<{ product: Product }> => {
-      return api.put(`/products/${id}`, data);
+      // Check if we have a file upload (base64 data URL) or just a URL
+      const isImageFile = data.image_url?.startsWith("data:image/");
+
+      if (isImageFile) {
+        // Convert base64 to file and create FormData
+        const formData = new FormData();
+
+        // Convert base64 to blob/file
+        const base64Data = data.image_url!.split(",")[1];
+        const mimeType = data.image_url!.split(";")[0].split(":")[1];
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: mimeType });
+        const file = new File(
+          [blob],
+          `product-image.${mimeType.split("/")[1]}`,
+          { type: mimeType }
+        );
+
+        // Add form fields
+        Object.entries(data).forEach(([key, value]) => {
+          if (key !== "image_url" && value !== undefined && value !== null) {
+            formData.append(key, String(value));
+          }
+        });
+
+        // Add the image file
+        formData.append("image", file);
+
+        const response = await apiClient.put(`/products/${id}`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        return response.data.data;
+      } else {
+        // Regular JSON submission
+        return api.put(`/products/${id}`, data);
+      }
+    },
+
+    // Upload product image separately
+    uploadProductImage: async (
+      productId: number,
+      file: File
+    ): Promise<{ product: Product; image_url: string }> => {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const response = await apiClient.post(
+        `/products/${productId}/image`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      return response.data.data;
+    },
+
+    // Remove product image
+    removeProductImage: async (
+      productId: number
+    ): Promise<{ product: Product }> => {
+      return api.delete(`/products/${productId}/image`);
     },
 
     // Update stock
