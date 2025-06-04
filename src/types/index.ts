@@ -89,6 +89,7 @@ export interface ProductUpdateData extends Partial<ProductCreateData> {
 export interface Category {
   id: number;
   name: string;
+  code: string; // Add this field
   slug: string;
   description?: string;
   image_url?: string;
@@ -101,6 +102,7 @@ export interface Category {
 
 export interface CategoryCreateData {
   name: string;
+  code: string; // Add this field
   slug?: string;
   description?: string;
   image_url?: string;
@@ -278,6 +280,7 @@ export interface ResendCodeFormData {
 
 export interface CategoryFormData {
   name: string;
+  code: string; // Add this field
   slug?: string;
   description?: string;
   image_url?: string;
@@ -287,6 +290,7 @@ export interface CategoryFormData {
 
 export interface CategoryCreateFormData {
   name: string;
+  code: string; // Add this field
   slug?: string;
   description?: string;
   image_url?: string;
@@ -301,7 +305,7 @@ export interface ProductEditFormData {
   description?: string;
   price: number;
   stock_quantity: number;
-  category_id?: number;
+  category_id: number;
   weight?: number;
   dimensions?: string;
   is_featured?: boolean;
@@ -317,7 +321,7 @@ export interface ProductCreateFormData {
   description?: string;
   price: number;
   stock_quantity: number;
-  category_id?: number;
+  category_id: number;
   weight?: number;
   dimensions?: string;
   is_featured?: boolean;
@@ -389,4 +393,30 @@ export interface CheckoutFormData {
   delivery_address: string;
   delivery_notes?: string;
   payment_method?: string;
+}
+
+export interface CategoryCreateFormData {
+  name: string;
+  slug?: string;
+  description?: string;
+  image_url?: string;
+  sort_order?: number;
+}
+
+export interface CategoryFormData {
+  name: string;
+  slug?: string;
+  description?: string;
+  image_url?: string;
+  sort_order?: number;
+  is_active: boolean;
+}
+
+// Update the existing CategoryCreateData interface to be consistent
+export interface CategoryCreateData {
+  name: string;
+  slug?: string;
+  description?: string;
+  image_url?: string;
+  sort_order?: number;
 }

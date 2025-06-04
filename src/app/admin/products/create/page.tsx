@@ -82,7 +82,7 @@ const productCreateSchema = yup.object({
     .min(0, "Stock quantity cannot be negative")
     .integer("Stock quantity must be a whole number")
     .max(999999, "Stock quantity is too high"),
-  category_id: yup.number().optional(),
+  category_id: yup.number().required(),
   weight: yup
     .number()
     .min(0, "Weight must be positive")

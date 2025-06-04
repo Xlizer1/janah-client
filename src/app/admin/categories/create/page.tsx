@@ -10,14 +10,13 @@ import {
   Grid,
   TextField,
   Button,
-  FormControlLabel,
-  Switch,
   Alert,
   Card,
   CardContent,
   CardHeader,
   InputAdornment,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
 import {
   ArrowBack,
@@ -27,6 +26,9 @@ import {
   Category as CategoryIcon,
   Info,
   Refresh,
+  PhotoCamera,
+  Warning,
+  CheckCircle,
 } from "@mui/icons-material";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -36,9 +38,10 @@ import { toast } from "react-toastify";
 
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { ImageUpload } from "@/components/ui/ImageUpload";
 import { useAuth } from "@/store/auth.store";
 import { categoriesService } from "@/services/categories.service";
-import type { CategoryCreateData } from "@/types";
+import type { CategoryCreateFormData } from "@/types";
 
 const categorySchema = yup.object({
   name: yup
@@ -46,6 +49,15 @@ const categorySchema = yup.object({
     .required("Category name is required")
     .min(2, "Category name must be at least 2 characters")
     .max(100, "Category name must be less than 100 characters"),
+  code: yup
+    .string()
+    .required("Category code is required")
+    .min(2, "Category code must be at least 2 characters")
+    .max(20, "Category code must be less than 20 characters")
+    .matches(
+      /^[A-Z0-9_-]+$/,
+      "Code must be uppercase letters, numbers, underscores, or hyphens only"
+    ),
   slug: yup
     .string()
     .matches(
@@ -57,7 +69,7 @@ const categorySchema = yup.object({
     .string()
     .max(500, "Description must be less than 500 characters")
     .optional(),
-  image_url: yup.string().url("Image URL must be valid").optional(),
+  image_url: yup.string().optional(),
   sort_order: yup
     .number()
     .min(0, "Sort order must be positive")
@@ -91,18 +103,22 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
 function CreateCategoryContent() {
   const router = useRouter();
   const [isDraft, setIsDraft] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting, isDirty },
     watch,
     setValue,
     getValues,
-  } = useForm<CategoryCreateData>({
+    clearErrors,
+    setError,
+  } = useForm<CategoryCreateFormData>({
     resolver: yupResolver(categorySchema),
     defaultValues: {
       name: "",
+      code: "",
       slug: "",
       description: "",
       image_url: "",
@@ -112,29 +128,218 @@ function CreateCategoryContent() {
 
   const watchName = watch("name");
   React.useEffect(() => {
-    if (watchName) {
+    if (watchName && watchName.length > 0) {
       const slug = watchName
         .toLowerCase()
         .replace(/[^a-z0-9\s-]/g, "")
         .replace(/\s+/g, "-")
-        .replace(/-+/g, "-");
-      setValue("slug", slug);
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "");
+
+      if (slug !== getValues("slug")) {
+        setValue("slug", slug);
+      }
     }
   }, [watchName, setValue, getValues]);
 
+  const validateForm = (data: CategoryCreateFormData): string[] => {
+    const errors: string[] = [];
+
+    if (!data.name?.trim()) {
+      errors.push("Category name is required");
+    }
+
+    if (!data.code?.trim()) {
+      errors.push("Category code is required");
+    }
+
+    if (data.sort_order && data.sort_order < 0) {
+      errors.push("Sort order cannot be negative");
+    }
+
+    // Validate image if provided
+    if (data.image_url && data.image_url.startsWith("data:image/")) {
+      try {
+        const base64Data = data.image_url.split(",")[1];
+        if (!base64Data || base64Data.length === 0) {
+          errors.push("Invalid image data");
+        }
+
+        // Check if base64 is valid
+        atob(base64Data);
+
+        // Check image size (approximate)
+        const sizeInBytes = (base64Data.length * 3) / 4;
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        if (sizeInBytes > maxSize) {
+          errors.push("Image size too large (max 10MB)");
+        }
+      } catch (e) {
+        errors.push("Invalid image format");
+      }
+    }
+
+    return errors;
+  };
+
   const createCategoryMutation = useMutation({
-    mutationFn: categoriesService.admin.createCategory,
+    mutationFn: async (data: CategoryCreateFormData) => {
+      try {
+        console.log("Creating category with data:", data);
+
+        // Validate required fields
+        if (!data.name?.trim()) {
+          throw new Error("Category name is required");
+        }
+
+        const isImageFile =
+          data.image_url && data.image_url.startsWith("data:image/");
+
+        if (isImageFile) {
+          console.log("Processing image upload...");
+
+          try {
+            // Convert base64 to File
+            const base64ToFile = (
+              dataUrl: string,
+              fileName: string = "category-image"
+            ): File => {
+              const arr = dataUrl.split(",");
+              const mime = arr[0].match(/:(.*?);/)?.[1];
+              const bstr = atob(arr[1]);
+              let n = bstr.length;
+              const u8arr = new Uint8Array(n);
+
+              while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+              }
+
+              const extension = mime?.split("/")[1] || "jpg";
+              const fullFileName = `${fileName}.${extension}`;
+              return new File([u8arr], fullFileName, { type: mime });
+            };
+
+            const formData = new FormData();
+
+            // Add all form fields except image_url
+            Object.entries(data).forEach(([key, value]) => {
+              if (
+                key !== "image_url" &&
+                value !== undefined &&
+                value !== null
+              ) {
+                if (typeof value === "number") {
+                  formData.append(key, value.toString());
+                } else if (typeof value === "boolean") {
+                  formData.append(key, value ? "true" : "false");
+                } else {
+                  formData.append(key, String(value));
+                }
+              }
+            });
+
+            const file = base64ToFile(data.image_url!, "category-image");
+            console.log("Image file created:", {
+              name: file.name,
+              size: file.size,
+              type: file.type,
+            });
+
+            formData.append("image", file);
+
+            // Use the API client directly for FormData
+            const { apiClient } = await import("@/lib/api-client");
+            const response = await apiClient.post("/categories", formData, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+              timeout: 60000, // 60 second timeout for image upload
+            });
+
+            if (!response.data) {
+              throw new Error("Failed to create category");
+            }
+
+            const result = response.data;
+            console.log("Category created successfully with image");
+            return result.data;
+          } catch (imageError) {
+            console.error("Image processing error:", imageError);
+            if (imageError instanceof Error) {
+              throw new Error(`Image upload failed: ${imageError.message}`);
+            }
+            throw new Error("Image upload failed: Unknown error");
+          }
+        } else {
+          console.log("Creating category without image...");
+
+          // Remove image_url if it's empty or invalid
+          const { image_url, ...categoryData } = data;
+          const response = await categoriesService.admin.createCategory(
+            categoryData
+          );
+          console.log("Category created successfully without image");
+          return response;
+        }
+      } catch (error) {
+        console.error("Category creation failed:", error);
+        throw error;
+      }
+    },
     onSuccess: (data) => {
       toast.success("Category created successfully!");
       router.push(`/admin/categories/${data.category.id}/edit`);
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to create category");
+      console.error("Category creation error:", error);
+
+      // Handle validation errors
+      if (error.response?.data?.errors) {
+        const serverErrors = error.response.data.errors;
+        Object.keys(serverErrors).forEach((field) => {
+          setError(field as keyof CategoryCreateFormData, {
+            type: "server",
+            message: Array.isArray(serverErrors[field])
+              ? serverErrors[field][0]
+              : serverErrors[field],
+          });
+        });
+      }
+
+      const errorMessage =
+        error.message ||
+        error.response?.data?.message ||
+        "Failed to create category";
+      toast.error(errorMessage);
     },
   });
 
-  const onSubmit = (data: CategoryCreateData) => {
-    createCategoryMutation.mutate(data);
+  const onSubmit = async (data: CategoryCreateFormData) => {
+    try {
+      // Clear previous validation errors
+      setValidationErrors([]);
+      clearErrors();
+
+      // Validate form data
+      const errors = validateForm(data);
+      if (errors.length > 0) {
+        setValidationErrors(errors);
+        toast.error("Please fix the validation errors");
+        return;
+      }
+
+      console.log("Submitting category data:", data);
+
+      // Show loading toast for image uploads
+      if (data.image_url && data.image_url.startsWith("data:image/")) {
+        toast.info("Uploading image, please wait...");
+      }
+
+      await createCategoryMutation.mutateAsync(data);
+    } catch (error) {
+      console.error("Form submission error:", error);
+      // Error handling is done in the mutation's onError
+    }
   };
 
   const handleSaveAsDraft = () => {
@@ -143,7 +348,21 @@ function CreateCategoryContent() {
   };
 
   const handleImageUpload = () => {
-    toast.info("Image upload functionality coming soon");
+    toast.info("Use the image upload component below");
+  };
+
+  const handleImageError = (error: string) => {
+    console.error("Image upload error:", error);
+    toast.error(error);
+    setError("image_url", {
+      type: "manual",
+      message: error,
+    });
+  };
+
+  const handleImageChange = (imageUrl: string) => {
+    setValue("image_url", imageUrl, { shouldValidate: true });
+    clearErrors("image_url");
   };
 
   const handlePreview = () => {
@@ -172,31 +391,59 @@ function CreateCategoryContent() {
             variant="outlined"
             startIcon={<Preview />}
             onClick={handlePreview}
+            disabled={isSubmitting}
           >
             Preview
           </Button>
           <Button
             variant="outlined"
             onClick={handleSaveAsDraft}
-            disabled={createCategoryMutation.isPending}
+            disabled={isSubmitting}
           >
             Save as Draft
           </Button>
           <Button
             variant="contained"
-            startIcon={<Save />}
+            startIcon={isSubmitting ? <CircularProgress size={20} /> : <Save />}
             onClick={handleSubmit(onSubmit)}
-            disabled={createCategoryMutation.isPending}
+            disabled={isSubmitting || !isDirty}
           >
-            {createCategoryMutation.isPending
-              ? "Creating..."
-              : "Create Category"}
+            {isSubmitting ? "Creating..." : "Create Category"}
           </Button>
         </Box>
         <Typography variant="body1" color="text.secondary">
           Fill in the category details below to organize your products
         </Typography>
       </Box>
+
+      {/* Validation Errors */}
+      {validationErrors.length > 0 && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+            Please fix the following errors:
+          </Typography>
+          <ul style={{ margin: 0, paddingLeft: 20 }}>
+            {validationErrors.map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ul>
+        </Alert>
+      )}
+
+      {/* Loading State */}
+      {isSubmitting && (
+        <Alert severity="info" sx={{ mb: 3 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <CircularProgress size={20} />
+            <Typography>
+              {watch("image_url") &&
+              watch("image_url")?.startsWith("data:image/")
+                ? "Creating category and uploading image..."
+                : "Creating category..."}
+            </Typography>
+          </Box>
+        </Alert>
+      )}
 
       <Grid container spacing={3}>
         {/* Main Content */}
@@ -216,15 +463,42 @@ function CreateCategoryContent() {
                       {...field}
                       label="Category Name"
                       fullWidth
+                      required
                       error={!!errors.name}
                       helperText={errors.name?.message}
                       placeholder="Enter category name"
+                      disabled={isSubmitting}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
                             <CategoryIcon color="action" />
                           </InputAdornment>
                         ),
+                      }}
+                    />
+                  )}
+                />
+
+                <Controller
+                  name="code"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Category Code"
+                      fullWidth
+                      required
+                      error={!!errors.code}
+                      helperText={
+                        errors.code?.message ||
+                        "Unique identifier for the category (e.g., ELEC, COMP)"
+                      }
+                      placeholder="Enter category code"
+                      disabled={isSubmitting}
+                      onChange={(e) => {
+                        // Auto-uppercase the code
+                        const value = e.target.value.toUpperCase();
+                        field.onChange(value);
                       }}
                     />
                   )}
@@ -244,6 +518,7 @@ function CreateCategoryContent() {
                         "URL-friendly version of the name (auto-generated)"
                       }
                       placeholder="category-name"
+                      disabled={isSubmitting}
                     />
                   )}
                 />
@@ -264,6 +539,7 @@ function CreateCategoryContent() {
                         "Optional description for this category"
                       }
                       placeholder="Describe this category and what products it contains..."
+                      disabled={isSubmitting}
                     />
                   )}
                 />
@@ -274,67 +550,21 @@ function CreateCategoryContent() {
             <Card>
               <CardHeader title="Category Image" />
               <CardContent>
-                <Controller
-                  name="image_url"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Image URL"
-                      fullWidth
-                      error={!!errors.image_url}
-                      helperText={
-                        errors.image_url?.message ||
-                        "Enter image URL or upload below"
-                      }
-                      placeholder="https://example.com/image.jpg"
-                    />
-                  )}
+                <ImageUpload
+                  value={watch("image_url")}
+                  onChange={handleImageChange}
+                  onError={handleImageError}
+                  maxSize={10}
+                  label="Upload Category Image"
+                  helperText="Max 10MB, PNG or JPG format recommended. Category images should be at least 400x400px"
+                  variant="dropzone"
+                  disabled={isSubmitting}
                 />
 
-                <Box sx={{ mt: 2 }}>
-                  <Button
-                    variant="outlined"
-                    startIcon={<CloudUpload />}
-                    onClick={handleImageUpload}
-                    fullWidth
-                  >
-                    Upload Image
-                  </Button>
-                </Box>
-
-                {/* Image Preview */}
-                {watch("image_url") && (
-                  <Box sx={{ mt: 2 }}>
-                    <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                      Image Preview:
-                    </Typography>
-                    <Box
-                      sx={{
-                        width: 200,
-                        height: 200,
-                        border: 1,
-                        borderColor: "divider",
-                        borderRadius: 2,
-                        overflow: "hidden",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        bgcolor: "grey.50",
-                      }}
-                    >
-                      <img
-                        src={watch("image_url")}
-                        alt="Category preview"
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                        onError={() => toast.error("Invalid image URL")}
-                      />
-                    </Box>
-                  </Box>
+                {errors.image_url && (
+                  <Alert severity="error" sx={{ mt: 2 }}>
+                    {errors.image_url.message}
+                  </Alert>
                 )}
               </CardContent>
             </Card>
@@ -363,9 +593,87 @@ function CreateCategoryContent() {
                         "Lower numbers appear first"
                       }
                       inputProps={{ min: 0 }}
+                      disabled={isSubmitting}
                     />
                   )}
                 />
+              </CardContent>
+            </Card>
+
+            {/* Validation Status */}
+            <Card>
+              <CardHeader title="Validation Status" />
+              <CardContent>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    {watch("name") ? (
+                      <CheckCircle
+                        sx={{ fontSize: 16, color: "success.main" }}
+                      />
+                    ) : (
+                      <Warning sx={{ fontSize: 16, color: "warning.main" }} />
+                    )}
+                    <Typography variant="body2">
+                      Category Name {watch("name") ? "✓" : "(Required)"}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    {watch("code") ? (
+                      <CheckCircle
+                        sx={{ fontSize: 16, color: "success.main" }}
+                      />
+                    ) : (
+                      <Warning sx={{ fontSize: 16, color: "warning.main" }} />
+                    )}
+                    <Typography variant="body2">
+                      Category Code {watch("code") ? "✓" : "(Required)"}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    {watch("slug") ? (
+                      <CheckCircle
+                        sx={{ fontSize: 16, color: "success.main" }}
+                      />
+                    ) : (
+                      <Info sx={{ fontSize: 16, color: "info.main" }} />
+                    )}
+                    <Typography variant="body2">
+                      URL Slug {watch("slug") ? "✓" : "(Auto-generated)"}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    {watch("image_url") ? (
+                      <CheckCircle
+                        sx={{ fontSize: 16, color: "success.main" }}
+                      />
+                    ) : (
+                      <Info sx={{ fontSize: 16, color: "info.main" }} />
+                    )}
+                    <Typography variant="body2">
+                      Category Image {watch("image_url") ? "✓" : "(Optional)"}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    {watch("sort_order") != null &&
+                    watch("sort_order")! >= 0 ? (
+                      <CheckCircle
+                        sx={{ fontSize: 16, color: "success.main" }}
+                      />
+                    ) : (
+                      <Info sx={{ fontSize: 16, color: "info.main" }} />
+                    )}
+                    <Typography variant="body2">
+                      Sort Order{" "}
+                      {watch("sort_order") != null && watch("sort_order")! >= 0
+                        ? "✓"
+                        : "(Optional)"}
+                    </Typography>
+                  </Box>
+                </Box>
               </CardContent>
             </Card>
 
@@ -427,17 +735,19 @@ function CreateCategoryContent() {
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                   <Button
                     variant="outlined"
-                    startIcon={<CloudUpload />}
+                    startIcon={<PhotoCamera />}
                     onClick={handleImageUpload}
                     fullWidth
+                    disabled={isSubmitting}
                   >
-                    Upload Image
+                    Add Image
                   </Button>
                   <Button
                     variant="outlined"
                     startIcon={<Preview />}
                     onClick={handlePreview}
                     fullWidth
+                    disabled={isSubmitting}
                   >
                     Preview Category
                   </Button>
@@ -473,25 +783,30 @@ function CreateCategoryContent() {
           }}
         >
           <Link href="/admin/categories">
-            <Button startIcon={<ArrowBack />}>Back to Categories</Button>
-          </Link>
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <Button
-              variant="outlined"
-              onClick={handleSaveAsDraft}
-              disabled={createCategoryMutation.isPending}
-            >
-              Save as Draft
+            <Button startIcon={<ArrowBack />} disabled={isSubmitting}>
+              Back to Categories
             </Button>
+          </Link>
+          <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+            {isDirty && !isSubmitting && (
+              <Typography variant="body2" color="warning.main">
+                You have unsaved changes
+              </Typography>
+            )}
+            {isSubmitting && (
+              <Typography variant="body2" color="info.main">
+                Creating category...
+              </Typography>
+            )}
             <Button
               variant="contained"
-              startIcon={<Save />}
+              startIcon={
+                isSubmitting ? <CircularProgress size={20} /> : <Save />
+              }
               onClick={handleSubmit(onSubmit)}
-              disabled={createCategoryMutation.isPending}
+              disabled={isSubmitting || !isDirty}
             >
-              {createCategoryMutation.isPending
-                ? "Creating..."
-                : "Create Category"}
+              {isSubmitting ? "Creating..." : "Create Category"}
             </Button>
           </Box>
         </Box>
