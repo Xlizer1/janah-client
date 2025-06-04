@@ -975,6 +975,7 @@ const arTranslations = {
   "auth.signInToAccess": "سجل دخولك للوصول إلى حسابك",
   "auth.success": "تم تسجيل الخروج بنجاح",
   "auth.error": "فشل تسجيل الخروج",
+  "auth.welcomeBack": "مرحبا بعودتك",
 };
 
 export default arTranslations;

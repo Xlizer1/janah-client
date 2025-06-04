@@ -990,6 +990,7 @@ const enTranslations = {
   "auth.signInToAccess": "Sign in to access your account",
   "auth.success": "Logged out successfully",
   "auth.error": "Logout failed",
+  "auth.welcomeBack": "Welcome back",
 };
 
 export default enTranslations;
