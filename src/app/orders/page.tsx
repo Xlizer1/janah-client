@@ -1,3 +1,4 @@
+// src/app/orders/page.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -135,10 +136,7 @@ export default function OrdersPage() {
   };
 
   const formatStatus = (status: string) => {
-    return status
-      .split("_")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
+    return t(`orders.orderStatus.${status}`);
   };
 
   if (!isAuthenticated) {
@@ -167,12 +165,12 @@ export default function OrdersPage() {
         {/* Header */}
         <Box sx={{ mb: 4 }}>
           <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-            My Orders
+            {t("orders.title")}
           </Typography>
           <Typography variant="body1" color="text.secondary">
             {data?.pagination?.total
               ? `${data.pagination.total} orders found`
-              : "Loading orders..."}
+              : t("common.loading")}
           </Typography>
         </Box>
 
@@ -199,7 +197,7 @@ export default function OrdersPage() {
                         variant="contained"
                         size="small"
                       >
-                        Search
+                        {t("common.search")}
                       </Button>
                     </InputAdornment>
                   ),
@@ -208,10 +206,10 @@ export default function OrdersPage() {
             </Grid>
             <Grid item xs={12} md={3}>
               <FormControl fullWidth>
-                <InputLabel>Status Filter</InputLabel>
+                <InputLabel>{t("common.filter")}</InputLabel>
                 <Select
                   value={filters.status || ""}
-                  label="Status Filter"
+                  label={t("common.filter")}
                   onChange={(e) =>
                     handleFilterChange({
                       status: e.target.value || undefined,
@@ -219,13 +217,25 @@ export default function OrdersPage() {
                   }
                   startAdornment={<FilterList sx={{ mr: 1 }} />}
                 >
-                  <MenuItem value="">All Orders</MenuItem>
-                  <MenuItem value="pending">Pending</MenuItem>
-                  <MenuItem value="confirmed">Confirmed</MenuItem>
-                  <MenuItem value="preparing">Preparing</MenuItem>
-                  <MenuItem value="shipped">Shipped</MenuItem>
-                  <MenuItem value="delivered">Delivered</MenuItem>
-                  <MenuItem value="cancelled">Cancelled</MenuItem>
+                  <MenuItem value="">{t("orders.allOrders")}</MenuItem>
+                  <MenuItem value="pending">
+                    {t("orders.orderStatus.pending")}
+                  </MenuItem>
+                  <MenuItem value="confirmed">
+                    {t("orders.orderStatus.confirmed")}
+                  </MenuItem>
+                  <MenuItem value="preparing">
+                    {t("orders.orderStatus.preparing")}
+                  </MenuItem>
+                  <MenuItem value="shipped">
+                    {t("orders.orderStatus.shipped")}
+                  </MenuItem>
+                  <MenuItem value="delivered">
+                    {t("orders.orderStatus.delivered")}
+                  </MenuItem>
+                  <MenuItem value="cancelled">
+                    {t("orders.orderStatus.cancelled")}
+                  </MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -235,7 +245,7 @@ export default function OrdersPage() {
                 fullWidth
                 onClick={() => router.push("/products")}
               >
-                Continue Shopping
+                {t("common.continue.shopping")}
               </Button>
             </Grid>
           </Grid>
@@ -243,7 +253,7 @@ export default function OrdersPage() {
 
         {/* Orders List */}
         {isLoading ? (
-          <LoadingSpinner message="Loading orders..." />
+          <LoadingSpinner message={t("common.loading")} />
         ) : data?.orders?.length ? (
           <>
             <Grid container spacing={3}>
@@ -266,7 +276,7 @@ export default function OrdersPage() {
                               variant="caption"
                               color="text.secondary"
                             >
-                              Order Number
+                              {t("checkout.orderNumber")}
                             </Typography>
                             <Typography variant="h6" sx={{ fontWeight: 600 }}>
                               #{order.order_number}
@@ -277,7 +287,7 @@ export default function OrdersPage() {
                               variant="caption"
                               color="text.secondary"
                             >
-                              Status
+                              {t("orders.status")}
                             </Typography>
                             <Box>
                               <Chip
@@ -294,7 +304,7 @@ export default function OrdersPage() {
                               variant="caption"
                               color="text.secondary"
                             >
-                              Order Date
+                              {t("orders.orderDate")}
                             </Typography>
                             <Typography variant="body2">
                               {format(
@@ -308,7 +318,7 @@ export default function OrdersPage() {
                               variant="caption"
                               color="text.secondary"
                             >
-                              Total Amount
+                              {t("orders.totalAmount")}
                             </Typography>
                             <Typography
                               variant="h6"
@@ -334,7 +344,7 @@ export default function OrdersPage() {
                                   router.push(`/orders/${order.id}`)
                                 }
                               >
-                                View Details
+                                {t("orders.viewDetails")}
                               </Button>
                               <Button
                                 variant="outlined"
@@ -346,23 +356,23 @@ export default function OrdersPage() {
                                   )
                                 }
                               >
-                                Track
+                                {t("orders.trackOrder")}
                               </Button>
                             </Box>
                           </Grid>
                         </Grid>
                       </Box>
 
-                      {/* Order Items - FIXED: Added safe array access */}
+                      {/* Order Items */}
                       <Box sx={{ p: 3 }}>
                         <Typography
                           variant="subtitle2"
                           sx={{ fontWeight: 600, mb: 2 }}
                         >
-                          Order Items ({order.items?.length || 0})
+                          {t("orders.orderDetails")} ({order.items?.length || 0}
+                          )
                         </Typography>
                         <List dense>
-                          {/* SAFE ARRAY ACCESS: Check if items exists and has length */}
                           {order.items && order.items.length > 0 ? (
                             order.items.slice(0, 3).map((item, index) => (
                               <React.Fragment key={item.id}>
@@ -404,7 +414,8 @@ export default function OrdersPage() {
                                           variant="body2"
                                           color="text.secondary"
                                         >
-                                          Quantity: {item.quantity} ×{" "}
+                                          {t("common.quantity")}:{" "}
+                                          {item.quantity} ×{" "}
                                           {formatPrice(item.unit_price)}
                                         </Typography>
                                         <Typography
@@ -412,7 +423,7 @@ export default function OrdersPage() {
                                           color="primary.main"
                                           fontWeight={600}
                                         >
-                                          Subtotal:{" "}
+                                          {t("common.subtotal")}:{" "}
                                           {formatPrice(item.total_price)}
                                         </Typography>
                                       </Box>
@@ -427,7 +438,6 @@ export default function OrdersPage() {
                               </React.Fragment>
                             ))
                           ) : (
-                            /* Show message when no items */
                             <ListItem sx={{ px: 0, py: 1 }}>
                               <ListItemText>
                                 <Typography
@@ -440,7 +450,6 @@ export default function OrdersPage() {
                             </ListItem>
                           )}
 
-                          {/* Show "more items" message only if items exist and length > 3 */}
                           {order.items && order.items.length > 3 && (
                             <ListItem sx={{ px: 0, py: 1 }}>
                               <ListItemText>
@@ -465,7 +474,7 @@ export default function OrdersPage() {
                           }}
                         >
                           <Typography variant="caption" color="text.secondary">
-                            Delivery Address
+                            {t("orders.deliveryAddress")}
                           </Typography>
                           <Typography variant="body2" sx={{ mt: 0.5 }}>
                             {order.delivery_address}
@@ -476,7 +485,7 @@ export default function OrdersPage() {
                               color="text.secondary"
                               sx={{ mt: 0.5 }}
                             >
-                              Notes: {order.delivery_notes}
+                              {t("common.notes")}: {order.delivery_notes}
                             </Typography>
                           )}
                         </Box>
@@ -506,12 +515,12 @@ export default function OrdersPage() {
           <Box sx={{ textAlign: "center", py: 8 }}>
             <ShoppingBag sx={{ fontSize: 80, color: "grey.300", mb: 2 }} />
             <Typography variant="h6" sx={{ mb: 2 }}>
-              No orders found
+              {t("orders.noOrders")}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
               {filters.status || searchQuery
                 ? "No orders match your current filters"
-                : "You haven't placed any orders yet"}
+                : t("orders.noOrders.subtitle")}
             </Typography>
             <Box sx={{ display: "flex", gap: 2, justifyContent: "center" }}>
               {(filters.status || searchQuery) && (
@@ -522,14 +531,14 @@ export default function OrdersPage() {
                     setSearchQuery("");
                   }}
                 >
-                  Clear Filters
+                  {t("orders.clearFilters")}
                 </Button>
               )}
               <Button
                 variant="contained"
                 onClick={() => router.push("/products")}
               >
-                Start Shopping
+                {t("orders.startShopping")}
               </Button>
             </Box>
           </Box>

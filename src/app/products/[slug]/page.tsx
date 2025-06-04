@@ -139,7 +139,7 @@ export default function ProductDetailPage() {
   if (isLoading) {
     return (
       <MainLayout>
-        <LoadingSpinner fullHeight message="Loading product..." />
+        <LoadingSpinner fullHeight message={t("common.loading")} />
       </MainLayout>
     );
   }
@@ -155,7 +155,7 @@ export default function ProductDetailPage() {
             The product you're looking for doesn't exist or has been removed.
           </Typography>
           <Button variant="contained" onClick={() => router.push("/products")}>
-            Browse Products
+            {t("404.browseProducts")}
           </Button>
         </Container>
       </MainLayout>
@@ -178,7 +178,7 @@ export default function ProductDetailPage() {
           onClick={() => router.back()}
           sx={{ mb: 3 }}
         >
-          Back
+          {t("common.back")}
         </Button>
 
         {/* Breadcrumbs */}
@@ -193,7 +193,7 @@ export default function ProductDetailPage() {
           </Link>
           <Link href="/products">
             <Typography color="text.secondary" sx={{ cursor: "pointer" }}>
-              Products
+              {t("products.title")}
             </Typography>
           </Link>
           {product.category_name && (
@@ -292,7 +292,7 @@ export default function ProductDetailPage() {
               >
                 <Rating value={4.5} readOnly precision={0.5} />
                 <Typography variant="body2" color="text.secondary">
-                  (124 reviews)
+                  (124 {t("products.reviews")})
                 </Typography>
               </Box>
 
@@ -308,14 +308,14 @@ export default function ProductDetailPage() {
               {/* Stock Status */}
               <Box sx={{ mb: 3 }}>
                 {isOutOfStock ? (
-                  <Alert severity="error">Out of Stock</Alert>
+                  <Alert severity="error">{t("products.outOfStock")}</Alert>
                 ) : isLowStock ? (
                   <Alert severity="warning">
-                    Only {product.stock_quantity} left in stock
+                    {t("products.lowStock")} ({product.stock_quantity} left)
                   </Alert>
                 ) : (
                   <Alert severity="success">
-                    In Stock ({product.stock_quantity} available)
+                    {t("products.inStock")} ({product.stock_quantity} available)
                   </Alert>
                 )}
               </Box>
@@ -325,7 +325,7 @@ export default function ProductDetailPage() {
                 {product.is_featured && (
                   <Chip
                     icon={<Star />}
-                    label="Featured"
+                    label={t("products.featured")}
                     color="warning"
                     variant="filled"
                   />
@@ -336,7 +336,7 @@ export default function ProductDetailPage() {
               {!isOutOfStock && (
                 <Box sx={{ mb: 4 }}>
                   <Typography variant="subtitle2" sx={{ mb: 2 }}>
-                    Quantity
+                    {t("common.quantity")}
                   </Typography>
                   <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
                     <Box
@@ -383,7 +383,7 @@ export default function ProductDetailPage() {
                       onClick={handleAddToCart}
                       sx={{ flex: 1, py: 1.5 }}
                     >
-                      Add to Cart
+                      {t("products.addToCart")}
                     </Button>
                   </Box>
                 </Box>
@@ -433,10 +433,10 @@ export default function ProductDetailPage() {
             value={selectedTab}
             onChange={(e, newValue) => setSelectedTab(newValue)}
           >
-            <Tab label="Description" />
-            <Tab label="Specifications" />
-            <Tab label="Reviews" />
-            <Tab label="Shipping" />
+            <Tab label={t("products.description")} />
+            <Tab label={t("products.specifications")} />
+            <Tab label={t("products.reviews")} />
+            <Tab label={t("products.shipping")} />
           </Tabs>
 
           <TabPanel value={selectedTab} index={0}>
@@ -469,13 +469,14 @@ export default function ProductDetailPage() {
 
           <TabPanel value={selectedTab} index={2}>
             <Typography variant="body1">
-              Customer reviews will be displayed here.
+              Customer {t("products.reviews")} will be displayed here.
             </Typography>
           </TabPanel>
 
           <TabPanel value={selectedTab} index={3}>
             <Typography variant="body1">
-              Shipping information and delivery options will be displayed here.
+              {t("products.shipping")} information and delivery options will be
+              displayed here.
             </Typography>
           </TabPanel>
         </Box>
@@ -484,7 +485,7 @@ export default function ProductDetailPage() {
         {relatedProductsData?.products?.length && (
           <Box sx={{ mt: 8 }}>
             <Typography variant="h5" sx={{ fontWeight: 700, mb: 4 }}>
-              Related Products
+              {t("products.relatedProducts")}
             </Typography>
             <Grid container spacing={3}>
               {relatedProductsData.products

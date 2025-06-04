@@ -34,6 +34,7 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
 import { authService } from "@/services/auth.service";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const resetPasswordSchema = yup.object({
   phone_number: yup
@@ -64,6 +65,7 @@ interface ResetPasswordFormData {
 
 function ResetPasswordContent() {
   const router = useRouter();
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const phoneFromUrl = searchParams.get("phone") || "";
 
@@ -106,7 +108,7 @@ function ResetPasswordContent() {
     mutationFn: authService.resetPassword,
     onSuccess: () => {
       setIsSuccess(true);
-      toast.success("Password reset successfully!");
+      toast.success(t("auth.resetPassword.complete"));
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || "Password reset failed";
@@ -129,7 +131,7 @@ function ResetPasswordContent() {
     mutationFn: (phone_number: string) =>
       authService.resendCode({ phone_number, type: "password_reset" }),
     onSuccess: () => {
-      toast.success("Reset code sent successfully!");
+      toast.success(t("auth.resetCode.sent"));
       setTimeLeft(600);
       setCanResend(false);
     },
@@ -187,7 +189,7 @@ function ResetPasswordContent() {
               color: "success.main",
             }}
           >
-            Password Reset Complete!
+            {t("auth.resetPassword.complete")}
           </Typography>
 
           <Typography
@@ -195,8 +197,7 @@ function ResetPasswordContent() {
             color="text.secondary"
             sx={{ mb: 4, lineHeight: 1.6 }}
           >
-            Your password has been successfully reset. You can now log in with
-            your new password.
+            {t("auth.resetPassword.success")}
           </Typography>
 
           <Button
@@ -213,7 +214,7 @@ function ResetPasswordContent() {
               mb: 2,
             }}
           >
-            Continue to Login
+            {t("auth.continueToLogin")}
           </Button>
         </Paper>
       </Container>
@@ -263,14 +264,14 @@ function ResetPasswordContent() {
               WebkitTextFillColor: "transparent",
             }}
           >
-            Reset Your Password
+            {t("auth.resetPassword.title")}
           </Typography>
           <Typography
             variant="body1"
             color="text.secondary"
             sx={{ lineHeight: 1.6 }}
           >
-            Enter the verification code and your new password
+            {t("auth.resetPassword.subtitle")}
           </Typography>
         </Box>
 
@@ -280,7 +281,7 @@ function ResetPasswordContent() {
             {/* Phone Number */}
             <TextField
               fullWidth
-              label="Phone Number"
+              label={t("auth.phone")}
               {...register("phone_number")}
               error={!!errors.phone_number}
               helperText={errors.phone_number?.message}
@@ -303,7 +304,7 @@ function ResetPasswordContent() {
             <Box>
               <TextField
                 fullWidth
-                label="Verification Code"
+                label={t("auth.verification.code")}
                 placeholder="Enter 6-digit code"
                 {...register("verification_code")}
                 error={!!errors.verification_code}
@@ -327,7 +328,7 @@ function ResetPasswordContent() {
               <Box sx={{ textAlign: "center", mt: 1 }}>
                 {!canResend ? (
                   <Typography variant="body2" color="text.secondary">
-                    Code expires in {formatTime(timeLeft)}
+                    {t("auth.codeExpires")} {formatTime(timeLeft)}
                   </Typography>
                 ) : (
                   <Button
@@ -344,7 +345,9 @@ function ResetPasswordContent() {
                     disabled={resendMutation.isPending}
                     sx={{ textTransform: "none" }}
                   >
-                    {resendMutation.isPending ? "Sending..." : "Resend Code"}
+                    {resendMutation.isPending
+                      ? t("auth.sending")
+                      : t("auth.resendCode")}
                   </Button>
                 )}
               </Box>
@@ -356,7 +359,7 @@ function ResetPasswordContent() {
                 <TextField
                   fullWidth
                   type={showPassword ? "text" : "password"}
-                  label="New Password"
+                  label={t("auth.newPassword")}
                   {...register("new_password")}
                   error={!!errors.new_password}
                   helperText={errors.new_password?.message}
@@ -383,7 +386,7 @@ function ResetPasswordContent() {
                 <TextField
                   fullWidth
                   type={showConfirmPassword ? "text" : "password"}
-                  label="Confirm Password"
+                  label={t("auth.confirmPassword")}
                   {...register("confirm_password")}
                   error={!!errors.confirm_password}
                   helperText={errors.confirm_password?.message}
@@ -443,7 +446,7 @@ function ResetPasswordContent() {
                   Resetting Password...
                 </Box>
               ) : (
-                "Reset Password"
+                t("auth.resetPassword")
               )}
             </Button>
           </Box>
@@ -451,7 +454,7 @@ function ResetPasswordContent() {
 
         <Divider sx={{ my: 3 }}>
           <Typography variant="body2" color="text.secondary">
-            Remember your password?
+            {t("auth.rememberPassword")}
           </Typography>
         </Divider>
 
@@ -475,7 +478,7 @@ function ResetPasswordContent() {
                 },
               }}
             >
-              Back to Login
+              {t("auth.backToLogin")}
             </Button>
           </Link>
         </Box>
@@ -483,8 +486,7 @@ function ResetPasswordContent() {
         {/* Info Alert */}
         <Alert severity="info" sx={{ mt: 3 }}>
           <Typography variant="body2">
-            Enter the 6-digit code sent to your phone and create a new password.
-            Your new password must be at least 6 characters long.
+            {t("auth.resetPassword.message")}
           </Typography>
         </Alert>
       </Paper>

@@ -1,3 +1,4 @@
+// src/app/cart/page.tsx
 "use client";
 
 import React from "react";
@@ -38,7 +39,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 
 export default function CartPage() {
   const router = useRouter();
-    const { t } = useTranslation();
+  const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const {
     items,
@@ -82,21 +83,21 @@ export default function CartPage() {
         >
           <Link href="/">
             <Typography color="text.secondary" sx={{ cursor: "pointer" }}>
-            {t("nav.products")}
+              {t("nav.products")}
             </Typography>
           </Link>
-          <Typography color="primary.main">Shopping Cart</Typography>
+          <Typography color="primary.main">{t("cart.title")}</Typography>
         </Breadcrumbs>
 
         {/* Page Header */}
         <Box sx={{ mb: 4 }}>
           <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-            Shopping Cart
+            {t("cart.title")}
           </Typography>
           <Typography variant="body1" color="text.secondary">
             {totalItems > 0
-              ? `${totalItems} item${totalItems > 1 ? "s" : ""} in your cart`
-              : "Your cart is empty"}
+              ? `${totalItems} ${t("cart.itemsCount", { count: totalItems })}`
+              : t("cart.empty")}
           </Typography>
         </Box>
 
@@ -111,15 +112,14 @@ export default function CartPage() {
               }}
             />
             <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
-              Your cart is empty
+              {t("cart.empty")}
             </Typography>
             <Typography
               variant="body1"
               color="text.secondary"
               sx={{ mb: 4, maxWidth: 400, mx: "auto" }}
             >
-              Looks like you haven't added anything to your cart yet. Start
-              shopping to fill it up!
+              {t("cart.emptySubtitle")}
             </Typography>
             <Box sx={{ display: "flex", gap: 2, justifyContent: "center" }}>
               <Button
@@ -128,7 +128,7 @@ export default function CartPage() {
                 onClick={() => router.push("/products")}
                 sx={{ px: 4 }}
               >
-                Start Shopping
+                {t("common.continue.shopping")}
               </Button>
               <Button
                 variant="outlined"
@@ -136,7 +136,7 @@ export default function CartPage() {
                 onClick={() => router.push("/categories")}
                 sx={{ px: 4 }}
               >
-                Browse Categories
+                {t("cart.browseCategories")}
               </Button>
             </Box>
           </Box>
@@ -157,7 +157,7 @@ export default function CartPage() {
                   }}
                 >
                   <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                    Cart Items ({totalItems})
+                    {t("cart.cartItems")} ({totalItems})
                   </Typography>
                   <Button
                     variant="text"
@@ -165,7 +165,7 @@ export default function CartPage() {
                     onClick={clearCart}
                     sx={{ textTransform: "none" }}
                   >
-                    Clear Cart
+                    {t("cart.clearCart")}
                   </Button>
                 </Box>
 
@@ -240,7 +240,8 @@ export default function CartPage() {
                               color="text.secondary"
                               sx={{ mb: 1 }}
                             >
-                              Category: {item.product.category_name}
+                              {t("common.category")}:{" "}
+                              {item.product.category_name}
                             </Typography>
                           )}
 
@@ -368,18 +369,18 @@ export default function CartPage() {
                   }
                   onClick={() => router.push("/products")}
                 >
-                  Continue Shopping
+                  {t("cart.continueShopping")}
                 </Button>
               </Box>
             </Grid>
 
-            {/* Order Summary */}
+            {/* Right Column - Order Summary */}
             <Grid item xs={12} lg={4}>
               <Box sx={{ position: "sticky", top: 100 }}>
                 {/* Summary Card */}
                 <Paper sx={{ p: 3, mb: 3, borderRadius: 2 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-                    Order Summary
+                    {t("cart.orderSummary")}
                   </Typography>
 
                   <Box
@@ -389,7 +390,9 @@ export default function CartPage() {
                       mb: 1,
                     }}
                   >
-                    <Typography>Subtotal ({totalItems} items):</Typography>
+                    <Typography>
+                      {t("common.subtotal")} ({totalItems} {t("cart.items")}):
+                    </Typography>
                     <Typography>{formatPrice(totalPrice)}</Typography>
                   </Box>
 
@@ -400,8 +403,10 @@ export default function CartPage() {
                       mb: 1,
                     }}
                   >
-                    <Typography>Shipping:</Typography>
-                    <Typography color="success.main">Free</Typography>
+                    <Typography>{t("common.shipping")}:</Typography>
+                    <Typography color="success.main">
+                      {t("common.free")}
+                    </Typography>
                   </Box>
 
                   <Box
@@ -411,8 +416,8 @@ export default function CartPage() {
                       mb: 1,
                     }}
                   >
-                    <Typography>Tax:</Typography>
-                    <Typography>Included</Typography>
+                    <Typography>{t("common.tax")}:</Typography>
+                    <Typography>{t("common.included")}</Typography>
                   </Box>
 
                   <Divider sx={{ my: 2 }} />
@@ -425,7 +430,7 @@ export default function CartPage() {
                     }}
                   >
                     <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                      Total:
+                      {t("common.total")}:
                     </Typography>
                     <Typography
                       variant="h6"
@@ -450,7 +455,7 @@ export default function CartPage() {
                     }}
                   >
                     {isAuthenticated
-                      ? "Proceed to Checkout"
+                      ? t("cart.proceedToCheckout")
                       : "Sign In to Checkout"}
                   </Button>
 
@@ -472,7 +477,7 @@ export default function CartPage() {
                       variant="subtitle1"
                       sx={{ fontWeight: 600, mb: 2 }}
                     >
-                      Why shop with us?
+                      {t("cart.whyShopWithUs")}
                     </Typography>
 
                     <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
@@ -482,10 +487,10 @@ export default function CartPage() {
                       />
                       <Box>
                         <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          Free Delivery
+                          {t("cart.freeDelivery")}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          Free shipping within Baghdad
+                          {t("cart.freeDelivery.subtitle")}
                         </Typography>
                       </Box>
                     </Box>
@@ -494,10 +499,10 @@ export default function CartPage() {
                       <Security color="primary" sx={{ mr: 2, fontSize: 20 }} />
                       <Box>
                         <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          Secure Payment
+                          {t("cart.securePayment")}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          Cash on delivery available
+                          {t("cart.securePayment.subtitle")}
                         </Typography>
                       </Box>
                     </Box>
@@ -506,10 +511,10 @@ export default function CartPage() {
                       <Refresh color="primary" sx={{ mr: 2, fontSize: 20 }} />
                       <Box>
                         <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          Easy Returns
+                          {t("cart.easyReturns")}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          30-day return policy
+                          {t("cart.easyReturns.subtitle")}
                         </Typography>
                       </Box>
                     </Box>

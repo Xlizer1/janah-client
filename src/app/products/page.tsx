@@ -1,3 +1,4 @@
+// src/app/products/page.tsx
 "use client";
 
 import React, { useState, Suspense } from "react";
@@ -103,12 +104,12 @@ function ProductsPageContent() {
   );
 
   const sortOptions = [
-    { value: "created_at_DESC", label: "Newest First" },
-    { value: "created_at_ASC", label: "Oldest First" },
-    { value: "name_ASC", label: "Name A-Z" },
-    { value: "name_DESC", label: "Name Z-A" },
-    { value: "price_ASC", label: "Price Low to High" },
-    { value: "price_DESC", label: "Price High to Low" },
+    { value: "created_at_DESC", label: t("products.sortBy.newest") },
+    { value: "created_at_ASC", label: t("products.sortBy.oldest") },
+    { value: "name_ASC", label: t("products.sortBy.nameAsc") },
+    { value: "name_DESC", label: t("products.sortBy.nameDesc") },
+    { value: "price_ASC", label: t("products.sortBy.priceAsc") },
+    { value: "price_DESC", label: t("products.sortBy.priceDesc") },
   ];
 
   if (error) {
@@ -126,12 +127,12 @@ function ProductsPageContent() {
       {/* Page Header */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-          Products
+          {t("products.title")}
         </Typography>
         <Typography variant="body1" color="text.secondary">
           {data?.pagination.total
             ? `${data.pagination.total} products found`
-            : "Loading products..."}
+            : t("common.loading")}
         </Typography>
       </Box>
 
@@ -187,7 +188,7 @@ function ProductsPageContent() {
                     label={
                       categoriesData?.categories.find(
                         (c) => c.id === filters.category_id
-                      )?.name || "Category"
+                      )?.name || t("common.category")
                     }
                     onDelete={() =>
                       handleFilterChange({ category_id: undefined })
@@ -198,7 +199,7 @@ function ProductsPageContent() {
                 )}
                 {filters.search && (
                   <Chip
-                    label={`Search: ${filters.search}`}
+                    label={`${t("common.search")}: ${filters.search}`}
                     onDelete={() => handleFilterChange({ search: undefined })}
                     color="primary"
                     variant="outlined"
@@ -206,7 +207,7 @@ function ProductsPageContent() {
                 )}
                 {filters.is_featured && (
                   <Chip
-                    label="Featured"
+                    label={t("products.featured")}
                     onDelete={() =>
                       handleFilterChange({ is_featured: undefined })
                     }
@@ -216,7 +217,7 @@ function ProductsPageContent() {
                 )}
                 {hasActiveFilters && (
                   <Chip
-                    label="Clear All"
+                    label={t("common.clear")}
                     onClick={clearFilters}
                     color="default"
                     variant="outlined"
@@ -230,10 +231,10 @@ function ProductsPageContent() {
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
               {/* Sort */}
               <FormControl size="small" sx={{ minWidth: 180 }}>
-                <InputLabel>Sort by</InputLabel>
+                <InputLabel>{t("common.sort")}</InputLabel>
                 <Select
                   value={`${filters.sort_by}_${filters.sort_order}`}
-                  label="Sort by"
+                  label={t("common.sort")}
                   onChange={(e) => handleSortChange(e.target.value)}
                 >
                   {sortOptions.map((option) => (
@@ -264,7 +265,7 @@ function ProductsPageContent() {
 
           {/* Products Grid */}
           {isLoading ? (
-            <LoadingSpinner message="Loading products..." />
+            <LoadingSpinner message={t("common.loading")} />
           ) : data?.products?.length ? (
             <>
               <Grid container spacing={3}>
@@ -300,10 +301,10 @@ function ProductsPageContent() {
           ) : (
             <Box sx={{ textAlign: "center", py: 8 }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                No products found
+                {t("products.noProducts")}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Try adjusting your filters or search terms
+                {t("products.noProducts.subtitle")}
               </Typography>
             </Box>
           )}
@@ -323,7 +324,7 @@ function ProductsPageContent() {
         }}
       >
         <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
-          Filters
+          {t("products.filters")}
         </Typography>
         <ProductFilters
           filters={filters}

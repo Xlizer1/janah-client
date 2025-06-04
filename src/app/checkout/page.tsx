@@ -1,3 +1,4 @@
+// src/app/checkout/page.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -61,8 +62,6 @@ const checkoutSchema = yup.object({
   payment_method: yup.string().optional(),
 });
 
-const steps = ["Review Items", "Delivery Info", "Payment", "Confirmation"];
-
 export default function CheckoutPage() {
   const router = useRouter();
   const { t } = useTranslation();
@@ -71,6 +70,13 @@ export default function CheckoutPage() {
   const [activeStep, setActiveStep] = useState(0);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
+
+  const steps = [
+    t("checkout.reviewItems"),
+    t("checkout.deliveryInfo"),
+    t("checkout.payment"),
+    t("checkout.confirmation"),
+  ];
 
   const {
     register,
@@ -104,7 +110,7 @@ export default function CheckoutPage() {
       setOrderNumber(data.order.order_number);
       setOrderSuccess(true);
       clearCart();
-      toast.success("Order placed successfully!");
+      toast.success(t("checkout.orderPlaced"));
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || "Failed to place order");
@@ -156,32 +162,30 @@ export default function CheckoutPage() {
           <Paper sx={{ p: 4, textAlign: "center", borderRadius: 3 }}>
             <CheckCircle sx={{ fontSize: 80, color: "success.main", mb: 2 }} />
             <Typography variant="h4" sx={{ fontWeight: 700, mb: 2 }}>
-              Order Placed Successfully!
+              {t("checkout.orderPlaced")}
             </Typography>
             <Typography
               variant="body1"
               color="text.secondary"
               sx={{ mb: 3, lineHeight: 1.6 }}
             >
-              Thank you for your order. Your order number is:{" "}
-              <strong>{orderNumber}</strong>
+              {t("checkout.orderSuccess")} <strong>{orderNumber}</strong>
             </Typography>
             <Typography variant="body2" sx={{ mb: 4 }}>
-              We'll send you an SMS notification with updates on your order
-              status.
+              {t("checkout.orderSuccess.sms")}
             </Typography>
             <Box sx={{ display: "flex", gap: 2, justifyContent: "center" }}>
               <Button
                 variant="contained"
                 onClick={() => router.push("/orders")}
               >
-                View Orders
+                {t("checkout.viewOrders")}
               </Button>
               <Button
                 variant="outlined"
                 onClick={() => router.push("/products")}
               >
-                Continue Shopping
+                {t("common.continue.shopping")}
               </Button>
             </Box>
           </Paper>
@@ -203,7 +207,7 @@ export default function CheckoutPage() {
             Back to Cart
           </Button>
           <Typography variant="h4" sx={{ fontWeight: 700 }}>
-            Checkout
+            {t("checkout.title")}
           </Typography>
         </Box>
 
@@ -225,7 +229,7 @@ export default function CheckoutPage() {
               {activeStep === 0 && (
                 <Paper sx={{ p: 3 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-                    Review Your Items
+                    {t("checkout.reviewItems")}
                   </Typography>
                   <List>
                     {items.map((item, index) => (
@@ -261,7 +265,7 @@ export default function CheckoutPage() {
                                   variant="body2"
                                   color="text.secondary"
                                 >
-                                  Quantity: {item.quantity} ×{" "}
+                                  {t("common.quantity")}: {item.quantity} ×{" "}
                                   {formatPrice(item.product.price)}
                                 </Typography>
                                 <Typography
@@ -269,7 +273,8 @@ export default function CheckoutPage() {
                                   color="primary.main"
                                   fontWeight={600}
                                 >
-                                  Subtotal: {formatPrice(item.subtotal)}
+                                  {t("common.subtotal")}:{" "}
+                                  {formatPrice(item.subtotal)}
                                 </Typography>
                               </Box>
                             }
@@ -291,7 +296,7 @@ export default function CheckoutPage() {
                 <Paper sx={{ p: 3 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
                     <LocationOn sx={{ mr: 1, verticalAlign: "middle" }} />
-                    Delivery Information
+                    {t("checkout.deliveryInfo")}
                   </Typography>
 
                   {/* Customer Info */}
@@ -301,7 +306,7 @@ export default function CheckoutPage() {
                         variant="subtitle2"
                         sx={{ fontWeight: 600, mb: 1 }}
                       >
-                        Delivering to:
+                        {t("checkout.deliveryTo")}
                       </Typography>
                       <Typography variant="body1">
                         {user?.first_name} {user?.last_name}
@@ -314,7 +319,7 @@ export default function CheckoutPage() {
 
                   <TextField
                     fullWidth
-                    label="Delivery Address"
+                    label={t("checkout.deliveryAddress")}
                     multiline
                     rows={3}
                     placeholder="Enter your complete delivery address..."
@@ -326,7 +331,7 @@ export default function CheckoutPage() {
 
                   <TextField
                     fullWidth
-                    label="Delivery Notes (Optional)"
+                    label={t("checkout.deliveryNotes")}
                     multiline
                     rows={2}
                     placeholder="Any special instructions for delivery..."
@@ -338,15 +343,14 @@ export default function CheckoutPage() {
 
                   <Alert severity="info" sx={{ mb: 3 }}>
                     <Typography variant="body2">
-                      Please provide a detailed address including landmarks for
-                      accurate delivery.
+                      {t("checkout.addressNote")}
                     </Typography>
                   </Alert>
 
                   <Box
                     sx={{ display: "flex", justifyContent: "space-between" }}
                   >
-                    <Button onClick={handleBack}>Back</Button>
+                    <Button onClick={handleBack}>{t("common.back")}</Button>
                     <Button
                       variant="contained"
                       onClick={handleNext}
@@ -362,12 +366,12 @@ export default function CheckoutPage() {
                 <Paper sx={{ p: 3 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
                     <Payment sx={{ mr: 1, verticalAlign: "middle" }} />
-                    Payment Method
+                    {t("checkout.payment")}
                   </Typography>
 
                   <FormControl component="fieldset" sx={{ mb: 3 }}>
                     <FormLabel component="legend">
-                      Select Payment Method
+                      {t("checkout.paymentMethod")}
                     </FormLabel>
                     <RadioGroup {...register("payment_method")}>
                       <FormControlLabel
@@ -384,7 +388,7 @@ export default function CheckoutPage() {
                             <AttachMoney />
                             <Box>
                               <Typography variant="body1" fontWeight={600}>
-                                Cash on Delivery
+                                {t("checkout.cashOnDelivery")}
                               </Typography>
                               <Typography
                                 variant="caption"
@@ -401,16 +405,14 @@ export default function CheckoutPage() {
 
                   <Alert severity="info" sx={{ mb: 3 }}>
                     <Typography variant="body2">
-                      Currently, we only accept cash payments upon delivery. Our
-                      delivery team will collect payment when your order
-                      arrives.
+                      {t("checkout.cashOnDeliveryInfo")}
                     </Typography>
                   </Alert>
 
                   <Box
                     sx={{ display: "flex", justifyContent: "space-between" }}
                   >
-                    <Button onClick={handleBack}>Back</Button>
+                    <Button onClick={handleBack}>{t("common.back")}</Button>
                     <Button variant="contained" onClick={handleNext}>
                       Review Order
                     </Button>
@@ -422,7 +424,7 @@ export default function CheckoutPage() {
                 <Paper sx={{ p: 3 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
                     <CheckCircle sx={{ mr: 1, verticalAlign: "middle" }} />
-                    Order Confirmation
+                    {t("checkout.confirmation")}
                   </Typography>
 
                   {/* Order Summary */}
@@ -432,7 +434,7 @@ export default function CheckoutPage() {
                         variant="subtitle2"
                         sx={{ fontWeight: 600, mb: 2 }}
                       >
-                        Order Summary
+                        {t("cart.orderSummary")}
                       </Typography>
                       <Box
                         sx={{
@@ -441,7 +443,9 @@ export default function CheckoutPage() {
                           mb: 1,
                         }}
                       >
-                        <Typography>Items ({totalItems}):</Typography>
+                        <Typography>
+                          {t("cart.items")} ({totalItems}):
+                        </Typography>
                         <Typography>{formatPrice(totalPrice)}</Typography>
                       </Box>
                       <Box
@@ -451,8 +455,10 @@ export default function CheckoutPage() {
                           mb: 1,
                         }}
                       >
-                        <Typography>Delivery:</Typography>
-                        <Typography color="success.main">Free</Typography>
+                        <Typography>{t("common.shipping")}:</Typography>
+                        <Typography color="success.main">
+                          {t("common.free")}
+                        </Typography>
                       </Box>
                       <Divider sx={{ my: 1 }} />
                       <Box
@@ -462,7 +468,7 @@ export default function CheckoutPage() {
                         }}
                       >
                         <Typography variant="h6" fontWeight={700}>
-                          Total:
+                          {t("common.total")}:
                         </Typography>
                         <Typography
                           variant="h6"
@@ -482,33 +488,34 @@ export default function CheckoutPage() {
                         variant="subtitle2"
                         sx={{ fontWeight: 600, mb: 2 }}
                       >
-                        Delivery Information
+                        {t("checkout.deliveryInfo")}
                       </Typography>
                       <Typography variant="body2" sx={{ mb: 1 }}>
-                        <strong>Address:</strong> {watch("delivery_address")}
+                        <strong>{t("common.address")}:</strong>{" "}
+                        {watch("delivery_address")}
                       </Typography>
                       {watch("delivery_notes") && (
                         <Typography variant="body2" sx={{ mb: 1 }}>
-                          <strong>Notes:</strong> {watch("delivery_notes")}
+                          <strong>{t("common.notes")}:</strong>{" "}
+                          {watch("delivery_notes")}
                         </Typography>
                       )}
                       <Typography variant="body2">
-                        <strong>Payment:</strong> Cash on Delivery
+                        <strong>Payment:</strong> {t("checkout.cashOnDelivery")}
                       </Typography>
                     </CardContent>
                   </Card>
 
                   <Alert severity="warning" sx={{ mb: 3 }}>
                     <Typography variant="body2">
-                      Please review your order carefully. Once placed, you can
-                      track your order status but changes may not be possible.
+                      {t("checkout.reviewYourOrder")}
                     </Typography>
                   </Alert>
 
                   <Box
                     sx={{ display: "flex", justifyContent: "space-between" }}
                   >
-                    <Button onClick={handleBack}>Back</Button>
+                    <Button onClick={handleBack}>{t("common.back")}</Button>
                     <Button
                       type="submit"
                       variant="contained"
@@ -521,10 +528,10 @@ export default function CheckoutPage() {
                           sx={{ display: "flex", alignItems: "center", gap: 1 }}
                         >
                           <CircularProgress size={20} color="inherit" />
-                          Placing Order...
+                          {t("checkout.placingOrder")}
                         </Box>
                       ) : (
-                        "Place Order"
+                        t("checkout.placeOrder")
                       )}
                     </Button>
                   </Box>
@@ -536,7 +543,7 @@ export default function CheckoutPage() {
             <Grid item xs={12} md={4}>
               <Paper sx={{ p: 3, position: "sticky", top: 100 }}>
                 <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-                  Order Summary
+                  {t("cart.orderSummary")}
                 </Typography>
 
                 <Box sx={{ mb: 3 }}>
@@ -601,7 +608,7 @@ export default function CheckoutPage() {
                     mb: 1,
                   }}
                 >
-                  <Typography>Subtotal:</Typography>
+                  <Typography>{t("common.subtotal")}:</Typography>
                   <Typography>{formatPrice(totalPrice)}</Typography>
                 </Box>
 
@@ -612,8 +619,10 @@ export default function CheckoutPage() {
                     mb: 1,
                   }}
                 >
-                  <Typography>Delivery:</Typography>
-                  <Typography color="success.main">Free</Typography>
+                  <Typography>{t("common.shipping")}:</Typography>
+                  <Typography color="success.main">
+                    {t("common.free")}
+                  </Typography>
                 </Box>
 
                 <Divider sx={{ my: 2 }} />
@@ -626,7 +635,7 @@ export default function CheckoutPage() {
                   }}
                 >
                   <Typography variant="h6" fontWeight={700}>
-                    Total:
+                    {t("common.total")}:
                   </Typography>
                   <Typography
                     variant="h6"
@@ -643,7 +652,7 @@ export default function CheckoutPage() {
                 >
                   <LocalShipping color="primary" />
                   <Typography variant="body2" color="text.secondary">
-                    Free delivery within Baghdad
+                    {t("checkout.shippingInfo")}
                   </Typography>
                 </Box>
 
