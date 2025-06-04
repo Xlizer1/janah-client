@@ -360,7 +360,8 @@ export interface Order {
   total_amount: number;
   delivery_address: string;
   delivery_notes?: string;
-  items: OrderItem[];
+  items?: OrderItem[]; // Made optional for list views
+  items_count?: number; // Added for list views that might only show count
   created_at: string;
   updated_at: string;
   confirmed_at?: string;

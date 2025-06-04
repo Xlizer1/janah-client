@@ -4,3 +4,4 @@ export { AdminSettings } from './AdminSettings';
 export { BulkOperations } from './BulkOperations';
 export { ImportExport } from './ImportExport';
 export { UserManagement } from './UserManagement';
+export { OrderManagement } from './OrderManagement';

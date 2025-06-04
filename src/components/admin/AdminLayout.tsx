@@ -1,3 +1,4 @@
+// src/components/admin/AdminLayout.tsx - Updated with Orders
 "use client";
 
 import React, { useState } from "react";
@@ -36,6 +37,7 @@ import {
   Home,
   ChevronRight,
   FilePresent,
+  Receipt, // Added for Orders
 } from "@mui/icons-material";
 import { useAuth } from "@/store/auth.store";
 import { toast } from "react-toastify";
@@ -98,6 +100,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       href: "/admin/categories",
     },
     {
+      text: "Orders", // Added Orders menu item
+      icon: Receipt,
+      href: "/admin/orders",
+    },
+    {
       text: "Users",
       icon: People,
       href: "/admin/users",
@@ -112,11 +119,6 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       icon: Settings,
       href: "/admin/settings",
     },
-    // {
-    //   text: "Bulk Operations",
-    //   icon: Settings,
-    //   href: "/admin/bulk-operations",
-    // },
     {
       text: "Import/Export",
       icon: FilePresent,

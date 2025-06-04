@@ -7,6 +7,20 @@ import type {
   OrderFilters,
 } from "@/types";
 
+const normalizeOrder = (order: any): Order => {
+  return {
+    ...order,
+    items: order.items || [],
+    items_count: order.items_count || order.items?.length || 0,
+    delivery_notes: order.delivery_notes || "",
+    confirmed_at: order.confirmed_at || null,
+    shipped_at: order.shipped_at || null,
+    delivered_at: order.delivered_at || null,
+    cancelled_at: order.cancelled_at || null,
+    cancellation_reason: order.cancellation_reason || null,
+  };
+};
+
 export const ordersService = {
   // Customer order methods
   customer: {
@@ -56,17 +70,42 @@ export const ordersService = {
     getAllOrders: async (
       filters: OrderFilters = {}
     ): Promise<OrdersResponse> => {
-      const cleanFilters = Object.fromEntries(
-        Object.entries(filters).filter(
-          ([_, value]) => value !== undefined && value !== null
-        )
-      );
-      return api.get("/orders/admin/all", cleanFilters);
+      try {
+        const cleanFilters = Object.fromEntries(
+          Object.entries(filters).filter(
+            ([_, value]) =>
+              value !== undefined && value !== null && value !== ""
+          )
+        );
+
+        const response = await api.get("/orders/admin/all", cleanFilters);
+
+        // Normalize the orders data
+        if (response.orders && Array.isArray(response.orders)) {
+          response.orders = response.orders.map(normalizeOrder);
+        }
+
+        return response;
+      } catch (error) {
+        console.error("Failed to fetch orders:", error);
+        throw error;
+      }
     },
 
     // Get order by ID
     getOrder: async (orderId: number): Promise<{ order: Order }> => {
-      return api.get(`/orders/admin/${orderId}`);
+      try {
+        const response = await api.get(`/orders/admin/${orderId}`);
+
+        if (response.order) {
+          response.order = normalizeOrder(response.order);
+        }
+
+        return response;
+      } catch (error) {
+        console.error(`Failed to fetch order ${orderId}:`, error);
+        throw error;
+      }
     },
 
     // Update order status
@@ -90,7 +129,22 @@ export const ordersService = {
       status: string,
       filters: { page?: number; limit?: number } = {}
     ): Promise<OrdersResponse> => {
-      return api.get(`/orders/admin/status/${status}`, filters);
+      try {
+        const response = await api.get(
+          `/orders/admin/status/${status}`,
+          filters
+        );
+
+        // Normalize the orders data
+        if (response.orders && Array.isArray(response.orders)) {
+          response.orders = response.orders.map(normalizeOrder);
+        }
+
+        return response;
+      } catch (error) {
+        console.error(`Failed to fetch ${status} orders:`, error);
+        throw error;
+      }
     },
 
     // Get order statistics
