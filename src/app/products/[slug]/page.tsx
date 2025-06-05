@@ -473,8 +473,8 @@ export default function ProductDetailPage() {
   const isLowStock = product.stock_quantity > 0 && product.stock_quantity <= 5;
 
   // Get product images - prioritize new images array, fallback to legacy image_url
-  const productImages = product.images?.length
-    ? product.images
+  const productImages = product.image_urls?.length
+    ? product.image_urls
     : product.image_url
     ? [product.image_url]
     : [];

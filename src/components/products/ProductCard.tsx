@@ -63,8 +63,8 @@ export function ProductCard({
   const isLowStock = product.stock_quantity > 0 && product.stock_quantity <= 5;
 
   // Get the main image (first image) or fallback to legacy image_url
-  const mainImage = product.images?.[0] || product.image_url;
-  const hasMultipleImages = product.images && product.images.length > 1;
+  const mainImage = product.image_urls?.[0] || product.image_url;
+  const hasMultipleImages = product.image_urls && product.image_urls.length > 1;
 
   return (
     <Link href={`/products/${product.slug || product.id}`} className="block">
@@ -146,7 +146,7 @@ export function ProductCard({
             >
               <PhotoLibrary sx={{ fontSize: 14 }} />
               <Typography variant="caption" sx={{ fontSize: "0.7rem" }}>
-                {product.images!.length}
+                {product.image_urls!.length}
               </Typography>
             </Box>
           )}

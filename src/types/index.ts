@@ -64,7 +64,7 @@ export interface Product {
   is_active: boolean;
   is_featured: boolean;
   // Updated: Support both new images array and legacy image_url
-  images?: string[]; // New: Array of image URLs
+  image_urls?: string[]; // New: Array of image URLs
   image_url?: string; // Legacy: Single image URL (for backwards compatibility)
   full_code?: string; // Computed: category_code + product_code
   created_at: string;

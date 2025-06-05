@@ -90,8 +90,8 @@ const productCreateSchema = yup.object({
     .optional(),
   dimensions: yup.string().optional(),
   is_featured: yup.boolean().optional(),
-  images: yup.array().of(yup.string()).optional(),
-});
+  images: yup.array().of(yup.string().required()).optional(),
+}) satisfies yup.ObjectSchema<ProductCreateFormData>;
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
@@ -122,10 +122,16 @@ function CreateProductContent() {
   const [isDraft, setIsDraft] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
+  // Fixed: Destructure all needed properties from useForm
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
+    watch,
+    setValue,
+    getValues,
+    clearErrors,
+    setError,
   } = useForm<ProductCreateFormData>({
     resolver: yupResolver(productCreateSchema),
     defaultValues: {
@@ -139,7 +145,7 @@ function CreateProductContent() {
       weight: 1,
       dimensions: "1x1x1",
       is_featured: false,
-      images: [], // Fixed: string[] instead of (string | undefined)[]
+      images: [],
     },
   });
 
@@ -246,6 +252,7 @@ function CreateProductContent() {
     return errors;
   };
 
+  // Fixed: Properly typed submit handler
   const onSubmit = async (data: ProductCreateFormData) => {
     try {
       // Clear previous validation errors
@@ -358,7 +365,9 @@ function CreateProductContent() {
             <CircularProgress size={20} />
             <Typography>
               {watch("images") &&
-              watch("images")?.some((img) => img.startsWith("data:image/"))
+              watch("images")?.some((img: string) =>
+                img.startsWith("data:image/")
+              )
                 ? "Creating product and uploading images..."
                 : "Creating product..."}
             </Typography>

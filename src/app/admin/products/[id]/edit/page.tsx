@@ -148,6 +148,7 @@ function EditProductContent() {
     reset,
     clearErrors,
     setError,
+    getValues, // Add this missing property
   } = useForm<ProductEditFormData>({
     resolver: yupResolver(productSchema),
     defaultValues: {
@@ -163,7 +164,7 @@ function EditProductContent() {
       dimensions: "1x1x1",
       is_featured: false,
       is_active: true,
-      images: [],
+      images: [], // Ensure this is string[], not (string | undefined)[]
     },
   });
 
@@ -257,8 +258,11 @@ function EditProductContent() {
         dimensions: product.dimensions || "1x1x1",
         is_featured: product.is_featured,
         is_active: product.is_active,
-        images:
-          product.images || (product.image_url ? [product.image_url] : []),
+        images: product.image_urls?.length
+          ? product.image_urls
+          : product.image_url
+          ? [product.image_url]
+          : [],
       });
       setNewStockQuantity(product.stock_quantity);
     }
@@ -513,7 +517,9 @@ function EditProductContent() {
             <CircularProgress size={20} />
             <Typography>
               {watch("images") &&
-              watch("images")?.some((img) => img.startsWith("data:image/"))
+              watch("images")?.some((img: string) =>
+                img.startsWith("data:image/")
+              )
                 ? "Updating product and uploading images..."
                 : "Updating product..."}
             </Typography>
@@ -997,9 +1003,9 @@ function EditProductContent() {
                       Images
                     </Typography>
                     <Typography variant="body2">
-                      {(product.images?.length || 0) +
+                      {(product.image_urls?.length || 0) +
                         (product.image_url &&
-                        !product.images?.includes(product.image_url)
+                        !product.image_urls?.includes(product.image_url)
                           ? 1
                           : 0)}{" "}
                       images
