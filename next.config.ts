@@ -2,7 +2,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ["localhost", "example.com"],
+    domains: [
+      "aljanah.store",
+      "www.aljanah.store",
+      "localhost", // for development
+    ],
     unoptimized: process.env.NODE_ENV === "development",
   },
   env: {
