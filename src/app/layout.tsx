@@ -10,13 +10,17 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Janah - Store",
+  title: "Al Janah - Store",
   description: "Modern store with advanced features",
   keywords: "ecommerce, shopping, online store, products, electronics",
   authors: [{ name: "Janah Team" }],
   manifest: "/manifest.json",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
     apple: "/apple-touch-icon.png",
   },
 };
@@ -37,7 +41,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
