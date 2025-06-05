@@ -101,33 +101,23 @@ const base64ToFile = (
   }
 };
 
-// NEW: Helper function to process multiple images
+// Helper function to process multiple images
 const processMultipleImages = (
-  images: string | string[],
+  images: string[],
   baseFileName: string = "product-image"
 ): File[] => {
   try {
-    // Handle single image (backward compatibility)
-    if (typeof images === "string") {
-      return [base64ToFile(images, baseFileName)];
+    if (images.length === 0) {
+      return [];
     }
 
-    // Handle multiple images
-    if (Array.isArray(images)) {
-      if (images.length === 0) {
-        return [];
-      }
-
-      if (images.length > 5) {
-        throw new Error("Cannot upload more than 5 images");
-      }
-
-      return images.map((imageData, index) => {
-        return base64ToFile(imageData, `${baseFileName}-${index + 1}`);
-      });
+    if (images.length > 5) {
+      throw new Error("Cannot upload more than 5 images");
     }
 
-    return [];
+    return images.map((imageData, index) => {
+      return base64ToFile(imageData, `${baseFileName}-${index + 1}`);
+    });
   } catch (error) {
     console.error("Multiple images processing error:", error);
     throw error;
@@ -141,12 +131,7 @@ const prepareFormData = (
   const formData = new FormData();
 
   Object.entries(data).forEach(([key, value]) => {
-    if (
-      key !== "image_url" &&
-      key !== "image_urls" &&
-      value !== undefined &&
-      value !== null
-    ) {
+    if (key !== "images" && value !== undefined && value !== null) {
       // Handle different data types properly for FormData
       if (typeof value === "number") {
         formData.append(key, value.toString());
@@ -253,121 +238,37 @@ export const productsService = {
     createProduct: async (
       data: ProductCreateFormData
     ): Promise<{ product: Product }> => {
-      try {
-        console.log("Creating product with data:", data);
+      // Fixed: Access images property correctly
+      const hasImages = data.images && data.images.length > 0;
 
-        // Validate required fields
-        if (!data.name || !data.code) {
-          throw new Error("Product name and code are required");
-        }
+      if (hasImages) {
+        const formData = new FormData();
 
-        if (!data.price || data.price <= 0) {
-          throw new Error("Valid price is required");
-        }
-
-        if (data.stock_quantity === undefined || data.stock_quantity < 0) {
-          throw new Error("Valid stock quantity is required");
-        }
-
-        // NEW: Support both single image (image_url) and multiple images (image_urls)
-        const hasImages =
-          (data.image_url && typeof data.image_url === "string") ||
-          (data.image_urls &&
-            Array.isArray(data.image_urls) &&
-            data.image_urls.length > 0);
-
-        if (hasImages) {
-          console.log("Processing image upload...");
-
-          try {
-            const formData = prepareFormData(data);
-
-            // NEW: Process multiple images or single image
-            let imageFiles: File[] = [];
-
-            if (
-              data.image_urls &&
-              Array.isArray(data.image_urls) &&
-              data.image_urls.length > 0
-            ) {
-              // Multiple images
-              console.log(`Processing ${data.image_urls.length} images...`);
-              imageFiles = processMultipleImages(
-                data.image_urls,
-                "product-image"
-              );
-
-              // Append all images with "images" field name (plural)
-              imageFiles.forEach((file, index) => {
-                console.log(`Adding image ${index + 1}:`, {
-                  name: file.name,
-                  size: file.size,
-                  type: file.type,
-                });
-                formData.append("images", file);
-              });
-            } else if (data.image_url && typeof data.image_url === "string") {
-              // Single image (backward compatibility)
-              console.log("Processing single image...");
-              const isImageFile = data.image_url.startsWith("data:image/");
-
-              if (isImageFile) {
-                const file = base64ToFile(data.image_url, "product-image");
-                console.log("Single image file created:", {
-                  name: file.name,
-                  size: file.size,
-                  type: file.type,
-                });
-                formData.append("images", file); // Use "images" for consistency
-              }
-            }
-
-            const response = await apiClient.post("/products", formData, {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-              timeout: 60000, // 60 second timeout for image upload
-            });
-
-            console.log(
-              `Product created successfully with ${imageFiles.length} image(s)`
-            );
-            return response.data.data;
-          } catch (imageError) {
-            console.error("Image processing error:", imageError);
-
-            if (imageError instanceof Error) {
-              throw new Error(`Image upload failed: ${imageError.message}`);
-            }
-            throw new Error("Image upload failed: Unknown error");
+        // Add all non-image fields
+        Object.entries(data).forEach(([key, value]) => {
+          if (key !== "images" && value !== undefined && value !== null) {
+            formData.append(key, String(value));
           }
-        } else {
-          console.log("Creating product without image...");
+        });
 
-          // Remove image fields if they're empty or invalid
-          const { image_url, image_urls, ...productData } = data;
+        // Process images - now properly typed as string[]
+        data.images!.forEach((imageData, index) => {
+          if (imageData.startsWith("data:image/")) {
+            const file = base64ToFile(imageData, `product-image-${index + 1}`);
+            formData.append("images", file);
+          }
+        });
 
-          const response = await api.post("/products", productData);
-          console.log("Product created successfully without image");
-          return response;
-        }
-      } catch (error) {
-        console.error("Product creation failed:", error);
+        const response = await apiClient.post("/products", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
 
-        // Handle different types of errors
-        if (error instanceof Error) {
-          throw error;
-        }
-
-        // Handle axios errors
-        if (error && typeof error === "object" && "response" in error) {
-          const axiosError = error as any;
-          const message =
-            axiosError.response?.data?.message || "Failed to create product";
-          throw new Error(message);
-        }
-
-        throw new Error("Failed to create product: Unknown error");
+        return response.data.data;
+      } else {
+        // Remove images field if empty
+        const { images, ...productData } = data;
+        const response = await api.post("/products", productData);
+        return response;
       }
     },
 
@@ -375,144 +276,40 @@ export const productsService = {
       id: number,
       data: ProductEditFormData
     ): Promise<{ product: Product }> => {
-      try {
-        console.log("Updating product with data:", data);
+      // Fixed: Access images property correctly
+      const hasImages = data.images && data.images.length > 0;
+      const { product_id, images, ...updateData } = data;
 
-        // Validate required fields
-        if (!data.name) {
-          throw new Error("Product name is required");
-        }
+      if (hasImages) {
+        const formData = new FormData();
 
-        if (!data.code) {
-          throw new Error("Product code is required");
-        }
-
-        if (!data.price || data.price <= 0) {
-          throw new Error("Valid price is required");
-        }
-
-        if (data.stock_quantity === undefined || data.stock_quantity < 0) {
-          throw new Error("Valid stock quantity is required");
-        }
-
-        // NEW: Support both single image (image_url) and multiple images (image_urls)
-        const hasImages =
-          (data.image_url && typeof data.image_url === "string") ||
-          (data.image_urls &&
-            Array.isArray(data.image_urls) &&
-            data.image_urls.length > 0);
-
-        // Remove product_id and image fields from the data sent to API
-        const { product_id, image_url, image_urls, ...updateData } = data;
-
-        if (hasImages) {
-          console.log("Processing image update...");
-
-          try {
-            const formData = new FormData();
-
-            // Add all non-image fields to FormData
-            Object.entries(updateData).forEach(([key, value]) => {
-              if (value !== undefined && value !== null) {
-                if (typeof value === "number") {
-                  formData.append(key, value.toString());
-                } else if (typeof value === "boolean") {
-                  formData.append(key, value ? "true" : "false");
-                } else {
-                  formData.append(key, String(value));
-                }
-              }
-            });
-
-            // NEW: Process multiple images or single image
-            let imageFiles: File[] = [];
-
-            if (
-              data.image_urls &&
-              Array.isArray(data.image_urls) &&
-              data.image_urls.length > 0
-            ) {
-              // Multiple images
-              console.log(
-                `Processing ${data.image_urls.length} images for update...`
-              );
-              imageFiles = processMultipleImages(
-                data.image_urls,
-                "product-image"
-              );
-
-              // Append all images with "images" field name (plural)
-              imageFiles.forEach((file, index) => {
-                console.log(`Adding image ${index + 1} for update:`, {
-                  name: file.name,
-                  size: file.size,
-                  type: file.type,
-                });
-                formData.append("images", file);
-              });
-            } else if (data.image_url && typeof data.image_url === "string") {
-              // Single image (backward compatibility)
-              const isImageFile = data.image_url.startsWith("data:image/");
-
-              if (isImageFile) {
-                console.log("Processing single image for update...");
-                const file = base64ToFile(data.image_url, "product-image");
-                console.log("Single image file created for update:", {
-                  name: file.name,
-                  size: file.size,
-                  type: file.type,
-                });
-                formData.append("images", file); // Use "images" for consistency
-              }
-            }
-
-            const response = await apiClient.put(`/products/${id}`, formData, {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-              timeout: 60000, // 60 second timeout for image upload
-            });
-
-            console.log(
-              `Product updated successfully with ${imageFiles.length} image(s)`
-            );
-            return response.data.data;
-          } catch (imageError) {
-            console.error("Image processing error during update:", imageError);
-
-            if (imageError instanceof Error) {
-              throw new Error(`Image update failed: ${imageError.message}`);
-            }
-            throw new Error("Image update failed: Unknown error");
+        // Add all non-image fields
+        Object.entries(updateData).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            formData.append(key, String(value));
           }
-        } else {
-          console.log("Updating product without image changes...");
+        });
 
-          const response = await api.put(`/products/${id}`, updateData);
-          console.log("Product updated successfully without image");
-          return response;
-        }
-      } catch (error) {
-        console.error("Product update failed:", error);
+        // Process images - now properly typed as string[]
+        data.images!.forEach((imageData, index) => {
+          if (imageData.startsWith("data:image/")) {
+            const file = base64ToFile(imageData, `product-image-${index + 1}`);
+            formData.append("images", file);
+          }
+        });
 
-        // Handle different types of errors
-        if (error instanceof Error) {
-          throw error;
-        }
+        const response = await apiClient.put(`/products/${id}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
 
-        // Handle axios errors
-        if (error && typeof error === "object" && "response" in error) {
-          const axiosError = error as any;
-          const message =
-            axiosError.response?.data?.message || "Failed to update product";
-          throw new Error(message);
-        }
-
-        throw new Error("Failed to update product: Unknown error");
+        return response.data.data;
+      } else {
+        const response = await api.put(`/products/${id}`, updateData);
+        return response;
       }
     },
 
-    // NEW: Multiple images upload method
+    // Multiple images upload method
     uploadProductImages: async (
       productId: number,
       files: File[]

@@ -125,12 +125,7 @@ function CreateProductContent() {
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitting, isDirty },
-    watch,
-    setValue,
-    getValues,
-    clearErrors,
-    setError,
+    formState: { errors, isSubmitting },
   } = useForm<ProductCreateFormData>({
     resolver: yupResolver(productCreateSchema),
     defaultValues: {
@@ -140,11 +135,11 @@ function CreateProductContent() {
       description: "",
       price: 0,
       stock_quantity: 0,
-      category_id: undefined,
+      category_id: 0,
       weight: 1,
       dimensions: "1x1x1",
       is_featured: false,
-      images: [],
+      images: [], // Fixed: string[] instead of (string | undefined)[]
     },
   });
 

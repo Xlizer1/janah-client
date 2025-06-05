@@ -101,8 +101,8 @@ const productSchema = yup.object({
   dimensions: yup.string().optional(),
   is_featured: yup.boolean().optional(),
   is_active: yup.boolean().required(),
-  images: yup.array().of(yup.string()).optional(),
-});
+  images: yup.array().of(yup.string().required()).optional(),
+}) satisfies yup.ObjectSchema<ProductEditFormData>;
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
