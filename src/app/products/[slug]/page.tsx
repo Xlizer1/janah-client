@@ -22,6 +22,9 @@ import {
   Alert,
   Card,
   CardContent,
+  Dialog,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import {
   AddShoppingCart,
@@ -36,6 +39,11 @@ import {
   Star,
   ArrowBack,
   NavigateNext,
+  ChevronLeft,
+  ChevronRight,
+  Close,
+  ZoomIn,
+  PhotoLibrary,
 } from "@mui/icons-material";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
@@ -61,6 +69,306 @@ function TabPanel({ children, value, index }: TabPanelProps) {
   );
 }
 
+interface ImageGalleryProps {
+  images: string[];
+  productName: string;
+}
+
+function ImageGallery({ images, productName }: ImageGalleryProps) {
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
+  const nextImage = () => {
+    setSelectedImageIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const prevImage = () => {
+    setSelectedImageIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  const openLightbox = (index: number) => {
+    setSelectedImageIndex(index);
+    setLightboxOpen(true);
+  };
+
+  if (!images || images.length === 0) {
+    return (
+      <Box sx={{ position: "sticky", top: 100 }}>
+        <Paper
+          sx={{
+            height: 500,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            bgcolor: "grey.100",
+            borderRadius: 2,
+          }}
+        >
+          <Typography variant="h6" color="text.secondary">
+            No Images Available
+          </Typography>
+        </Paper>
+      </Box>
+    );
+  }
+
+  return (
+    <Box sx={{ position: "sticky", top: 100 }}>
+      {/* Main Image */}
+      <Paper
+        sx={{
+          height: 500,
+          mb: 2,
+          overflow: "hidden",
+          borderRadius: 2,
+          bgcolor: "grey.100",
+          position: "relative",
+          cursor: "zoom-in",
+        }}
+        onClick={() => openLightbox(selectedImageIndex)}
+      >
+        <Image
+          src={images[selectedImageIndex]}
+          alt={`${productName} - Image ${selectedImageIndex + 1}`}
+          fill
+          style={{ objectFit: "cover" }}
+        />
+
+        {/* Navigation Arrows (only show if multiple images) */}
+        {images.length > 1 && (
+          <>
+            <IconButton
+              onClick={(e) => {
+                e.stopPropagation();
+                prevImage();
+              }}
+              sx={{
+                position: "absolute",
+                left: 8,
+                top: "50%",
+                transform: "translateY(-50%)",
+                bgcolor: "rgba(255,255,255,0.8)",
+                "&:hover": { bgcolor: "rgba(255,255,255,0.9)" },
+              }}
+            >
+              <ChevronLeft />
+            </IconButton>
+            <IconButton
+              onClick={(e) => {
+                e.stopPropagation();
+                nextImage();
+              }}
+              sx={{
+                position: "absolute",
+                right: 8,
+                top: "50%",
+                transform: "translateY(-50%)",
+                bgcolor: "rgba(255,255,255,0.8)",
+                "&:hover": { bgcolor: "rgba(255,255,255,0.9)" },
+              }}
+            >
+              <ChevronRight />
+            </IconButton>
+
+            {/* Image Counter */}
+            <Box
+              sx={{
+                position: "absolute",
+                bottom: 8,
+                right: 8,
+                bgcolor: "rgba(0,0,0,0.7)",
+                color: "white",
+                px: 1,
+                py: 0.5,
+                borderRadius: 1,
+                display: "flex",
+                alignItems: "center",
+                gap: 0.5,
+              }}
+            >
+              <PhotoLibrary sx={{ fontSize: 16 }} />
+              <Typography variant="caption">
+                {selectedImageIndex + 1} / {images.length}
+              </Typography>
+            </Box>
+          </>
+        )}
+
+        {/* Zoom Icon */}
+        <IconButton
+          onClick={(e) => {
+            e.stopPropagation();
+            openLightbox(selectedImageIndex);
+          }}
+          sx={{
+            position: "absolute",
+            top: 8,
+            right: 8,
+            bgcolor: "rgba(255,255,255,0.8)",
+            "&:hover": { bgcolor: "rgba(255,255,255,0.9)" },
+          }}
+        >
+          <ZoomIn />
+        </IconButton>
+      </Paper>
+
+      {/* Thumbnail Images */}
+      {images.length > 1 && (
+        <Box sx={{ display: "flex", gap: 1, overflowX: "auto", pb: 1 }}>
+          {images.map((image, index) => (
+            <Paper
+              key={index}
+              sx={{
+                width: 80,
+                height: 80,
+                minWidth: 80,
+                cursor: "pointer",
+                overflow: "hidden",
+                border: selectedImageIndex === index ? 2 : 0,
+                borderColor: "primary.main",
+                borderRadius: 1,
+                transition: "all 0.2s ease",
+                "&:hover": {
+                  opacity: 0.8,
+                },
+              }}
+              onClick={() => setSelectedImageIndex(index)}
+            >
+              <Image
+                src={image}
+                alt={`${productName} thumbnail ${index + 1}`}
+                width={80}
+                height={80}
+                style={{ objectFit: "cover" }}
+              />
+            </Paper>
+          ))}
+        </Box>
+      )}
+
+      {/* Lightbox */}
+      <Dialog
+        open={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+        maxWidth={false}
+        PaperProps={{
+          sx: {
+            bgcolor: "transparent",
+            boxShadow: "none",
+            overflow: "hidden",
+          },
+        }}
+      >
+        <DialogContent
+          sx={{
+            p: 0,
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: "80vh",
+            minWidth: "80vw",
+          }}
+        >
+          {/* Close Button */}
+          <IconButton
+            onClick={() => setLightboxOpen(false)}
+            sx={{
+              position: "absolute",
+              top: 16,
+              right: 16,
+              bgcolor: "rgba(255,255,255,0.9)",
+              zIndex: 2,
+              "&:hover": { bgcolor: "rgba(255,255,255,1)" },
+            }}
+          >
+            <Close />
+          </IconButton>
+
+          {/* Navigation Arrows */}
+          {images.length > 1 && (
+            <>
+              <IconButton
+                onClick={prevImage}
+                sx={{
+                  position: "absolute",
+                  left: 16,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  bgcolor: "rgba(255,255,255,0.9)",
+                  zIndex: 2,
+                  "&:hover": { bgcolor: "rgba(255,255,255,1)" },
+                }}
+              >
+                <ChevronLeft />
+              </IconButton>
+              <IconButton
+                onClick={nextImage}
+                sx={{
+                  position: "absolute",
+                  right: 16,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  bgcolor: "rgba(255,255,255,0.9)",
+                  zIndex: 2,
+                  "&:hover": { bgcolor: "rgba(255,255,255,1)" },
+                }}
+              >
+                <ChevronRight />
+              </IconButton>
+            </>
+          )}
+
+          {/* Main Image */}
+          <Box
+            sx={{
+              position: "relative",
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Image
+              src={images[selectedImageIndex]}
+              alt={`${productName} - Full size ${selectedImageIndex + 1}`}
+              width={800}
+              height={600}
+              style={{
+                objectFit: "contain",
+                maxWidth: "100%",
+                maxHeight: "80vh",
+              }}
+            />
+          </Box>
+
+          {/* Image Counter */}
+          {images.length > 1 && (
+            <Box
+              sx={{
+                position: "absolute",
+                bottom: 16,
+                left: "50%",
+                transform: "translateX(-50%)",
+                bgcolor: "rgba(0,0,0,0.8)",
+                color: "white",
+                px: 2,
+                py: 1,
+                borderRadius: 1,
+              }}
+            >
+              <Typography variant="body2">
+                {selectedImageIndex + 1} of {images.length}
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+      </Dialog>
+    </Box>
+  );
+}
+
 export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -70,7 +378,6 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   const slug = params.slug as string;
 
@@ -165,8 +472,11 @@ export default function ProductDetailPage() {
   const isOutOfStock = product.stock_quantity === 0;
   const isLowStock = product.stock_quantity > 0 && product.stock_quantity <= 5;
 
-  const productImages = product.image_url
-    ? [product.image_url, product.image_url, product.image_url]
+  // Get product images - prioritize new images array, fallback to legacy image_url
+  const productImages = product.images?.length
+    ? product.images
+    : product.image_url
+    ? [product.image_url]
     : [];
 
   return (
@@ -209,63 +519,7 @@ export default function ProductDetailPage() {
         <Grid container spacing={4}>
           {/* Product Images */}
           <Grid item xs={12} md={6}>
-            <Box sx={{ position: "sticky", top: 100 }}>
-              {/* Main Image */}
-              <Paper
-                sx={{
-                  height: 500,
-                  mb: 2,
-                  overflow: "hidden",
-                  borderRadius: 2,
-                  bgcolor: "grey.100",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                {productImages[selectedImageIndex] ? (
-                  <Image
-                    src={productImages[selectedImageIndex]}
-                    alt={product.name}
-                    fill
-                    style={{ objectFit: "cover" }}
-                  />
-                ) : (
-                  <Typography variant="h6" color="text.secondary">
-                    No Image Available
-                  </Typography>
-                )}
-              </Paper>
-
-              {/* Thumbnail Images */}
-              {productImages.length > 1 && (
-                <Box sx={{ display: "flex", gap: 1 }}>
-                  {productImages.map((image, index) => (
-                    <Paper
-                      key={index}
-                      sx={{
-                        width: 80,
-                        height: 80,
-                        cursor: "pointer",
-                        overflow: "hidden",
-                        border: selectedImageIndex === index ? 2 : 0,
-                        borderColor: "primary.main",
-                        borderRadius: 1,
-                      }}
-                      onClick={() => setSelectedImageIndex(index)}
-                    >
-                      <Image
-                        src={image}
-                        alt={`${product.name} ${index + 1}`}
-                        width={80}
-                        height={80}
-                        style={{ objectFit: "cover" }}
-                      />
-                    </Paper>
-                  ))}
-                </Box>
-              )}
-            </Box>
+            <ImageGallery images={productImages} productName={product.name} />
           </Grid>
 
           {/* Product Info */}
@@ -285,6 +539,17 @@ export default function ProductDetailPage() {
               <Typography variant="h3" sx={{ fontWeight: 700, mb: 2 }}>
                 {product.name}
               </Typography>
+
+              {/* Product Code */}
+              {product.code && (
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 2, fontFamily: "monospace" }}
+                >
+                  Product Code: {product.full_code || product.code}
+                </Typography>
+              )}
 
               {/* Rating */}
               <Box
@@ -328,6 +593,14 @@ export default function ProductDetailPage() {
                     label={t("products.featured")}
                     color="warning"
                     variant="filled"
+                  />
+                )}
+                {productImages.length > 1 && (
+                  <Chip
+                    icon={<PhotoLibrary />}
+                    label={`${productImages.length} Images`}
+                    color="info"
+                    variant="outlined"
                   />
                 )}
               </Box>
@@ -464,6 +737,25 @@ export default function ProductDetailPage() {
                   <Typography variant="body1">{product.dimensions}</Typography>
                 </Grid>
               )}
+              {product.code && (
+                <Grid item xs={6} sm={4}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Product Code
+                  </Typography>
+                  <Typography variant="body1" sx={{ fontFamily: "monospace" }}>
+                    {product.full_code || product.code}
+                  </Typography>
+                </Grid>
+              )}
+              <Grid item xs={6} sm={4}>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Images
+                </Typography>
+                <Typography variant="body1">
+                  {productImages.length} product image
+                  {productImages.length !== 1 ? "s" : ""}
+                </Typography>
+              </Grid>
             </Grid>
           </TabPanel>
 

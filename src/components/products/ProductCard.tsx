@@ -13,6 +13,7 @@ import {
   Chip,
   IconButton,
   Rating,
+  Badge,
 } from "@mui/material";
 import {
   AddShoppingCart,
@@ -20,6 +21,7 @@ import {
   FavoriteBorder,
   Visibility,
   Star,
+  PhotoLibrary,
 } from "@mui/icons-material";
 import { useCart } from "@/store/cart.store";
 import type { Product } from "@/types";
@@ -60,6 +62,10 @@ export function ProductCard({
   const isOutOfStock = product.stock_quantity === 0;
   const isLowStock = product.stock_quantity > 0 && product.stock_quantity <= 5;
 
+  // Get the main image (first image) or fallback to legacy image_url
+  const mainImage = product.images?.[0] || product.image_url;
+  const hasMultipleImages = product.images && product.images.length > 1;
+
   return (
     <Link href={`/products/${product.slug || product.id}`} className="block">
       <Card
@@ -95,9 +101,9 @@ export function ProductCard({
               justifyContent: "center",
             }}
           >
-            {product.image_url ? (
+            {mainImage ? (
               <Image
-                src={product.image_url}
+                src={mainImage}
                 alt={product.name}
                 fill
                 style={{ objectFit: "cover" }}
@@ -120,6 +126,30 @@ export function ProductCard({
               </Box>
             )}
           </CardMedia>
+
+          {/* Multiple Images Indicator */}
+          {hasMultipleImages && (
+            <Box
+              sx={{
+                position: "absolute",
+                top: 12,
+                right: 60,
+                bgcolor: "rgba(0,0,0,0.7)",
+                color: "white",
+                borderRadius: 1,
+                px: 1,
+                py: 0.5,
+                display: "flex",
+                alignItems: "center",
+                gap: 0.5,
+              }}
+            >
+              <PhotoLibrary sx={{ fontSize: 14 }} />
+              <Typography variant="caption" sx={{ fontSize: "0.7rem" }}>
+                {product.images!.length}
+              </Typography>
+            </Box>
+          )}
 
           {/* Product Badges */}
           <Box
@@ -270,6 +300,22 @@ export function ProductCard({
           >
             {product.name}
           </Typography>
+
+          {/* Product Code */}
+          {product.code && (
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{
+                fontWeight: 500,
+                mb: 1,
+                display: "block",
+                fontFamily: "monospace",
+              }}
+            >
+              {product.full_code || product.code}
+            </Typography>
+          )}
 
           {/* Rating */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>

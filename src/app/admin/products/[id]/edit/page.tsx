@@ -60,7 +60,7 @@ import { useAuth } from "@/store/auth.store";
 import { productsService } from "@/services/products.service";
 import { categoriesService } from "@/services/categories.service";
 import type { ProductEditFormData } from "@/types";
-import { ImageUpload } from "@/components/ui/ImageUpload";
+import { MultiImageUpload } from "@/components/ui/ImageUpload";
 import { useTranslation } from "@/hooks/useTranslation";
 
 const productSchema = yup.object({
@@ -101,7 +101,7 @@ const productSchema = yup.object({
   dimensions: yup.string().optional(),
   is_featured: yup.boolean().optional(),
   is_active: yup.boolean().required(),
-  image_url: yup.string().optional(),
+  images: yup.array().of(yup.string()).optional(),
 });
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
@@ -163,7 +163,7 @@ function EditProductContent() {
       dimensions: "1x1x1",
       is_featured: false,
       is_active: true,
-      image_url: "",
+      images: [],
     },
   });
 
@@ -247,7 +247,7 @@ function EditProductContent() {
       reset({
         product_id: productId,
         name: product.name,
-        code: product.code || "", // Handle missing code
+        code: product.code || "",
         slug: product.slug,
         description: product.description || "",
         price: product.price,
@@ -257,7 +257,8 @@ function EditProductContent() {
         dimensions: product.dimensions || "1x1x1",
         is_featured: product.is_featured,
         is_active: product.is_active,
-        image_url: product.image_url || "",
+        images:
+          product.images || (product.image_url ? [product.image_url] : []),
       });
       setNewStockQuantity(product.stock_quantity);
     }
@@ -286,26 +287,30 @@ function EditProductContent() {
       errors.push("Weight cannot be negative");
     }
 
-    // Validate image if provided
-    if (data.image_url && data.image_url.startsWith("data:image/")) {
-      try {
-        const base64Data = data.image_url.split(",")[1];
-        if (!base64Data || base64Data.length === 0) {
-          errors.push("Invalid image data");
-        }
+    // Validate images if provided
+    if (data.images && data.images.length > 0) {
+      data.images.forEach((imageUrl, index) => {
+        if (imageUrl.startsWith("data:image/")) {
+          try {
+            const base64Data = imageUrl.split(",")[1];
+            if (!base64Data || base64Data.length === 0) {
+              errors.push(`Invalid image data for image ${index + 1}`);
+            }
 
-        // Check if base64 is valid
-        atob(base64Data);
+            // Check if base64 is valid
+            atob(base64Data);
 
-        // Check image size (approximate)
-        const sizeInBytes = (base64Data.length * 3) / 4;
-        const maxSize = 10 * 1024 * 1024; // 10MB
-        if (sizeInBytes > maxSize) {
-          errors.push("Image size too large (max 10MB)");
+            // Check image size (approximate)
+            const sizeInBytes = (base64Data.length * 3) / 4;
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            if (sizeInBytes > maxSize) {
+              errors.push(`Image ${index + 1} size too large (max 10MB)`);
+            }
+          } catch (e) {
+            errors.push(`Invalid image format for image ${index + 1}`);
+          }
         }
-      } catch (e) {
-        errors.push("Invalid image format");
-      }
+      });
     }
 
     return errors;
@@ -328,8 +333,11 @@ function EditProductContent() {
       console.log("Submitting product update:", data);
 
       // Show loading toast for image uploads
-      if (data.image_url && data.image_url.startsWith("data:image/")) {
-        toast.info("Uploading image, please wait...");
+      if (
+        data.images &&
+        data.images.some((img) => img.startsWith("data:image/"))
+      ) {
+        toast.info("Uploading images, please wait...");
       }
 
       await updateProductMutation.mutateAsync(data);
@@ -348,22 +356,18 @@ function EditProductContent() {
     updateStockMutation.mutate(newStockQuantity);
   };
 
-  const handleImageUpload = () => {
-    toast.info("Use the image upload component below");
-  };
-
   const handleImageError = (error: string) => {
     console.error("Image upload error:", error);
     toast.error(error);
-    setError("image_url", {
+    setError("images", {
       type: "manual",
       message: error,
     });
   };
 
-  const handleImageChange = (imageUrl: string) => {
-    setValue("image_url", imageUrl, { shouldValidate: true });
-    clearErrors("image_url");
+  const handleImagesChange = (imageUrls: string[]) => {
+    setValue("images", imageUrls, { shouldValidate: true });
+    clearErrors("images");
   };
 
   const getStatusColor = (product: any) => {
@@ -508,9 +512,9 @@ function EditProductContent() {
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <CircularProgress size={20} />
             <Typography>
-              {watch("image_url") &&
-              watch("image_url")?.startsWith("data:image/")
-                ? "Updating product and uploading image..."
+              {watch("images") &&
+              watch("images")?.some((img) => img.startsWith("data:image/"))
+                ? "Updating product and uploading images..."
                 : "Updating product..."}
             </Typography>
           </Box>
@@ -719,97 +723,27 @@ function EditProductContent() {
             <Card>
               <CardHeader title="Product Images" />
               <CardContent>
-                {/* Show existing image if it's an HTTP URL */}
-                {watch("image_url") &&
-                  !watch("image_url")?.startsWith("data:image/") && (
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                        Current Image:
-                      </Typography>
-                      <Box
-                        sx={{
-                          width: 200,
-                          height: 200,
-                          border: 1,
-                          borderColor: "divider",
-                          borderRadius: 2,
-                          overflow: "hidden",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          bgcolor: "grey.50",
-                          position: "relative",
-                        }}
-                      >
-                        <img
-                          src={watch("image_url")}
-                          alt="Current product image"
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
-                          onError={() => console.error("Failed to load image")}
-                        />
-                        <IconButton
-                          onClick={() => setValue("image_url", "")}
-                          sx={{
-                            position: "absolute",
-                            top: 8,
-                            right: 8,
-                            bgcolor: "rgba(255,255,255,0.9)",
-                            color: "error.main",
-                            "&:hover": {
-                              bgcolor: "rgba(255,255,255,1)",
-                              color: "error.dark",
-                            },
-                          }}
-                          size="small"
-                          disabled={isSubmitting}
-                        >
-                          <Delete fontSize="small" />
-                        </IconButton>
-                      </Box>
-                    </Box>
-                  )}
-
-                {/* Only show ImageUpload component if no existing image or user wants to change it */}
-                {(!watch("image_url") ||
-                  watch("image_url")?.startsWith("data:image/")) && (
-                  <ImageUpload
-                    value={
-                      watch("image_url")?.startsWith("data:image/")
-                        ? watch("image_url")
-                        : ""
-                    }
-                    onChange={handleImageChange}
-                    onError={handleImageError}
-                    maxSize={10}
-                    label="Upload Product Image"
-                    helperText="Max 10MB, PNG or JPG format recommended"
-                    variant="dropzone"
-                    disabled={isSubmitting}
-                  />
-                )}
-
-                {/* Button to change existing image */}
-                {watch("image_url") &&
-                  !watch("image_url")?.startsWith("data:image/") && (
-                    <Button
-                      variant="outlined"
-                      startIcon={<PhotoCamera />}
-                      onClick={() => setValue("image_url", "")}
-                      fullWidth
+                <Controller
+                  name="images"
+                  control={control}
+                  render={({ field }) => (
+                    <MultiImageUpload
+                      value={field.value || []}
+                      onChange={handleImagesChange}
+                      onError={handleImageError}
+                      maxSize={10}
+                      maxFiles={5}
+                      label="Upload Product Images"
+                      helperText="Max 5 images, 10MB each. First image will be the main product image."
+                      variant="dropzone"
                       disabled={isSubmitting}
-                      sx={{ mt: 2 }}
-                    >
-                      Change Image
-                    </Button>
+                    />
                   )}
+                />
 
-                {errors.image_url && (
+                {errors.images && (
                   <Alert severity="error" sx={{ mt: 2 }}>
-                    {errors.image_url.message}
+                    {errors.images.message}
                   </Alert>
                 )}
               </CardContent>
@@ -941,15 +875,6 @@ function EditProductContent() {
                   >
                     View Live Product
                   </Button>
-                  <Button
-                    variant="outlined"
-                    startIcon={<PhotoCamera />}
-                    onClick={handleImageUpload}
-                    fullWidth
-                    disabled={isSubmitting}
-                  >
-                    Change Image
-                  </Button>
                 </Box>
               </CardContent>
             </Card>
@@ -1018,6 +943,22 @@ function EditProductContent() {
                         : "(Required)"}
                     </Typography>
                   </Box>
+
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    {watch("images") && watch("images")!.length > 0 ? (
+                      <CheckCircle
+                        sx={{ fontSize: 16, color: "success.main" }}
+                      />
+                    ) : (
+                      <Info sx={{ fontSize: 16, color: "info.main" }} />
+                    )}
+                    <Typography variant="body2">
+                      Product Images{" "}
+                      {watch("images") && watch("images")!.length > 0
+                        ? `✓ (${watch("images")!.length})`
+                        : "(Optional)"}
+                    </Typography>
+                  </Box>
                 </Box>
               </CardContent>
             </Card>
@@ -1049,6 +990,19 @@ function EditProductContent() {
                     </Typography>
                     <Typography variant="body2">
                       {product.stock_quantity} units
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">
+                      Images
+                    </Typography>
+                    <Typography variant="body2">
+                      {(product.images?.length || 0) +
+                        (product.image_url &&
+                        !product.images?.includes(product.image_url)
+                          ? 1
+                          : 0)}{" "}
+                      images
                     </Typography>
                   </Box>
                 </Box>

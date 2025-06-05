@@ -50,7 +50,7 @@ export interface AuthResponse {
 export interface Product {
   id: number;
   name: string;
-  code: string; // Fixed: Added missing code field
+  code: string;
   slug: string;
   description?: string;
   price: number;
@@ -58,18 +58,22 @@ export interface Product {
   category_id?: number;
   category_name?: string;
   category_slug?: string;
+  category_code?: string;
   weight?: number;
   dimensions?: string;
   is_active: boolean;
   is_featured: boolean;
-  image_url?: string;
+  // Updated: Support both new images array and legacy image_url
+  images?: string[]; // New: Array of image URLs
+  image_url?: string; // Legacy: Single image URL (for backwards compatibility)
+  full_code?: string; // Computed: category_code + product_code
   created_at: string;
   updated_at: string;
 }
 
 export interface ProductCreateData {
   name: string;
-  code: string; // Fixed: Added missing code field
+  code: string;
   slug?: string;
   description?: string;
   price: number;
@@ -78,18 +82,21 @@ export interface ProductCreateData {
   weight?: number;
   dimensions?: string;
   is_featured?: boolean;
-  image_url?: string;
+  // Updated: Use images array instead of single image_url
+  images?: string[];
 }
 
 export interface ProductUpdateData extends Partial<ProductCreateData> {
-  code?: string; // FIXED: Added code field
+  code?: string;
   is_active?: boolean;
+  // Updated: Use images array instead of single image_url
+  images?: string[];
 }
 
 export interface Category {
   id: number;
   name: string;
-  code: string; // Add this field
+  code: string;
   slug: string;
   description?: string;
   image_url?: string;
@@ -102,7 +109,7 @@ export interface Category {
 
 export interface CategoryCreateData {
   name: string;
-  code: string; // Add this field
+  code: string;
   slug?: string;
   description?: string;
   image_url?: string;
@@ -280,7 +287,7 @@ export interface ResendCodeFormData {
 
 export interface CategoryFormData {
   name: string;
-  code: string; // Add this field
+  code: string;
   slug?: string;
   description?: string;
   image_url?: string;
@@ -290,7 +297,7 @@ export interface CategoryFormData {
 
 export interface CategoryCreateFormData {
   name: string;
-  code: string; // Add this field
+  code: string;
   slug?: string;
   description?: string;
   image_url?: string;
@@ -300,7 +307,7 @@ export interface CategoryCreateFormData {
 export interface ProductEditFormData {
   product_id: number; // Keep for form identification, but don't send to API
   name: string;
-  code: string; // FIXED: Added missing code field
+  code: string;
   slug?: string;
   description?: string;
   price: number;
@@ -310,13 +317,13 @@ export interface ProductEditFormData {
   dimensions?: string;
   is_featured?: boolean;
   is_active: boolean; // Required for edit forms
-  image_url?: string;
+  // Updated: Use images array instead of single image_url
+  images?: string[];
 }
 
-// Fixed: Made ProductCreateFormData consistent with ProductCreateData
 export interface ProductCreateFormData {
   name: string;
-  code: string; // Fixed: Added missing code field
+  code: string;
   slug?: string;
   description?: string;
   price: number;
@@ -325,7 +332,8 @@ export interface ProductCreateFormData {
   weight?: number;
   dimensions?: string;
   is_featured?: boolean;
-  image_url?: string;
+  // Updated: Use images array instead of single image_url
+  images?: string[];
 }
 
 export interface Order {
@@ -395,28 +403,37 @@ export interface CheckoutFormData {
   payment_method?: string;
 }
 
-export interface CategoryCreateFormData {
-  name: string;
-  slug?: string;
-  description?: string;
-  image_url?: string;
-  sort_order?: number;
+// Helper type for getting the main product image
+export type ProductMainImage = string | undefined;
+
+// Helper function type for getting the main image from a product
+export type GetProductMainImage = (product: Product) => ProductMainImage;
+
+// Helper function type for getting all images from a product
+export type GetProductImages = (product: Product) => string[];
+
+// Additional utility types for image handling
+export interface ImageUploadResult {
+  success: boolean;
+  imageUrl?: string;
+  error?: string;
 }
 
-export interface CategoryFormData {
-  name: string;
-  slug?: string;
-  description?: string;
-  image_url?: string;
-  sort_order?: number;
-  is_active: boolean;
+export interface MultiImageUploadResult {
+  success: boolean;
+  imageUrls?: string[];
+  failedUploads?: Array<{
+    index: number;
+    error: string;
+  }>;
 }
 
-// Update the existing CategoryCreateData interface to be consistent
-export interface CategoryCreateData {
-  name: string;
-  slug?: string;
-  description?: string;
-  image_url?: string;
-  sort_order?: number;
+// Product with guaranteed images (for components that require images)
+export interface ProductWithImages extends Omit<Product, "images"> {
+  images: string[]; // Required, not optional
+}
+
+// Legacy product format (for backward compatibility)
+export interface LegacyProduct extends Omit<Product, "images"> {
+  image_url: string; // Required in legacy format
 }

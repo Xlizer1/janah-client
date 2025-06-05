@@ -8,41 +8,46 @@ import {
   IconButton,
   CircularProgress,
   Alert,
+  Grid,
+  Paper,
 } from "@mui/material";
 import {
   CloudUpload,
   Delete,
   PhotoCamera,
   Image as ImageIcon,
+  DragIndicator,
 } from "@mui/icons-material";
 import Image from "next/image";
 import { useTranslation } from "@/hooks/useTranslation";
 
-interface ImageUploadProps {
-  value?: string; // Current image URL
-  onChange: (imageUrl: string) => void;
+interface MultiImageUploadProps {
+  value?: string[]; // Array of image URLs
+  onChange: (imageUrls: string[]) => void;
   onError?: (error: string) => void;
   disabled?: boolean;
   accept?: string;
   maxSize?: number; // in MB
+  maxFiles?: number; // maximum number of files
   label?: string;
   helperText?: string;
   showPreview?: boolean;
   variant?: "button" | "dropzone";
 }
 
-export function ImageUpload({
-  value,
+export function MultiImageUpload({
+  value = [],
   onChange,
   onError,
   disabled = false,
   accept = "image/*",
   maxSize = 5,
-  label = "Upload Image",
+  maxFiles = 5,
+  label = "Upload Images",
   helperText,
   showPreview = true,
   variant = "dropzone",
-}: ImageUploadProps) {
+}: MultiImageUploadProps) {
   const { t } = useTranslation();
   const [isUploading, setIsUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -62,28 +67,6 @@ export function ImageUpload({
     return null;
   };
 
-  const uploadToCloudinary = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "janah_products"); // You'll need to create this preset
-    formData.append("folder", "products");
-
-    const response = await fetch(
-      "https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload", // Replace with your cloud name
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to upload image");
-    }
-
-    const data = await response.json();
-    return data.secure_url;
-  };
-
   const convertToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -93,22 +76,37 @@ export function ImageUpload({
     });
   };
 
-  const handleFileSelect = async (file: File) => {
+  const handleFileSelect = async (files: FileList) => {
     setError(null);
 
-    const validationError = validateFile(file);
-    if (validationError) {
-      setError(validationError);
-      onError?.(validationError);
+    // Check if adding these files would exceed the maximum
+    if (value.length + files.length > maxFiles) {
+      const error = `Maximum ${maxFiles} images allowed. You can add ${
+        maxFiles - value.length
+      } more.`;
+      setError(error);
+      onError?.(error);
       return;
     }
 
     setIsUploading(true);
 
     try {
-      const base64Url = await convertToBase64(file);
+      const newImageUrls: string[] = [];
 
-      onChange(base64Url);
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const validationError = validateFile(file);
+
+        if (validationError) {
+          throw new Error(validationError);
+        }
+
+        const base64Url = await convertToBase64(file);
+        newImageUrls.push(base64Url);
+      }
+
+      onChange([...value, ...newImageUrls]);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Upload failed";
@@ -120,9 +118,9 @@ export function ImageUpload({
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      handleFileSelect(file);
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      handleFileSelect(files);
     }
   };
 
@@ -130,9 +128,9 @@ export function ImageUpload({
     event.preventDefault();
     setDragOver(false);
 
-    const file = event.dataTransfer.files[0];
-    if (file) {
-      handleFileSelect(file);
+    const files = event.dataTransfer.files;
+    if (files && files.length > 0) {
+      handleFileSelect(files);
     }
   };
 
@@ -146,17 +144,24 @@ export function ImageUpload({
     setDragOver(false);
   };
 
-  const handleRemoveImage = () => {
-    onChange("");
+  const handleRemoveImage = (index: number) => {
+    const newImages = value.filter((_, i) => i !== index);
+    onChange(newImages);
     setError(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+  };
+
+  const handleReorderImages = (fromIndex: number, toIndex: number) => {
+    const newImages = [...value];
+    const [movedImage] = newImages.splice(fromIndex, 1);
+    newImages.splice(toIndex, 0, movedImage);
+    onChange(newImages);
   };
 
   const handleButtonClick = () => {
     fileInputRef.current?.click();
   };
+
+  const canAddMore = value.length < maxFiles;
 
   if (variant === "button") {
     return (
@@ -167,7 +172,8 @@ export function ImageUpload({
           accept={accept}
           onChange={handleFileChange}
           style={{ display: "none" }}
-          disabled={disabled || isUploading}
+          disabled={disabled || isUploading || !canAddMore}
+          multiple
         />
 
         <Button
@@ -176,7 +182,7 @@ export function ImageUpload({
             isUploading ? <CircularProgress size={20} /> : <CloudUpload />
           }
           onClick={handleButtonClick}
-          disabled={disabled || isUploading}
+          disabled={disabled || isUploading || !canAddMore}
           fullWidth
         >
           {isUploading ? "Uploading..." : label}
@@ -198,40 +204,62 @@ export function ImageUpload({
           </Alert>
         )}
 
-        {showPreview && value && (
-          <Box sx={{ mt: 2, position: "relative", display: "inline-block" }}>
-            <Box
-              sx={{
-                width: 200,
-                height: 200,
-                border: 1,
-                borderColor: "divider",
-                borderRadius: 2,
-                overflow: "hidden",
-                position: "relative",
-              }}
-            >
-              <Image
-                src={value}
-                alt="Preview"
-                fill
-                style={{ objectFit: "cover" }}
-              />
-            </Box>
-            <IconButton
-              onClick={handleRemoveImage}
-              sx={{
-                position: "absolute",
-                top: -8,
-                right: -8,
-                bgcolor: "error.main",
-                color: "white",
-                "&:hover": { bgcolor: "error.dark" },
-              }}
-              size="small"
-            >
-              <Delete fontSize="small" />
-            </IconButton>
+        {showPreview && value.length > 0 && (
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+              Images ({value.length}/{maxFiles})
+            </Typography>
+            <Grid container spacing={2}>
+              {value.map((imageUrl, index) => (
+                <Grid item xs={6} sm={4} md={3} key={index}>
+                  <Paper
+                    sx={{
+                      position: "relative",
+                      aspectRatio: "1",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <Image
+                      src={imageUrl}
+                      alt={`Preview ${index + 1}`}
+                      fill
+                      style={{ objectFit: "cover" }}
+                    />
+                    <IconButton
+                      onClick={() => handleRemoveImage(index)}
+                      sx={{
+                        position: "absolute",
+                        top: 4,
+                        right: 4,
+                        bgcolor: "rgba(255,255,255,0.9)",
+                        color: "error.main",
+                        "&:hover": { bgcolor: "rgba(255,255,255,1)" },
+                      }}
+                      size="small"
+                    >
+                      <Delete fontSize="small" />
+                    </IconButton>
+                    {index === 0 && (
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          bottom: 4,
+                          left: 4,
+                          bgcolor: "primary.main",
+                          color: "white",
+                          px: 1,
+                          py: 0.5,
+                          borderRadius: 1,
+                          fontSize: "0.75rem",
+                        }}
+                      >
+                        Main
+                      </Box>
+                    )}
+                  </Paper>
+                </Grid>
+              ))}
+            </Grid>
           </Box>
         )}
       </Box>
@@ -246,10 +274,12 @@ export function ImageUpload({
         accept={accept}
         onChange={handleFileChange}
         style={{ display: "none" }}
-        disabled={disabled || isUploading}
+        disabled={disabled || isUploading || !canAddMore}
+        multiple
       />
 
-      {!value ? (
+      {/* Upload Area */}
+      {canAddMore && (
         <Box
           onDrop={handleDrop}
           onDragOver={handleDragOver}
@@ -265,6 +295,7 @@ export function ImageUpload({
             cursor: disabled || isUploading ? "not-allowed" : "pointer",
             bgcolor: dragOver ? "action.hover" : "background.paper",
             transition: "all 0.2s ease",
+            mb: value.length > 0 ? 2 : 0,
             "&:hover": {
               bgcolor:
                 disabled || isUploading ? "background.paper" : "action.hover",
@@ -290,7 +321,10 @@ export function ImageUpload({
                 {label}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Drag and drop an image here, or click to select
+                Drag and drop images here, or click to select
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {value.length}/{maxFiles} images • Multiple selection supported
               </Typography>
               {helperText && (
                 <Typography
@@ -304,70 +338,119 @@ export function ImageUpload({
             </Box>
           )}
         </Box>
-      ) : (
-        <Box sx={{ position: "relative", display: "inline-block" }}>
-          <Box
-            sx={{
-              width: "100%",
-              maxWidth: 400,
-              aspectRatio: "1",
-              border: 1,
-              borderColor: "divider",
-              borderRadius: 2,
-              overflow: "hidden",
-              position: "relative",
-            }}
-          >
-            <Image
-              src={value}
-              alt="Preview"
-              fill
-              style={{ objectFit: "cover" }}
-            />
-          </Box>
+      )}
 
-          <Box
-            sx={{
-              position: "absolute",
-              top: 8,
-              right: 8,
-              display: "flex",
-              gap: 1,
-            }}
-          >
-            <IconButton
-              onClick={handleButtonClick}
-              sx={{
-                bgcolor: "rgba(255,255,255,0.9)",
-                "&:hover": { bgcolor: "rgba(255,255,255,1)" },
-              }}
-              size="small"
-              disabled={disabled || isUploading}
-            >
-              <PhotoCamera fontSize="small" />
-            </IconButton>
-            <IconButton
-              onClick={handleRemoveImage}
-              sx={{
-                bgcolor: "rgba(255,255,255,0.9)",
-                color: "error.main",
-                "&:hover": {
-                  bgcolor: "rgba(255,255,255,1)",
-                  color: "error.dark",
-                },
-              }}
-              size="small"
-              disabled={disabled || isUploading}
-            >
-              <Delete fontSize="small" />
-            </IconButton>
-          </Box>
+      {/* Image Preview Grid */}
+      {showPreview && value.length > 0 && (
+        <Box>
+          <Typography variant="subtitle2" sx={{ mb: 2 }}>
+            Images ({value.length}/{maxFiles})
+            {value.length > 0 && (
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ ml: 1 }}
+              >
+                • First image will be the main product image
+              </Typography>
+            )}
+          </Typography>
+
+          <Grid container spacing={2}>
+            {value.map((imageUrl, index) => (
+              <Grid item xs={6} sm={4} md={3} key={index}>
+                <Paper
+                  sx={{
+                    position: "relative",
+                    aspectRatio: "1",
+                    overflow: "hidden",
+                    border: index === 0 ? 2 : 1,
+                    borderColor: index === 0 ? "primary.main" : "divider",
+                  }}
+                >
+                  <Image
+                    src={imageUrl}
+                    alt={`Product image ${index + 1}`}
+                    fill
+                    style={{ objectFit: "cover" }}
+                  />
+
+                  {/* Action Buttons */}
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: 4,
+                      right: 4,
+                      display: "flex",
+                      gap: 0.5,
+                    }}
+                  >
+                    <IconButton
+                      onClick={() => handleRemoveImage(index)}
+                      sx={{
+                        bgcolor: "rgba(255,255,255,0.9)",
+                        color: "error.main",
+                        "&:hover": { bgcolor: "rgba(255,255,255,1)" },
+                      }}
+                      size="small"
+                      disabled={disabled || isUploading}
+                    >
+                      <Delete fontSize="small" />
+                    </IconButton>
+                  </Box>
+
+                  {/* Main Image Indicator */}
+                  {index === 0 && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        bottom: 4,
+                        left: 4,
+                        bgcolor: "primary.main",
+                        color: "white",
+                        px: 1,
+                        py: 0.5,
+                        borderRadius: 1,
+                        fontSize: "0.75rem",
+                        fontWeight: 600,
+                      }}
+                    >
+                      Main Image
+                    </Box>
+                  )}
+
+                  {/* Image Number */}
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      bottom: 4,
+                      right: 4,
+                      bgcolor: "rgba(0,0,0,0.7)",
+                      color: "white",
+                      px: 1,
+                      py: 0.5,
+                      borderRadius: 1,
+                      fontSize: "0.75rem",
+                    }}
+                  >
+                    {index + 1}
+                  </Box>
+                </Paper>
+              </Grid>
+            ))}
+          </Grid>
         </Box>
       )}
 
       {error && (
         <Alert severity="error" sx={{ mt: 2 }}>
           {error}
+        </Alert>
+      )}
+
+      {!canAddMore && (
+        <Alert severity="info" sx={{ mt: 2 }}>
+          Maximum number of images ({maxFiles}) reached.
         </Alert>
       )}
     </Box>

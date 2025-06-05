@@ -51,8 +51,7 @@ import { useAuth } from "@/store/auth.store";
 import { productsService } from "@/services/products.service";
 import { categoriesService } from "@/services/categories.service";
 import type { ProductCreateFormData } from "@/types";
-import { ImageUpload } from "@/components/ui/ImageUpload";
-import Image from "next/image";
+import { MultiImageUpload } from "@/components/ui/ImageUpload";
 import { useTranslation } from "@/hooks/useTranslation";
 
 const productCreateSchema = yup.object({
@@ -91,7 +90,7 @@ const productCreateSchema = yup.object({
     .optional(),
   dimensions: yup.string().optional(),
   is_featured: yup.boolean().optional(),
-  image_url: yup.string().optional(),
+  images: yup.array().of(yup.string()).optional(),
 });
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
@@ -145,7 +144,7 @@ function CreateProductContent() {
       weight: 1,
       dimensions: "1x1x1",
       is_featured: false,
-      image_url: "",
+      images: [],
     },
   });
 
@@ -223,26 +222,30 @@ function CreateProductContent() {
       errors.push("Weight cannot be negative");
     }
 
-    // Validate image if provided
-    if (data.image_url && data.image_url.startsWith("data:image/")) {
-      try {
-        const base64Data = data.image_url.split(",")[1];
-        if (!base64Data || base64Data.length === 0) {
-          errors.push("Invalid image data");
-        }
+    // Validate images if provided
+    if (data.images && data.images.length > 0) {
+      data.images.forEach((imageUrl, index) => {
+        if (imageUrl.startsWith("data:image/")) {
+          try {
+            const base64Data = imageUrl.split(",")[1];
+            if (!base64Data || base64Data.length === 0) {
+              errors.push(`Invalid image data for image ${index + 1}`);
+            }
 
-        // Check if base64 is valid
-        atob(base64Data);
+            // Check if base64 is valid
+            atob(base64Data);
 
-        // Check image size (approximate)
-        const sizeInBytes = (base64Data.length * 3) / 4;
-        const maxSize = 10 * 1024 * 1024; // 10MB
-        if (sizeInBytes > maxSize) {
-          errors.push("Image size too large (max 10MB)");
+            // Check image size (approximate)
+            const sizeInBytes = (base64Data.length * 3) / 4;
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            if (sizeInBytes > maxSize) {
+              errors.push(`Image ${index + 1} size too large (max 10MB)`);
+            }
+          } catch (e) {
+            errors.push(`Invalid image format for image ${index + 1}`);
+          }
         }
-      } catch (e) {
-        errors.push("Invalid image format");
-      }
+      });
     }
 
     return errors;
@@ -265,8 +268,11 @@ function CreateProductContent() {
       console.log("Submitting product data:", data);
 
       // Show loading toast for image uploads
-      if (data.image_url && data.image_url.startsWith("data:image/")) {
-        toast.info("Uploading image, please wait...");
+      if (
+        data.images &&
+        data.images.some((img) => img.startsWith("data:image/"))
+      ) {
+        toast.info("Uploading images, please wait...");
       }
 
       await createProductMutation.mutateAsync(data);
@@ -281,22 +287,18 @@ function CreateProductContent() {
     toast.info("Save as draft functionality coming soon");
   };
 
-  const handleImageUpload = () => {
-    toast.info("Use the image upload component below");
-  };
-
   const handleImageError = (error: string) => {
     console.error("Image upload error:", error);
     toast.error(error);
-    setError("image_url", {
+    setError("images", {
       type: "manual",
       message: error,
     });
   };
 
-  const handleImageChange = (imageUrl: string) => {
-    setValue("image_url", imageUrl, { shouldValidate: true });
-    clearErrors("image_url");
+  const handleImagesChange = (imageUrls: string[]) => {
+    setValue("images", imageUrls, { shouldValidate: true });
+    clearErrors("images");
   };
 
   return (
@@ -360,9 +362,9 @@ function CreateProductContent() {
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <CircularProgress size={20} />
             <Typography>
-              {watch("image_url") &&
-              watch("image_url")?.startsWith("data:image/")
-                ? "Creating product and uploading image..."
+              {watch("images") &&
+              watch("images")?.some((img) => img.startsWith("data:image/"))
+                ? "Creating product and uploading images..."
                 : "Creating product..."}
             </Typography>
           </Box>
@@ -561,20 +563,27 @@ function CreateProductContent() {
             <Card>
               <CardHeader title="Product Images" />
               <CardContent>
-                <ImageUpload
-                  value={watch("image_url")}
-                  onChange={handleImageChange}
-                  onError={handleImageError}
-                  maxSize={10}
-                  label="Upload Product Image"
-                  helperText="Max 10MB, PNG or JPG format recommended"
-                  variant="dropzone"
-                  disabled={isSubmitting}
+                <Controller
+                  name="images"
+                  control={control}
+                  render={({ field }) => (
+                    <MultiImageUpload
+                      value={field.value || []}
+                      onChange={handleImagesChange}
+                      onError={handleImageError}
+                      maxSize={10}
+                      maxFiles={5}
+                      label="Upload Product Images"
+                      helperText="Max 5 images, 10MB each. First image will be the main product image."
+                      variant="dropzone"
+                      disabled={isSubmitting}
+                    />
+                  )}
                 />
 
-                {errors.image_url && (
+                {errors.images && (
                   <Alert severity="error" sx={{ mt: 2 }}>
-                    {errors.image_url.message}
+                    {errors.images.message}
                   </Alert>
                 )}
               </CardContent>
@@ -657,33 +666,6 @@ function CreateProductContent() {
               </CardContent>
             </Card>
 
-            {/* Quick Actions */}
-            <Card>
-              <CardHeader title="Quick Actions" />
-              <CardContent>
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                  <Button
-                    variant="outlined"
-                    startIcon={<PhotoCamera />}
-                    onClick={handleImageUpload}
-                    fullWidth
-                    disabled={isSubmitting}
-                  >
-                    Add Image
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    startIcon={<Preview />}
-                    onClick={() => toast.info("Preview coming soon")}
-                    fullWidth
-                    disabled={isSubmitting}
-                  >
-                    Preview Product
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
-
             {/* Validation Status */}
             <Card>
               <CardHeader title="Validation Status" />
@@ -748,6 +730,22 @@ function CreateProductContent() {
                         : "(Required)"}
                     </Typography>
                   </Box>
+
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    {watch("images") && watch("images")!.length > 0 ? (
+                      <CheckCircle
+                        sx={{ fontSize: 16, color: "success.main" }}
+                      />
+                    ) : (
+                      <Info sx={{ fontSize: 16, color: "info.main" }} />
+                    )}
+                    <Typography variant="body2">
+                      Product Images{" "}
+                      {watch("images") && watch("images")!.length > 0
+                        ? `✓ (${watch("images")!.length})`
+                        : "(Optional)"}
+                    </Typography>
+                  </Box>
                 </Box>
               </CardContent>
             </Card>
@@ -772,7 +770,7 @@ function CreateProductContent() {
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <Info sx={{ fontSize: 16, color: "info.main" }} />
                     <Typography variant="body2">
-                      Set accurate stock quantities for inventory tracking
+                      First image will be used as the main product image
                     </Typography>
                   </Box>
                 </Box>
