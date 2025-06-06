@@ -280,6 +280,8 @@ export const productsService = {
       const hasImages = data.images && data.images.length > 0;
       const { product_id, images, ...updateData } = data;
 
+      console.log(hasImages);
+
       if (hasImages) {
         const formData = new FormData();
 
