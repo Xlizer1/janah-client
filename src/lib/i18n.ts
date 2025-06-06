@@ -14,6 +14,9 @@ const resources = {
   },
 };
 
+// Check if we're on the client side
+const isClient = typeof window !== "undefined";
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -21,15 +24,27 @@ i18n
     resources,
     fallbackLng: "en",
     defaultNS: "common",
+    lng: "en", // Set default language for SSR consistency
 
     interpolation: {
       escapeValue: false,
     },
 
     detection: {
-      order: ["localStorage", "navigator", "htmlTag"],
-      caches: ["localStorage"],
+      // Only detect on client side
+      order: isClient ? ["localStorage", "navigator", "htmlTag"] : [],
+      caches: isClient ? ["localStorage"] : [],
+      // Don't lookup from localStorage during SSR
+      lookupLocalStorage: isClient ? "i18nextLng" : undefined,
     },
+
+    // Disable suspense to prevent hydration issues
+    react: {
+      useSuspense: false,
+    },
+
+    // Only use client-side detection
+    initImmediate: isClient,
   });
 
 export default i18n;

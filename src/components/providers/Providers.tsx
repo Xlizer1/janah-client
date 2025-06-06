@@ -2,12 +2,11 @@
 
 import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { AuthInitializer } from "./AuthInitializer";
 import { ThemeRegistry } from "./ThemeRegistry";
-import { ToastContainer } from "react-toastify";
+import dynamic from "next/dynamic";
 
-import '@/lib/i18n';
+import "@/lib/i18n";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -29,38 +28,42 @@ const queryClient = new QueryClient({
   },
 });
 
+// Dynamically import components that might cause hydration issues
+const DynamicToastContainer = dynamic(
+  () => import("react-toastify").then((mod) => mod.ToastContainer),
+  { ssr: false }
+);
+
+const DynamicReactQueryDevtools = dynamic(
+  () =>
+    import("@tanstack/react-query-devtools").then(
+      (mod) => mod.ReactQueryDevtools
+    ),
+  { ssr: false }
+);
+
 interface ProvidersProps {
   children: React.ReactNode;
 }
 
 export function Providers({ children }: ProvidersProps) {
-  const [mounted, setMounted] = React.useState(false);
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return (
-      <ThemeRegistry>
-        <QueryClientProvider client={queryClient}>
-          <AuthInitializer />
-          {children}
-        </QueryClientProvider>
-      </ThemeRegistry>
-    );
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeRegistry>
         <AuthInitializer />
         {children}
-        <ToastContainer
+        <DynamicToastContainer
           position="bottom-right"
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
         />
         {process.env.NODE_ENV === "development" && (
-          <ReactQueryDevtools initialIsOpen={false} />
+          <DynamicReactQueryDevtools initialIsOpen={false} />
         )}
       </ThemeRegistry>
     </QueryClientProvider>

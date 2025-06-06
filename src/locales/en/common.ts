@@ -146,8 +146,8 @@ const enTranslations = {
   "products.priceRange": "Price Range",
   "products.quickFilters": "Quick Filters",
   "products.allCategories": "All Categories",
-  "products.underPrice": "Under $50",
-  "products.priceRange.100to500": "$100 - $500",
+  "products.underPrice": "Under 50,000 IQD",
+  "products.priceRange.100to500": "100,000 IQD - 50,000 IQD",
 
   // Categories
   "categories.title": "Shop by Category",

@@ -439,7 +439,7 @@ export default function ProductDetailPage() {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "USD",
+      currency: "IQD",
     }).format(price);
   };
 
@@ -664,25 +664,25 @@ export default function ProductDetailPage() {
 
               {/* Action Buttons */}
               <Box sx={{ display: "flex", gap: 2, mb: 4 }}>
-                <Button
+                {/* <Button
                   variant="outlined"
                   startIcon={isFavorite ? <Favorite /> : <FavoriteBorder />}
                   onClick={() => setIsFavorite(!isFavorite)}
                   color={isFavorite ? "error" : "inherit"}
                 >
                   {isFavorite ? "Remove from Wishlist" : "Add to Wishlist"}
-                </Button>
+                </Button> */}
                 <IconButton onClick={handleShare}>
                   <Share />
                 </IconButton>
               </Box>
 
               {/* Product Features */}
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              {/* <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                   <LocalShipping color="primary" />
                   <Typography variant="body2">
-                    Free shipping on orders over $50
+                    Free shipping on orders over 50,000 IQD
                   </Typography>
                 </Box>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -695,7 +695,7 @@ export default function ProductDetailPage() {
                   <Refresh color="primary" />
                   <Typography variant="body2">30-day return policy</Typography>
                 </Box>
-              </Box>
+              </Box> */}
             </Box>
           </Grid>
         </Grid>

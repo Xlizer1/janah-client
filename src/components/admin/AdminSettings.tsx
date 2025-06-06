@@ -109,7 +109,7 @@ export function AdminSettings() {
       site_description: "Modern e-commerce platform",
       site_email: "support@janah.com",
       site_phone: "+964 773 300 2076",
-      currency: "USD",
+      currency: "IQD",
       timezone: "Asia/Baghdad",
       maintenance_mode: false,
       auto_approve_users: false,
@@ -343,7 +343,7 @@ export function AdminSettings() {
                                   {...field}
                                   label={t("admin.settings.currency")}
                                 >
-                                  <MenuItem value="USD">
+                                  <MenuItem value="IQD">
                                     USD - US Dollar
                                   </MenuItem>
                                   <MenuItem value="EUR">EUR - Euro</MenuItem>

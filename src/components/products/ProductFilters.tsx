@@ -183,7 +183,7 @@ export function ProductFilters({
                 }}
                 onBlur={() => handlePriceCommit({} as any, priceRange)}
                 InputProps={{
-                  startAdornment: "$",
+                  endAdornment: "IQD",
                 }}
               />
               <TextField
@@ -200,7 +200,7 @@ export function ProductFilters({
                 }}
                 onBlur={() => handlePriceCommit({} as any, priceRange)}
                 InputProps={{
-                  startAdornment: "$",
+                  endAdornment: "IQD",
                 }}
               />
             </Box>
@@ -308,7 +308,7 @@ export function ProductFilters({
                 }}
               />
             }
-            label="Under $50"
+            label="Under 50,000 IQD"
           />
 
           <FormControlLabel
@@ -323,7 +323,7 @@ export function ProductFilters({
                 }}
               />
             }
-            label="$100 - $500"
+            label="100,000 IQD - 50,000 IQD"
           />
         </Box>
       </Box>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
@@ -7,7 +7,6 @@ import rtlPlugin from "stylis-plugin-rtl";
 import { prefixer } from "stylis";
 import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
-import { useTranslation } from "@/hooks/useTranslation";
 
 const cacheRtl = createCache({
   key: "muirtl",
@@ -20,6 +19,7 @@ const cacheLtr = createCache({
 
 const createAppTheme = (direction: "ltr" | "rtl") =>
   createTheme({
+    direction,
     palette: {
       mode: "light",
       primary: {
@@ -161,9 +161,46 @@ interface ThemeRegistryProps {
 }
 
 export function ThemeRegistry({ children }: ThemeRegistryProps) {
-  const { isRTL } = useTranslation();
-  const theme = createAppTheme(isRTL ? "rtl" : "ltr");
-  const emotionCache = isRTL ? cacheRtl : cacheLtr;
+  const [mounted, setMounted] = useState(false);
+  const [isRTL, setIsRTL] = useState(false);
+
+  useEffect(() => {
+    // Check RTL after component mounts to avoid hydration mismatch
+    const checkRTL = () => {
+      if (typeof window !== "undefined") {
+        // Check document direction
+        const dir = document.documentElement.dir || document.body.dir;
+        if (dir === "rtl") {
+          setIsRTL(true);
+          return;
+        }
+
+        // Check i18n language (if available)
+        try {
+          const storedLang = localStorage.getItem("i18nextLng");
+          if (storedLang === "ar") {
+            setIsRTL(true);
+            return;
+          }
+        } catch (e) {
+          // localStorage might not be available
+        }
+
+        // Check browser language as fallback
+        const browserLang = navigator.language || navigator.languages?.[0];
+        if (browserLang?.startsWith("ar")) {
+          setIsRTL(true);
+        }
+      }
+    };
+
+    setMounted(true);
+    checkRTL();
+  }, []);
+
+  // Use LTR as default for SSR to prevent hydration mismatch
+  const theme = createAppTheme(mounted && isRTL ? "rtl" : "ltr");
+  const emotionCache = mounted && isRTL ? cacheRtl : cacheLtr;
 
   return (
     <AppRouterCacheProvider>

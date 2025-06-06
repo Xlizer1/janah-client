@@ -401,19 +401,19 @@ function SearchPageContent() {
                 </Typography>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                   <Chip
-                    label="Under $100"
+                    label="Under 100,000 IQD"
                     size="small"
                     variant="outlined"
                     clickable
                   />
                   <Chip
-                    label="$100 - $500"
+                    label="100,000 IQD - 50,000 IQD"
                     size="small"
                     variant="outlined"
                     clickable
                   />
                   <Chip
-                    label="Over $500"
+                    label="Over 50,000 IQD"
                     size="small"
                     variant="outlined"
                     clickable
