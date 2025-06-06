@@ -280,7 +280,7 @@ export const productsService = {
       const hasImages = data.images && data.images.length > 0;
       const { product_id, images, ...updateData } = data;
 
-      console.log(hasImages);
+      console.log("Submitting product update:", data);
 
       if (hasImages) {
         const formData = new FormData();
@@ -292,18 +292,35 @@ export const productsService = {
           }
         });
 
-        // Process images - now properly typed as string[]
+        // NEW: Collect existing images that should be kept
+        const existingImagesToKeep: string[] = [];
+
+        // Process images - separate existing from new
         data.images!.forEach((imageData, index) => {
           if (imageData.startsWith("data:image/")) {
+            // New base64 image - convert to file and upload
             const file = base64ToFile(imageData, `product-image-${index + 1}`);
             formData.append("images", file);
+          } else {
+            // Existing image URL - add to keep list
+            existingImagesToKeep.push(imageData);
           }
         });
+
+        // NEW: Send the list of existing images to keep
+        if (existingImagesToKeep.length > 0) {
+          formData.append(
+            "existing_images",
+            JSON.stringify(existingImagesToKeep)
+          );
+        }
+
+        console.log("Existing images to keep:", existingImagesToKeep);
+        console.log("FormData prepared for:", formData);
 
         const response = await apiClient.put(`/products/${id}`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-
         return response.data.data;
       } else {
         const response = await api.put(`/products/${id}`, updateData);
