@@ -10,13 +10,24 @@ interface CartState {
   totalItems: number;
   totalPrice: number;
 
-  addItem: (product: Product, quantity?: number) => void;
+  addItem: (
+    product: Product,
+    quantity?: number,
+    selling_price?: number
+  ) => void;
   removeItem: (productId: number) => void;
   updateQuantity: (productId: number, quantity: number) => void;
+  updateSellingPrice: (productId: number, selling_price: number) => void;
   clearCart: () => void;
   openCart: () => void;
   closeCart: () => void;
   toggleCart: () => void;
+  validateSellingPrices: () => boolean;
+  getItemsWithSellingPrices: () => Array<{
+    product_id: number;
+    quantity: number;
+    selling_price?: number;
+  }>;
 }
 
 export const useCartStore = create<CartState>()(
@@ -33,7 +44,7 @@ export const useCartStore = create<CartState>()(
         return get().items.reduce((total, item) => total + item.subtotal, 0);
       },
 
-      addItem: (product: Product, quantity = 1) => {
+      addItem: (product: Product, quantity = 1, selling_price?: number) => {
         const { items } = get();
         const existingItem = items.find(
           (item) => item.product.id === product.id
@@ -54,6 +65,7 @@ export const useCartStore = create<CartState>()(
                     ...item,
                     quantity: newQuantity,
                     subtotal: newQuantity * product.price,
+                    selling_price: selling_price || item.selling_price,
                   }
                 : item
             ),
@@ -70,6 +82,7 @@ export const useCartStore = create<CartState>()(
             product,
             quantity,
             subtotal: quantity * product.price,
+            selling_price: selling_price,
           };
 
           set({
@@ -122,6 +135,40 @@ export const useCartStore = create<CartState>()(
         });
       },
 
+      updateSellingPrice: (productId: number, selling_price: number) => {
+        const { items } = get();
+
+        set({
+          items: items.map((item) =>
+            item.product.id === productId
+              ? {
+                  ...item,
+                  selling_price,
+                }
+              : item
+          ),
+        });
+      },
+
+      validateSellingPrices: () => {
+        const { items } = get();
+        return items.every((item) => {
+          if (item.selling_price === undefined || item.selling_price === null) {
+            return false;
+          }
+          return item.selling_price > 0;
+        });
+      },
+
+      getItemsWithSellingPrices: () => {
+        const { items } = get();
+        return items.map((item) => ({
+          product_id: item.product.id,
+          quantity: item.quantity,
+          selling_price: item.selling_price,
+        }));
+      },
+
       clearCart: () => {
         set({ items: [] });
         toast.success("Cart cleared");
@@ -158,9 +205,12 @@ export const useCart = () => {
     addItem: store.addItem,
     removeItem: store.removeItem,
     updateQuantity: store.updateQuantity,
+    updateSellingPrice: store.updateSellingPrice,
     clearCart: store.clearCart,
     openCart: store.openCart,
     closeCart: store.closeCart,
     toggleCart: store.toggleCart,
+    validateSellingPrices: store.validateSellingPrices,
+    getItemsWithSellingPrices: store.getItemsWithSellingPrices,
   };
 };

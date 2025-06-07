@@ -191,6 +191,8 @@ const arTranslations = {
   "checkout.payment": "الدفع",
   "checkout.confirmation": "التأكيد",
   "checkout.deliveryAddress": "عنوان التوصيل",
+  "checkout.sellingPrice": "سعر البيع",
+  "checkout.sellingPriceP": "سعر البيع",
   "checkout.deliveryNotes": "ملاحظات التوصيل",
   "checkout.paymentMethod": "طريقة الدفع",
   "checkout.cashOnDelivery": "الدفع عند التوصيل",
@@ -251,9 +253,8 @@ const arTranslations = {
   "orders.orderDelivered": "تم تسليم الطلب",
 
   // Hero Section
-  "hero.title": "اكتشف منتجات مذهلة",
-  "hero.subtitle":
-    "تسوق أحدث الإلكترونيات والأجهزة والمزيد بأسعار لا تُقاوم وتوصيل سريع.",
+  "hero.title": "جاهز تبدي؟",
+  "hero.subtitle": "إبدأ تثبيت طلبات زبائنك الاَن, وخلي الجناح يهتم بالباقي.",
   "hero.shopNow": "تسوق الآن",
   "hero.viewTrending": "عرض الرائج",
   "hero.rating": "التقييم",

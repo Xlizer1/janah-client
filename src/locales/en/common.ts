@@ -193,6 +193,8 @@ const enTranslations = {
   "checkout.payment": "Payment",
   "checkout.confirmation": "Confirmation",
   "checkout.deliveryAddress": "Delivery Address",
+  "checkout.sellingPrice": "Selling Price",
+  "checkout.sellingPriceP": "Please specify your selling price",
   "checkout.deliveryNotes": "Delivery Notes",
   "checkout.paymentMethod": "Payment Method",
   "checkout.cashOnDelivery": "Cash on Delivery",
@@ -255,9 +257,9 @@ const enTranslations = {
   "orders.orderDelivered": "Order Delivered",
 
   // Hero Section
-  "hero.title": "Discover Amazing Products",
+  "hero.title": "Are you ready to start?",
   "hero.subtitle":
-    "Shop the latest electronics, gadgets, and more with unbeatable prices and fast delivery.",
+    "Start placing customer orders now, and let Al Janah do the rest.",
   "hero.shopNow": "Shop Now",
   "hero.viewTrending": "View Trending",
   "hero.rating": "Rating",

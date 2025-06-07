@@ -265,9 +265,11 @@ export interface LoadingStates {
   [key: string]: boolean;
 }
 
-export interface Cart {
-  items: CartItem[];
-  total: number;
+export interface CartItem {
+  product: Product;
+  quantity: number;
+  subtotal: number;
+  selling_price?: number; // Add selling price to cart items
 }
 
 export interface CartItem {
@@ -372,6 +374,7 @@ export interface OrderItem {
   quantity: number;
   unit_price: number;
   total_price: number;
+  selling_price?: number; // Add selling price to order items
 }
 
 export interface OrderCreateData {
@@ -380,6 +383,7 @@ export interface OrderCreateData {
   items: Array<{
     product_id: number;
     quantity: number;
+    selling_price?: number; // Add selling price to order creation
   }>;
 }
 
@@ -401,6 +405,18 @@ export interface CheckoutFormData {
   delivery_address: string;
   delivery_notes?: string;
   payment_method?: string;
+}
+
+export interface CartItemWithSelling extends CartItem {
+  selling_price: number; // Required for checkout
+}
+
+export interface WholesaleOrderAnalytics {
+  product_id: number;
+  purchase_price: number;
+  selling_price?: number;
+  profit_margin?: string;
+  quantity: number;
 }
 
 // Helper type for getting the main product image

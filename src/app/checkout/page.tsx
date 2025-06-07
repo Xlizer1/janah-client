@@ -1,4 +1,3 @@
-// src/app/checkout/page.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -65,7 +64,13 @@ const checkoutSchema = yup.object({
 export default function CheckoutPage() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { items, totalItems, totalPrice, clearCart } = useCart();
+  const {
+    items,
+    totalItems,
+    totalPrice,
+    clearCart,
+    getItemsWithSellingPrices,
+  } = useCart();
   const { user, isAuthenticated } = useAuth();
   const [activeStep, setActiveStep] = useState(0);
   const [orderSuccess, setOrderSuccess] = useState(false);
@@ -133,13 +138,12 @@ export default function CheckoutPage() {
   };
 
   const onSubmit = (data: CheckoutFormData) => {
+    const itemsWithSellingPrices = getItemsWithSellingPrices();
+
     const orderData: OrderCreateData = {
       delivery_address: data.delivery_address,
       delivery_notes: data.delivery_notes,
-      items: items.map((item) => ({
-        product_id: item.product.id,
-        quantity: item.quantity,
-      })),
+      items: itemsWithSellingPrices, // Now includes selling_price for each item
     };
 
     createOrderMutation.mutate(orderData);
@@ -229,12 +233,17 @@ export default function CheckoutPage() {
               {activeStep === 0 && (
                 <Paper sx={{ p: 3 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-                    {t("checkout.reviewItems")}
+                    Review Your Wholesale Order
                   </Typography>
+                  {/* <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
+                    {t("checkout.reviewItems")}
+                  </Typography> */}
                   <List>
                     {items.map((item, index) => (
                       <React.Fragment key={item.product.id}>
-                        <ListItem sx={{ px: 0, py: 2 }}>
+                        <ListItem
+                          sx={{ px: 0, py: 2, alignItems: "flex-start" }}
+                        >
                           <ListItemAvatar sx={{ mr: 2 }}>
                             <Avatar
                               sx={{ width: 60, height: 60, borderRadius: 2 }}
@@ -264,18 +273,56 @@ export default function CheckoutPage() {
                                 <Typography
                                   variant="body2"
                                   color="text.secondary"
+                                  sx={{ mb: 0.5 }}
                                 >
-                                  {t("common.quantity")}: {item.quantity} ×{" "}
+                                  Quantity: {item.quantity} ×{" "}
                                   {formatPrice(item.product.price)}
                                 </Typography>
                                 <Typography
-                                  variant="subtitle2"
+                                  variant="body2"
                                   color="primary.main"
                                   fontWeight={600}
+                                  sx={{ mb: 0.5 }}
                                 >
-                                  {t("common.subtotal")}:{" "}
+                                  Purchase Subtotal:{" "}
                                   {formatPrice(item.subtotal)}
                                 </Typography>
+                                {item.selling_price && (
+                                  <>
+                                    <Typography
+                                      variant="body2"
+                                      color="success.main"
+                                      fontWeight={600}
+                                      sx={{ mb: 0.5 }}
+                                    >
+                                      Your Selling Price:{" "}
+                                      {formatPrice(item.selling_price)} each
+                                    </Typography>
+                                    <Typography
+                                      variant="body2"
+                                      color="success.dark"
+                                      fontWeight={600}
+                                    >
+                                      Potential Revenue:{" "}
+                                      {formatPrice(
+                                        item.selling_price * item.quantity
+                                      )}
+                                    </Typography>
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                    >
+                                      Profit Margin:{" "}
+                                      {(
+                                        ((item.selling_price -
+                                          item.product.price) /
+                                          item.selling_price) *
+                                        100
+                                      ).toFixed(1)}
+                                      %
+                                    </Typography>
+                                  </>
+                                )}
                               </Box>
                             }
                           />
@@ -284,6 +331,63 @@ export default function CheckoutPage() {
                       </React.Fragment>
                     ))}
                   </List>
+
+                  {/* Summary stats for wholesale order */}
+                  <Box
+                    sx={{ mt: 3, p: 2, bgcolor: "grey.50", borderRadius: 1 }}
+                  >
+                    <Typography
+                      variant="subtitle2"
+                      fontWeight={600}
+                      sx={{ mb: 1 }}
+                    >
+                      Wholesale Order Summary:
+                    </Typography>
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <Typography variant="body2" color="text.secondary">
+                          Total Items: {totalItems}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Purchase Cost: {formatPrice(totalPrice)}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Typography variant="body2" color="text.secondary">
+                          Potential Revenue:{" "}
+                          {formatPrice(
+                            items.reduce(
+                              (total, item) =>
+                                total +
+                                (item.selling_price
+                                  ? item.selling_price * item.quantity
+                                  : 0),
+                              0
+                            )
+                          )}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color="success.main"
+                          fontWeight={600}
+                        >
+                          Estimated Profit:{" "}
+                          {formatPrice(
+                            items.reduce(
+                              (total, item) =>
+                                total +
+                                (item.selling_price
+                                  ? (item.selling_price - item.product.price) *
+                                    item.quantity
+                                  : 0),
+                              0
+                            )
+                          )}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </Box>
+
                   <Box sx={{ textAlign: "right", mt: 2 }}>
                     <Button variant="contained" onClick={handleNext}>
                       Continue to Delivery
@@ -656,9 +760,10 @@ export default function CheckoutPage() {
                   </Typography>
                 </Box>
 
-                <Alert severity="info">
-                  <Typography variant="caption">
-                    Your order will be delivered within 1-3 business days.
+                <Alert severity="info" sx={{ mt: 2 }}>
+                  <Typography variant="body2">
+                    This wholesale order includes your selling price information
+                    to help us provide better business support.
                   </Typography>
                 </Alert>
               </Paper>

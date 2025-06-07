@@ -55,6 +55,7 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useAuth } from "@/store/auth.store";
 import { ordersService } from "@/services/orders.service";
 import { useTranslation } from "@/hooks/useTranslation";
+import { OrderItem } from "@/types";
 
 export default function OrderDetailPage() {
   const params = useParams();
@@ -139,6 +140,37 @@ export default function OrderDetailPage() {
       (step) => step.key === order?.status
     );
     return { steps, currentStepIndex };
+  };
+
+  const calculateProfitStats = (items: OrderItem[]) => {
+    const stats = items.reduce(
+      (acc, item) => {
+        if (item.selling_price) {
+          const itemProfit =
+            (item.selling_price - item.unit_price) * item.quantity;
+          const itemRevenue = item.selling_price * item.quantity;
+          acc.totalProfit += itemProfit;
+          acc.totalRevenue += itemRevenue;
+          acc.itemsWithSelling += 1;
+        }
+        acc.totalItems += 1;
+        return acc;
+      },
+      {
+        totalProfit: 0,
+        totalRevenue: 0,
+        itemsWithSelling: 0,
+        totalItems: 0,
+      }
+    );
+
+    return {
+      ...stats,
+      avgMargin:
+        stats.totalRevenue > 0
+          ? ((stats.totalProfit / stats.totalRevenue) * 100).toFixed(1)
+          : "0",
+    };
   };
 
   if (!isAuthenticated) {
@@ -285,10 +317,40 @@ export default function OrderDetailPage() {
               <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
                 Order Items ({order.items?.length || 0})
               </Typography>
+              {/* Profit Summary */}
+              {order.items &&
+                order.items.some((item) => item.selling_price) && (
+                  <Alert severity="info" sx={{ mb: 3 }}>
+                    <Typography variant="body2" fontWeight={600}>
+                      Wholesale Order Analytics:
+                    </Typography>
+                    {(() => {
+                      const stats = calculateProfitStats(order.items);
+                      return (
+                        <Box sx={{ mt: 1 }}>
+                          <Typography variant="body2">
+                            • Potential Revenue:{" "}
+                            {formatPrice(stats.totalRevenue)}
+                          </Typography>
+                          <Typography variant="body2">
+                            • Estimated Profit: {formatPrice(stats.totalProfit)}
+                          </Typography>
+                          <Typography variant="body2">
+                            • Average Margin: {stats.avgMargin}%
+                          </Typography>
+                          <Typography variant="body2">
+                            • Items with selling price: {stats.itemsWithSelling}
+                            /{stats.totalItems}
+                          </Typography>
+                        </Box>
+                      );
+                    })()}
+                  </Alert>
+                )}
               <List>
                 {(order.items || []).map((item, index) => (
                   <React.Fragment key={item.id}>
-                    <ListItem sx={{ px: 0, py: 2 }}>
+                    <ListItem sx={{ px: 0, py: 2, alignItems: "flex-start" }}>
                       <ListItemAvatar sx={{ mr: 2 }}>
                         <Avatar
                           sx={{ width: 80, height: 80, borderRadius: 2 }}
@@ -330,15 +392,87 @@ export default function OrderDetailPage() {
                               color="text.secondary"
                               sx={{ mb: 1 }}
                             >
-                              Unit Price: {formatPrice(item.unit_price)}
+                              Purchase Price: {formatPrice(item.unit_price)}{" "}
+                              each
                             </Typography>
                             <Typography
                               variant="h6"
                               color="primary.main"
-                              sx={{ fontWeight: 700 }}
+                              sx={{ fontWeight: 700, mb: 1 }}
                             >
-                              Subtotal: {formatPrice(item.total_price)}
+                              Purchase Total: {formatPrice(item.total_price)}
                             </Typography>
+
+                            {/* Selling Price Information */}
+                            {item.selling_price ? (
+                              <Box
+                                sx={{
+                                  mt: 2,
+                                  p: 2,
+                                  bgcolor: "success.50",
+                                  borderRadius: 1,
+                                }}
+                              >
+                                <Typography
+                                  variant="body2"
+                                  color="success.dark"
+                                  fontWeight={600}
+                                  sx={{ mb: 0.5 }}
+                                >
+                                  Your Selling Price:{" "}
+                                  {formatPrice(item.selling_price)} each
+                                </Typography>
+                                <Typography
+                                  variant="body2"
+                                  color="success.dark"
+                                  sx={{ mb: 0.5 }}
+                                >
+                                  Potential Revenue:{" "}
+                                  {formatPrice(
+                                    item.selling_price * item.quantity
+                                  )}
+                                </Typography>
+                                <Typography
+                                  variant="body2"
+                                  color="success.main"
+                                  fontWeight={600}
+                                >
+                                  Profit per item:{" "}
+                                  {formatPrice(
+                                    item.selling_price - item.unit_price
+                                  )}
+                                </Typography>
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                >
+                                  Margin:{" "}
+                                  {(
+                                    ((item.selling_price - item.unit_price) /
+                                      item.selling_price) *
+                                    100
+                                  ).toFixed(1)}
+                                  %
+                                </Typography>
+                              </Box>
+                            ) : (
+                              <Box
+                                sx={{
+                                  mt: 2,
+                                  p: 2,
+                                  bgcolor: "grey.100",
+                                  borderRadius: 1,
+                                }}
+                              >
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                  fontStyle="italic"
+                                >
+                                  No selling price provided for this item
+                                </Typography>
+                              </Box>
+                            )}
                           </Box>
                         }
                       />
@@ -425,9 +559,48 @@ export default function OrderDetailPage() {
               <Box
                 sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
               >
-                <Typography>Items ({order.items?.length}):</Typography>
+                <Typography>Purchase Cost ({order.items?.length}):</Typography>
                 <Typography>{formatPrice(order.total_amount)}</Typography>
               </Box>
+
+              {/* Show potential revenue if selling prices are available */}
+              {order.items &&
+                order.items.some((item) => item.selling_price) &&
+                (() => {
+                  const stats = calculateProfitStats(order.items);
+                  return (
+                    <>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          mb: 1,
+                        }}
+                      >
+                        <Typography color="success.main">
+                          Potential Revenue:
+                        </Typography>
+                        <Typography color="success.main" fontWeight={600}>
+                          {formatPrice(stats.totalRevenue)}
+                        </Typography>
+                      </Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          mb: 1,
+                        }}
+                      >
+                        <Typography color="success.main">
+                          Estimated Profit:
+                        </Typography>
+                        <Typography color="success.main" fontWeight={700}>
+                          {formatPrice(stats.totalProfit)}
+                        </Typography>
+                      </Box>
+                    </>
+                  );
+                })()}
 
               <Box
                 sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
@@ -442,7 +615,7 @@ export default function OrderDetailPage() {
                 sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}
               >
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  Total:
+                  Total Paid:
                 </Typography>
                 <Typography
                   variant="h6"
