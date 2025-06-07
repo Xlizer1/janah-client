@@ -1,0 +1,1020 @@
+{
+  "info": {
+    "name": "Janah API - Auth & User Management",
+    "description": "Complete collection for authentication and user management endpoints",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "apiVersion",
+      "value": "v1",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testPhoneNumber",
+      "value": "+9647701234567",
+      "type": "string"
+    },
+    {
+      "key": "activationCode",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🔐 Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.user) {",
+                  "        pm.collectionVariables.set('userId', response.data.user.id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone_number\": \"{{testPhoneNumber}}\",\n  \"password\": \"password123\",\n  \"confirm_password\": \"password123\",\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"email\": \"john.doe@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "auth", "register"]
+            },
+            "description": "Register a new user account. User will be inactive until activated with an activation code."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"phone_number\": \"+9647701234567\",\n  \"password\": \"password123\",\n  \"confirm_password\": \"password123\",\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"email\": \"john.doe@example.com\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/register",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "{{apiVersion}}", "auth", "register"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"status\": true,\n  \"message\": \"Registration successful. Please contact an administrator to get an activation code.\",\n  \"data\": {\n    \"user\": {\n      \"id\": 1,\n      \"phone_number\": \"+9647701234567\",\n      \"first_name\": \"John\",\n      \"last_name\": \"Doe\",\n      \"email\": \"john.doe@example.com\",\n      \"is_active\": false,\n      \"role\": \"user\",\n      \"created_at\": \"2024-01-15T10:30:00.000Z\"\n    },\n    \"next_step\": \"get_activation_code\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Activate Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone_number\": \"{{testPhoneNumber}}\",\n  \"activation_code\": \"{{activationCode}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/activate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "auth", "activate"]
+            },
+            "description": "Activate user account using activation code provided by admin."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"phone_number\": \"+9647701234567\",\n  \"activation_code\": \"JANAH-2024-123\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/activate",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "{{apiVersion}}", "auth", "activate"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"status\": true,\n  \"message\": \"Account activated successfully! You can now login.\",\n  \"data\": {\n    \"user\": {\n      \"id\": 1,\n      \"phone_number\": \"+9647701234567\",\n      \"first_name\": \"John\",\n      \"last_name\": \"Doe\",\n      \"email\": \"john.doe@example.com\",\n      \"is_active\": true,\n      \"role\": \"user\",\n      \"activation_code_used\": \"JANAH-2024-123\",\n      \"activation_method\": \"activation_code\",\n      \"activated_at\": \"2024-01-15T10:35:00.000Z\"\n    },\n    \"next_step\": \"login\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.token) {",
+                  "        pm.collectionVariables.set('authToken', response.data.token);",
+                  "    }",
+                  "    if (response.data && response.data.user) {",
+                  "        pm.collectionVariables.set('userId', response.data.user.id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone_number\": \"{{testPhoneNumber}}\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "auth", "login"]
+            },
+            "description": "Login with phone number and password. Returns JWT token for authenticated requests."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"phone_number\": \"+9647701234567\",\n  \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "{{apiVersion}}", "auth", "login"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"status\": true,\n  \"message\": \"Login successful\",\n  \"data\": {\n    \"user\": {\n      \"id\": 1,\n      \"phone_number\": \"+9647701234567\",\n      \"first_name\": \"John\",\n      \"last_name\": \"Doe\",\n      \"email\": \"john.doe@example.com\",\n      \"is_active\": true,\n      \"role\": \"user\",\n      \"profile_picture\": null\n    },\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"token_type\": \"Bearer\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "auth", "profile"]
+            },
+            "description": "Get current user profile information."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/profile",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "{{apiVersion}}", "auth", "profile"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"status\": true,\n  \"message\": \"Profile retrieved successfully\",\n  \"data\": {\n    \"user\": {\n      \"id\": 1,\n      \"phone_number\": \"+9647701234567\",\n      \"first_name\": \"John\",\n      \"last_name\": \"Doe\",\n      \"email\": \"john.doe@example.com\",\n      \"is_active\": true,\n      \"role\": \"user\",\n      \"profile_picture\": \"http://localhost:8000/uploads/users/profile_123.jpg\",\n      \"created_at\": \"2024-01-15T10:30:00.000Z\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "first_name",
+                  "value": "John Updated",
+                  "type": "text"
+                },
+                {
+                  "key": "last_name",
+                  "value": "Doe Updated",
+                  "type": "text"
+                },
+                {
+                  "key": "email",
+                  "value": "john.updated@example.com",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": [],
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "auth", "profile"]
+            },
+            "description": "Update user profile information with optional profile picture upload."
+          }
+        },
+        {
+          "name": "Update Profile Picture",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/profile/picture",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "auth", "profile", "picture"]
+            },
+            "description": "Upload or update user profile picture."
+          }
+        },
+        {
+          "name": "Remove Profile Picture",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/profile/picture",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "auth", "profile", "picture"]
+            },
+            "description": "Remove user profile picture."
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"current_password\": \"password123\",\n  \"new_password\": \"newpassword123\",\n  \"confirm_password\": \"newpassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/change-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "auth", "change-password"]
+            },
+            "description": "Change user password. Requires current password for verification."
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "auth", "logout"]
+            },
+            "description": "Logout user (client-side token invalidation)."
+          }
+        }
+      ],
+      "description": "Authentication endpoints for user registration, login, profile management, and password changes."
+    },
+    {
+      "name": "👥 Admin - User Management",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/users?page=1&limit=10&role=user&is_active=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "admin", "users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "role",
+                  "value": "user",
+                  "description": "Filter by role (user, admin)"
+                },
+                {
+                  "key": "is_active",
+                  "value": "true",
+                  "description": "Filter by active status"
+                }
+              ]
+            },
+            "description": "Get all users with pagination and filters. Admin access required."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/users?page=1&limit=10",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "{{apiVersion}}", "admin", "users"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"status\": true,\n  \"message\": \"Users retrieved successfully\",\n  \"data\": {\n    \"users\": [\n      {\n        \"id\": 1,\n        \"phone_number\": \"+9647701234567\",\n        \"first_name\": \"John\",\n        \"last_name\": \"Doe\",\n        \"email\": \"john.doe@example.com\",\n        \"is_active\": true,\n        \"role\": \"user\",\n        \"activation_method\": \"activation_code\",\n        \"created_at\": \"2024-01-15T10:30:00.000Z\"\n      }\n    ],\n    \"pagination\": {\n      \"page\": 1,\n      \"limit\": 10,\n      \"total\": 1,\n      \"totalPages\": 1\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Pending Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/users/pending?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "admin", "users", "pending"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Get users who are not yet activated (pending activation)."
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "admin", "users", "{{userId}}"]
+            },
+            "description": "Get detailed information about a specific user."
+          }
+        },
+        {
+          "name": "Activate User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": {{userId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/users/activate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "admin", "users", "activate"]
+            },
+            "description": "Manually activate a user account (direct admin activation)."
+          }
+        },
+        {
+          "name": "Deactivate User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": {{userId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/users/deactivate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "admin", "users", "deactivate"]
+            },
+            "description": "Deactivate a user account."
+          }
+        },
+        {
+          "name": "Bulk Activate Users",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_ids\": [1, 2, 3]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/users/bulk-activate",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "{{apiVersion}}",
+                "admin",
+                "users",
+                "bulk-activate"
+              ]
+            },
+            "description": "Activate multiple users at once (max 50 users)."
+          }
+        },
+        {
+          "name": "Search Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/users/search?query={{testPhoneNumber}}&type=phone",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "admin", "users", "search"],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "{{testPhoneNumber}}"
+                },
+                {
+                  "key": "type",
+                  "value": "phone",
+                  "description": "Search type: phone, email, or id"
+                }
+              ]
+            },
+            "description": "Search for users by phone number, email, or ID."
+          }
+        },
+        {
+          "name": "Get Activation Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "admin", "stats"]
+            },
+            "description": "Get user activation statistics."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/stats",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "{{apiVersion}}", "admin", "stats"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"status\": true,\n  \"message\": \"Activation statistics retrieved successfully\",\n  \"data\": {\n    \"stats\": {\n      \"total_users\": 100,\n      \"active_users\": 85,\n      \"pending_activation\": 15,\n      \"activation_rate\": \"85.00\"\n    }\n  }\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Admin endpoints for managing users, including activation, deactivation, and statistics."
+    },
+    {
+      "name": "🎫 Admin - Activation Codes",
+      "item": [
+        {
+          "name": "Generate Activation Code",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.activation_code) {",
+                  "        pm.collectionVariables.set('activationCode', response.data.activation_code.code);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"format\": \"JANAH\",\n  \"expires_in_days\": 30,\n  \"notes\": \"Generated for new user registration\",\n  \"custom_code\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/activation-codes/generate",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "{{apiVersion}}",
+                "admin",
+                "activation-codes",
+                "generate"
+              ]
+            },
+            "description": "Generate a new activation code. Formats: JANAH, PREMIUM, TRIAL, CUSTOM."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"format\": \"JANAH\",\n  \"expires_in_days\": 30,\n  \"notes\": \"Generated for new user registration\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/activation-codes/generate",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "api",
+                    "{{apiVersion}}",
+                    "admin",
+                    "activation-codes",
+                    "generate"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"status\": true,\n  \"message\": \"Activation code generated successfully\",\n  \"data\": {\n    \"activation_code\": {\n      \"id\": 1,\n      \"code\": \"JANAH-2024-123\",\n      \"created_by\": 1,\n      \"expires_at\": \"2024-02-14T10:30:00.000Z\",\n      \"notes\": \"Generated for new user registration\",\n      \"is_active\": true,\n      \"used_by\": null,\n      \"used_at\": null,\n      \"created_at\": \"2024-01-15T10:30:00.000Z\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get All Activation Codes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/activation-codes?page=1&limit=20&status=unused",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "admin", "activation-codes"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "status",
+                  "value": "unused",
+                  "description": "Filter by status: used, unused, expired"
+                },
+                {
+                  "key": "created_by",
+                  "value": "",
+                  "description": "Filter by admin who created the code",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get all activation codes with filters and pagination."
+          }
+        },
+        {
+          "name": "Get Activation Code Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/activation-codes/{{activationCode}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "{{apiVersion}}",
+                "admin",
+                "activation-codes",
+                "{{activationCode}}"
+              ]
+            },
+            "description": "Get detailed information about a specific activation code."
+          }
+        },
+        {
+          "name": "Deactivate Activation Code",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/activation-codes/{{activationCode}}/deactivate",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "{{apiVersion}}",
+                "admin",
+                "activation-codes",
+                "{{activationCode}}",
+                "deactivate"
+              ]
+            },
+            "description": "Deactivate an activation code (only unused codes can be deactivated)."
+          }
+        },
+        {
+          "name": "Get Activation Code Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/activation-codes/stats",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "{{apiVersion}}",
+                "admin",
+                "activation-codes",
+                "stats"
+              ]
+            },
+            "description": "Get activation code usage statistics."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/{{apiVersion}}/admin/activation-codes/stats",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "api",
+                    "{{apiVersion}}",
+                    "admin",
+                    "activation-codes",
+                    "stats"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"status\": true,\n  \"message\": \"Activation statistics retrieved successfully\",\n  \"data\": {\n    \"statistics\": {\n      \"total_codes\": 50,\n      \"used_codes\": 25,\n      \"available_codes\": 20,\n      \"expired_codes\": 3,\n      \"disabled_codes\": 2\n    }\n  }\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Admin endpoints for managing activation codes used for user account activation."
+    },
+    {
+      "name": "🔧 System",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Check system health and status."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/health",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["health"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n  \"status\": true,\n  \"message\": \"Service is healthy\",\n  \"data\": {\n    \"status\": \"healthy\",\n    \"timestamp\": \"2024-01-15T10:30:00.000Z\",\n    \"uptime\": 3600,\n    \"environment\": \"development\",\n    \"version\": \"1.0.0\",\n    \"database\": \"connected\",\n    \"services\": {\n      \"api\": \"running\",\n      \"database\": \"connected\",\n      \"twilio\": \"configured\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "API Version",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", ""]
+            },
+            "description": "Get API version information."
+          }
+        }
+      ],
+      "description": "System endpoints for health checks and API information."
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-set base URL if not already set",
+          "if (!pm.collectionVariables.get('baseUrl')) {",
+          "    pm.collectionVariables.set('baseUrl', 'http://localhost:8000');",
+          "}",
+          "",
+          "// Log request details for debugging",
+          "console.log('Request URL:', pm.request.url);",
+          "console.log('Auth Token:', pm.collectionVariables.get('authToken') ? 'Present' : 'Not set');"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test script for all requests",
+          "pm.test('Response should have status field', function () {",
+          "    const jsonData = pm.response.json();",
+          "    pm.expect(jsonData).to.have.property('status');",
+          "});",
+          "",
+          "pm.test('Response should have message field', function () {",
+          "    const jsonData = pm.response.json();",
+          "    pm.expect(jsonData).to.have.property('message');",
+          "});",
+          "",
+          "// Log response for debugging",
+          "if (pm.response.code !== 200 && pm.response.code !== 201) {",
+          "    console.log('Error Response:', pm.response.json());",
+          "}"
+        ]
+      }
+    }
+  ]
+}
