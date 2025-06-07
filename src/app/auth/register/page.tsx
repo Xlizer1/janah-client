@@ -25,6 +25,7 @@ import {
   VisibilityOff,
   PersonAdd,
   CheckCircle,
+  VpnKey,
 } from "@mui/icons-material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -67,7 +68,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [registeredData, setRegisteredData] = useState<any>(null);
+  const [registeredPhone, setRegisteredPhone] = useState("");
 
   const {
     register,
@@ -81,10 +82,10 @@ export default function RegisterPage() {
   const registerMutation = useMutation({
     mutationFn: authService.register,
     onSuccess: (data, variables) => {
-      setRegisteredData(data);
+      setRegisteredPhone(variables.phone_number);
       setIsSuccess(true);
       toast.success(
-        "Registration successful! You can now login with your credentials."
+        "Registration successful! You can now activate your account."
       );
     },
     onError: (error: any) => {
@@ -106,6 +107,14 @@ export default function RegisterPage() {
 
   const onSubmit = (data: RegisterFormData) => {
     registerMutation.mutate(data);
+  };
+
+  const handleGoToActivation = () => {
+    router.push(`/auth/activate?phone=${encodeURIComponent(registeredPhone)}`);
+  };
+
+  const handleGoToLogin = () => {
+    router.push("/auth/login");
   };
 
   if (isSuccess) {
@@ -144,24 +153,31 @@ export default function RegisterPage() {
             color="text.secondary"
             sx={{ mb: 3, lineHeight: 1.6 }}
           >
-            Your account has been created successfully. You can now login and
-            activate your account using an activation code.
+            Your account has been created successfully! Now you need to activate
+            it with an activation code to start shopping.
           </Typography>
 
           <Alert severity="info" sx={{ mb: 3, textAlign: "left" }}>
             <Typography variant="body2">
               <strong>Next Steps:</strong>
-              <br />• Login with your credentials
-              <br />• Enter your activation code to unlock full access
-              <br />• Start shopping once activated!
+              <br />• Get an activation code (see contact info below)
+              <br />• Activate your account with the code
+              <br />• Login and start shopping!
             </Typography>
           </Alert>
 
           <Alert severity="warning" sx={{ mb: 3, textAlign: "left" }}>
             <Typography variant="body2">
-              <strong>Need an activation code?</strong>
+              <VpnKey
+                sx={{ fontSize: 16, mr: 1, verticalAlign: "text-bottom" }}
+              />
+              <strong>How to get an activation code:</strong>
               <br />
-              Contact us at <strong>+964 773 300 2076</strong> to purchase one.
+              📞 Call: <strong>+964 773 300 2076</strong>
+              <br />
+              ✉️ Email: <strong>support@janah.com</strong>
+              <br />
+              Purchase an activation code to unlock full shopping access.
             </Typography>
           </Alert>
 
@@ -170,32 +186,62 @@ export default function RegisterPage() {
               variant="contained"
               size="large"
               fullWidth
-              onClick={() => router.push("/auth/login")}
+              onClick={handleGoToActivation}
+              startIcon={<VpnKey />}
               sx={{
                 py: 1.5,
                 fontSize: "1.1rem",
                 fontWeight: 600,
                 textTransform: "none",
                 borderRadius: 2,
+                background: "linear-gradient(45deg, #0ea5e9 30%, #3b82f6 90%)",
+                "&:hover": {
+                  background:
+                    "linear-gradient(45deg, #0284c7 30%, #2563eb 90%)",
+                  transform: "translateY(-1px)",
+                  boxShadow: "0 6px 20px rgba(14, 165, 233, 0.4)",
+                },
+                transition: "all 0.3s ease",
               }}
             >
-              Continue to Login
+              Activate Account Now
             </Button>
 
             <Button
               variant="outlined"
               size="large"
               fullWidth
-              onClick={() => window.open("tel:+9647733002076")}
+              onClick={handleGoToLogin}
               sx={{
                 py: 1.5,
                 fontSize: "1.1rem",
                 fontWeight: 600,
                 textTransform: "none",
                 borderRadius: 2,
+                borderWidth: 2,
+                "&:hover": {
+                  borderWidth: 2,
+                  transform: "translateY(-1px)",
+                },
               }}
             >
-              Contact Us for Activation Code
+              Continue to Login
+            </Button>
+
+            <Button
+              variant="text"
+              size="large"
+              fullWidth
+              onClick={() => window.open("tel:+9647733002076")}
+              sx={{
+                py: 1.5,
+                fontSize: "1rem",
+                fontWeight: 600,
+                textTransform: "none",
+                borderRadius: 2,
+              }}
+            >
+              📞 Call Us for Activation Code
             </Button>
           </Box>
         </Paper>
@@ -244,16 +290,21 @@ export default function RegisterPage() {
         {/* Updated Registration Process Info */}
         <Alert severity="info" sx={{ mb: 4 }}>
           <Typography variant="body2">
-            <strong>New Registration Process:</strong>
+            <strong>Registration Process:</strong>
             <br />
-            1. Create your account below
+            1. Create your account below (takes 30 seconds)
             <br />
-            2. Login with your credentials
+            2. Get an activation code by contacting us
             <br />
-            3. Enter your activation code to unlock full access
+            3. Activate your account with the code
+            <br />
+            4. Login and start shopping!
             <br />
             <br />
-            <strong>Need an activation code?</strong> Contact us at{" "}
+            <VpnKey
+              sx={{ fontSize: 16, mr: 1, verticalAlign: "text-bottom" }}
+            />
+            <strong>Get activation code:</strong> Call{" "}
             <strong>+964 773 300 2076</strong>
           </Typography>
         </Alert>
@@ -304,7 +355,10 @@ export default function RegisterPage() {
               placeholder="+964 773 300 2076"
               {...register("phone_number")}
               error={!!errors.phone_number}
-              helperText={errors.phone_number?.message || "Your login username"}
+              helperText={
+                errors.phone_number?.message ||
+                "This will be your login username"
+              }
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -460,13 +514,13 @@ export default function RegisterPage() {
         {/* Contact Info */}
         <Alert severity="warning" sx={{ mt: 3 }}>
           <Typography variant="body2">
-            <strong>To activate your account after registration:</strong>
+            <strong>Ready to activate after registration?</strong>
             <br />
             📞 Call: <strong>+964 773 300 2076</strong>
             <br />
             ✉️ Email: <strong>support@janah.com</strong>
             <br />
-            Purchase an activation code to unlock full shopping access.
+            Get your activation code and unlock full shopping access instantly!
           </Typography>
         </Alert>
       </Paper>

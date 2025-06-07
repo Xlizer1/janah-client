@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Container,
   Paper,
@@ -13,18 +13,22 @@ import {
   InputAdornment,
   CircularProgress,
 } from "@mui/material";
-import { VpnKey, CheckCircle, Phone } from "@mui/icons-material";
+import { VpnKey, CheckCircle, Phone, ArrowBack } from "@mui/icons-material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import Link from "next/link";
 
-import { useAuth } from "@/store/auth.store";
 import { authService } from "@/services/auth.service";
 import { useTranslation } from "@/hooks/useTranslation";
 
 const activationSchema = yup.object({
+  phone_number: yup
+    .string()
+    .required("Phone number is required")
+    .matches(/^\+?[1-9]\d{1,14}$/, "Please enter a valid phone number"),
   activation_code: yup
     .string()
     .required("Activation code is required")
@@ -32,13 +36,15 @@ const activationSchema = yup.object({
 });
 
 interface ActivationFormData {
+  phone_number: string;
   activation_code: string;
 }
 
-export default function ActivatePage() {
+function ActivatePageContent() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { user, updateUser, logout } = useAuth();
+  const searchParams = useSearchParams();
+  const phoneFromUrl = searchParams.get("phone") || "";
   const [isSuccess, setIsSuccess] = useState(false);
 
   const {
@@ -46,21 +52,34 @@ export default function ActivatePage() {
     handleSubmit,
     formState: { errors },
     setError,
+    setValue,
   } = useForm<ActivationFormData>({
     resolver: yupResolver(activationSchema),
+    defaultValues: {
+      phone_number: phoneFromUrl,
+      activation_code: "",
+    },
   });
+
+  useEffect(() => {
+    if (phoneFromUrl) {
+      setValue("phone_number", phoneFromUrl);
+    }
+  }, [phoneFromUrl, setValue]);
 
   const activationMutation = useMutation({
     mutationFn: authService.activateAccount,
     onSuccess: (data) => {
-      updateUser(data.user);
       setIsSuccess(true);
       toast.success("Account activated successfully!");
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || "Activation failed";
 
-      if (message.includes("Invalid or expired")) {
+      if (
+        message.includes("Invalid or expired") ||
+        message.includes("not found")
+      ) {
         setError("activation_code", {
           message: "Invalid or expired activation code",
         });
@@ -68,6 +87,15 @@ export default function ActivatePage() {
         setError("activation_code", {
           message: "This activation code has already been used",
         });
+      } else if (message.includes("User not found")) {
+        setError("phone_number", {
+          message: "No account found with this phone number",
+        });
+      } else if (message.includes("already activated")) {
+        // User is already activated, redirect to login
+        toast.info("Account is already activated. You can now login.");
+        router.push("/auth/login");
+        return;
       } else {
         toast.error(message);
       }
@@ -78,30 +106,9 @@ export default function ActivatePage() {
     activationMutation.mutate(data);
   };
 
-  const handleLogout = async () => {
-    await logout();
+  const handleContinueToLogin = () => {
     router.push("/auth/login");
   };
-
-  const handleContinue = () => {
-    if (user?.role === "admin") {
-      router.push("/admin");
-    } else {
-      router.push("/");
-    }
-  };
-
-  // Redirect if user is already active
-  if (user?.is_active) {
-    router.push("/");
-    return null;
-  }
-
-  // Redirect if not logged in
-  if (!user) {
-    router.push("/auth/login");
-    return null;
-  }
 
   if (isSuccess) {
     return (
@@ -147,7 +154,7 @@ export default function ActivatePage() {
             variant="contained"
             size="large"
             fullWidth
-            onClick={handleContinue}
+            onClick={handleContinueToLogin}
             sx={{
               py: 1.5,
               fontSize: "1.1rem",
@@ -156,7 +163,7 @@ export default function ActivatePage() {
               borderRadius: 2,
             }}
           >
-            Continue to Store
+            Continue to Login
           </Button>
         </Paper>
       </Container>
@@ -173,6 +180,18 @@ export default function ActivatePage() {
           background: "linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)",
         }}
       >
+        {/* Back Button */}
+        <Box sx={{ mb: 3 }}>
+          <Link href="/auth/login">
+            <Button
+              startIcon={<ArrowBack />}
+              sx={{ textTransform: "none", color: "text.secondary" }}
+            >
+              Back to Login
+            </Button>
+          </Link>
+        </Box>
+
         {/* Header */}
         <Box sx={{ textAlign: "center", mb: 4 }}>
           <VpnKey
@@ -197,30 +216,9 @@ export default function ActivatePage() {
             Activate Your Account
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-            Enter your activation code to unlock full access to Janah
+            Enter your phone number and activation code to unlock full access to
+            Janah
           </Typography>
-
-          {/* User Info */}
-          <Box
-            sx={{
-              bgcolor: "grey.50",
-              p: 2,
-              borderRadius: 2,
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-            }}
-          >
-            <Phone sx={{ color: "text.secondary" }} />
-            <Box sx={{ textAlign: "left" }}>
-              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                {user.first_name} {user.last_name}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {user.phone_number}
-              </Typography>
-            </Box>
-          </Box>
         </Box>
 
         {/* Activation Info */}
@@ -239,6 +237,31 @@ export default function ActivatePage() {
         {/* Activation Form */}
         <form onSubmit={handleSubmit(onSubmit)}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+            <TextField
+              fullWidth
+              label="Phone Number"
+              placeholder="+964 773 300 2076"
+              {...register("phone_number")}
+              error={!!errors.phone_number}
+              helperText={
+                errors.phone_number?.message ||
+                "Enter the phone number you registered with"
+              }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Phone color="action" />
+                  </InputAdornment>
+                ),
+                readOnly: !!phoneFromUrl, // Make readonly if phone came from URL
+              }}
+              sx={{
+                "& .MuiInputBase-input": {
+                  bgcolor: phoneFromUrl ? "grey.50" : "transparent",
+                },
+              }}
+            />
+
             <TextField
               fullWidth
               label="Activation Code"
@@ -299,17 +322,6 @@ export default function ActivatePage() {
           </Box>
         </form>
 
-        {/* Logout Option */}
-        <Box sx={{ textAlign: "center", mt: 3 }}>
-          <Button
-            variant="text"
-            onClick={handleLogout}
-            sx={{ textTransform: "none" }}
-          >
-            Logout and use different account
-          </Button>
-        </Box>
-
         {/* Help */}
         <Alert severity="warning" sx={{ mt: 3 }}>
           <Typography variant="body2">
@@ -319,7 +331,41 @@ export default function ActivatePage() {
             shopping today!
           </Typography>
         </Alert>
+
+        {/* Already have account */}
+        <Box sx={{ textAlign: "center", mt: 3 }}>
+          <Typography variant="body2" color="text.secondary">
+            Account already activated?{" "}
+            <Link href="/auth/login">
+              <Typography
+                component="span"
+                color="primary.main"
+                sx={{
+                  cursor: "pointer",
+                  textDecoration: "none",
+                  "&:hover": { textDecoration: "underline" },
+                }}
+              >
+                Login here
+              </Typography>
+            </Link>
+          </Typography>
+        </Box>
       </Paper>
     </Container>
+  );
+}
+
+export default function ActivatePage() {
+  return (
+    <Suspense
+      fallback={
+        <Container maxWidth="sm" sx={{ py: 8, textAlign: "center" }}>
+          <CircularProgress />
+        </Container>
+      }
+    >
+      <ActivatePageContent />
+    </Suspense>
   );
 }

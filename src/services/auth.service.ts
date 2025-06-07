@@ -10,8 +10,9 @@ import type {
   ProfileUpdateFormData,
 } from "@/types";
 
-// New interface for activation code flow
+// Interface for activation code flow
 export interface ActivateAccountFormData {
+  phone_number: string;
   activation_code: string;
 }
 
@@ -27,14 +28,15 @@ export const authService = {
     return api.post("/auth/register", data);
   },
 
-  // New activation endpoint using activation codes
+  // Updated activation endpoint - matches server expectation
   activateAccount: async (
     data: ActivateAccountFormData
   ): Promise<{
     user: User;
     message: string;
+    next_step: string;
   }> => {
-    return api.post("/auth/activate-account", data);
+    return api.post("/auth/activate", data);
   },
 
   // Updated login - returns user even if not activated

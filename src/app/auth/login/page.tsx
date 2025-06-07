@@ -55,12 +55,17 @@ export default function LoginPage() {
   const { login } = useAuth();
   const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
+  const [needsActivation, setNeedsActivation] = useState<{
+    show: boolean;
+    phoneNumber: string;
+  }>({ show: false, phoneNumber: "" });
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     setError,
+    getValues,
   } = useForm<LoginFormData>({
     resolver: yupResolver(loginSchema),
   });
@@ -94,6 +99,13 @@ export default function LoginPage() {
     onError: (error: any) => {
       const message = error.response?.data?.message || t("auth.loginFailed");
 
+      // Check if this is the "account not activated" error
+      if (message.includes("not activated") || message.includes("activation")) {
+        const phoneNumber = getValues("phone_number");
+        setNeedsActivation({ show: true, phoneNumber });
+        return;
+      }
+
       if (message.includes("phone number or password")) {
         setError("phone_number", {
           message: t("auth.invalidCredentials"),
@@ -110,7 +122,14 @@ export default function LoginPage() {
   });
 
   const onSubmit = (data: LoginFormData) => {
+    setNeedsActivation({ show: false, phoneNumber: "" });
     loginMutation.mutate(data);
+  };
+
+  const handleGoToActivation = () => {
+    router.push(
+      `/auth/activate?phone=${encodeURIComponent(needsActivation.phoneNumber)}`
+    );
   };
 
   return (
@@ -150,6 +169,31 @@ export default function LoginPage() {
           </Typography>
         </Box>
 
+        {/* Activation Required Alert */}
+        {needsActivation.show && (
+          <Alert
+            severity="warning"
+            sx={{ mb: 3 }}
+            action={
+              <Button
+                color="inherit"
+                size="small"
+                onClick={handleGoToActivation}
+                startIcon={<VpnKey />}
+              >
+                Activate Now
+              </Button>
+            }
+          >
+            <Typography variant="body2">
+              <strong>Account Activation Required</strong>
+              <br />
+              Your account needs to be activated before you can login. Click
+              "Activate Now" to enter your activation code.
+            </Typography>
+          </Alert>
+        )}
+
         {/* Login Flow Info */}
         <Alert severity="info" sx={{ mb: 4 }}>
           <Typography variant="body2">
@@ -157,8 +201,8 @@ export default function LoginPage() {
             <br />
             • Enter your phone number and password
             <br />
-            • If your account needs activation, you'll be redirected to enter
-            your activation code
+            • If your account needs activation, you'll be directed to enter your
+            activation code
             <br />• Once activated, enjoy full access to the store!
           </Typography>
         </Alert>
@@ -309,7 +353,7 @@ export default function LoginPage() {
             <br />
             Password: <code>password123</code>
             <br />
-            <em>This account will redirect to activation screen</em>
+            <em>This account will show activation flow</em>
           </Typography>
         </Alert>
       </Paper>
