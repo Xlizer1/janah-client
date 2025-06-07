@@ -67,6 +67,7 @@ import { useAuth } from "@/store/auth.store";
 import { categoriesService } from "@/services/categories.service";
 import { productsService } from "@/services/products.service";
 import { useTranslation } from "@/hooks/useTranslation";
+import { formatPrice } from "@/utils/price";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -157,13 +158,6 @@ function CategoryDetailsContent() {
     } catch (error) {
       toast.error("Failed to copy URL");
     }
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "IQD",
-    }).format(price);
   };
 
   if (isLoading) {

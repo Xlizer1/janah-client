@@ -69,6 +69,7 @@ import { ordersService } from "@/services/orders.service";
 import type { Order, OrderFilters } from "@/types";
 import { format } from "date-fns";
 import { useTranslation } from "@/hooks/useTranslation";
+import { formatPrice } from "@/utils/price";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -230,13 +231,6 @@ export function OrderManagement() {
     };
     const Icon = icons[status as keyof typeof icons] || Schedule;
     return <Icon fontSize="small" />;
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "IQD",
-    }).format(price);
   };
 
   const handleMenuClick = (

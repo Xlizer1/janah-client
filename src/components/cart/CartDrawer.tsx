@@ -26,6 +26,7 @@ import {
 } from "@mui/icons-material";
 import { useCart } from "@/store/cart.store";
 import { useTranslation } from "@/hooks/useTranslation";
+import { formatPrice } from "@/utils/price";
 
 export function CartDrawer() {
   const { t } = useTranslation();
@@ -39,13 +40,6 @@ export function CartDrawer() {
     removeItem,
     clearCart,
   } = useCart();
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "IQD",
-    }).format(price);
-  };
 
   const handleQuantityChange = (productId: number, newQuantity: number) => {
     if (newQuantity < 1) {

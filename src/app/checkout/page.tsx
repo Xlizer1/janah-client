@@ -51,6 +51,7 @@ import { useAuth } from "@/store/auth.store";
 import { ordersService } from "@/services/orders.service";
 import type { CheckoutFormData, OrderCreateData } from "@/types";
 import { useTranslation } from "@/hooks/useTranslation";
+import { formatPrice } from "@/utils/price";
 
 const checkoutSchema = yup.object({
   delivery_address: yup
@@ -121,13 +122,6 @@ export default function CheckoutPage() {
       toast.error(error.response?.data?.message || "Failed to place order");
     },
   });
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "IQD",
-    }).format(price);
-  };
 
   const handleNext = async () => {
     // Validate current step before proceeding

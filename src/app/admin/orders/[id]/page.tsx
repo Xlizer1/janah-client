@@ -65,6 +65,7 @@ import { useAuth } from "@/store/auth.store";
 import { format } from "date-fns";
 import Link from "next/link";
 import { useTranslation } from "@/hooks/useTranslation";
+import { formatPrice } from "@/utils/price";
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
@@ -187,13 +188,6 @@ function OrderDetailContent() {
     };
     const Icon = icons[status as keyof typeof icons] || Schedule;
     return Icon;
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "IQD",
-    }).format(price);
   };
 
   if (isLoading) {

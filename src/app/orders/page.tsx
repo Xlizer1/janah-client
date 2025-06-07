@@ -48,6 +48,7 @@ import { useAuth } from "@/store/auth.store";
 import { ordersService } from "@/services/orders.service";
 import type { OrderFilters } from "@/types";
 import { useTranslation } from "@/hooks/useTranslation";
+import { formatPrice } from "@/utils/price";
 
 export default function OrdersPage() {
   const router = useRouter();
@@ -92,13 +93,6 @@ export default function OrdersPage() {
     } else {
       handleFilterChange({ search: undefined });
     }
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "IQD",
-    }).format(price);
   };
 
   const getStatusColor = (status: string) => {

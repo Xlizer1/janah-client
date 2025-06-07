@@ -70,6 +70,7 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useAuth } from "@/store/auth.store";
 import { productsService } from "@/services/products.service";
 import { useTranslation } from "@/hooks/useTranslation";
+import { formatPrice } from "@/utils/price";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -176,13 +177,6 @@ function ProductDetailsContent() {
     } catch (error) {
       toast.error("Failed to copy URL");
     }
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "IQD",
-    }).format(price);
   };
 
   const getStatusColor = (product: any) => {

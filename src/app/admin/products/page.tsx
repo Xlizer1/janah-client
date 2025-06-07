@@ -70,6 +70,7 @@ import { productsService } from "@/services/products.service";
 import { categoriesService } from "@/services/categories.service";
 import type { ProductFilters, Product } from "@/types";
 import { useTranslation } from "@/hooks/useTranslation";
+import { formatPrice } from "@/utils/price";
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAdmin, isAuthenticated, isLoading } = useAuth();
@@ -237,13 +238,6 @@ function ProductsManagementContent() {
     if (product.stock_quantity === 0) return t("products.outOfStock");
     if (product.stock_quantity <= 5) return t("products.lowStock");
     return t("products.inStock");
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "IQD",
-    }).format(price);
   };
 
   if (isLoading) {

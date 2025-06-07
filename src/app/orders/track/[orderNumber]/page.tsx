@@ -44,6 +44,7 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useAuth } from "@/store/auth.store";
 import { ordersService } from "@/services/orders.service";
 import { useTranslation } from "@/hooks/useTranslation";
+import { formatPrice } from "@/utils/price";
 
 export default function OrderTrackingPage() {
   const params = useParams();
@@ -67,13 +68,6 @@ export default function OrderTrackingPage() {
 
   const order = data?.order;
   const statusHistory = data?.status_history || [];
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "IQD",
-    }).format(price);
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {

@@ -56,6 +56,7 @@ import { useAuth } from "@/store/auth.store";
 import { ordersService } from "@/services/orders.service";
 import { useTranslation } from "@/hooks/useTranslation";
 import { OrderItem } from "@/types";
+import { formatPrice } from "@/utils/price";
 
 export default function OrderDetailPage() {
   const params = useParams();
@@ -77,13 +78,6 @@ export default function OrderDetailPage() {
   });
 
   const order = data?.order;
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "IQD",
-    }).format(price);
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {

@@ -39,6 +39,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { useCart } from "@/store/cart.store";
 import { useAuth } from "@/store/auth.store";
 import { useTranslation } from "@/hooks/useTranslation";
+import { formatPrice } from "@/utils/price";
 
 export default function CartPage() {
   const router = useRouter();
@@ -54,13 +55,6 @@ export default function CartPage() {
     clearCart,
     validateSellingPrices,
   } = useCart();
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "IQD",
-    }).format(price);
-  };
 
   const handleQuantityChange = (productId: number, newQuantity: number) => {
     if (newQuantity < 1) {

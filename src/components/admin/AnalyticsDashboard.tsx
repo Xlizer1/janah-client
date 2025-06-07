@@ -52,6 +52,7 @@ import {
 } from "recharts";
 import { adminService } from "@/services/admin.service";
 import { useTranslation } from "@/hooks/useTranslation";
+import { formatPrice, formatPriceCompact } from "@/utils/price";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
@@ -79,19 +80,50 @@ export function AnalyticsDashboard() {
     queryFn: () => adminService.getStats(),
   });
 
-  // Mock data for charts
+  // Mock data for charts - using realistic IQD amounts
   const salesData = [
-    { name: t("common.january"), sales: 4000, revenue: 2400 },
-    { name: t("common.february"), sales: 3000, revenue: 1398 },
-    { name: t("common.march"), sales: 2000, revenue: 9800 },
-    { name: t("common.april"), sales: 2780, revenue: 3908 },
-    { name: t("common.may"), sales: 1890, revenue: 4800 },
-    { name: t("common.june"), sales: 2390, revenue: 3800 },
+    { name: t("common.january"), sales: 4000, revenue: 24000000 }, // 24M IQD
+    { name: t("common.february"), sales: 3000, revenue: 13980000 }, // ~14M IQD
+    { name: t("common.march"), sales: 2000, revenue: 98000000 }, // 98M IQD
+    { name: t("common.april"), sales: 2780, revenue: 39080000 }, // ~39M IQD
+    { name: t("common.may"), sales: 1890, revenue: 48000000 }, // 48M IQD
+    { name: t("common.june"), sales: 2390, revenue: 38000000 }, // 38M IQD
   ];
 
   const handleExport = () => {
     // TODO: Implement analytics export
     console.log("Export analytics data");
+  };
+
+  // Custom tooltip for charts
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <Box
+          sx={{
+            bgcolor: "background.paper",
+            p: 2,
+            border: 1,
+            borderColor: "divider",
+            borderRadius: 1,
+            boxShadow: 2,
+          }}
+        >
+          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+            {label}
+          </Typography>
+          {payload.map((entry: any, index: number) => (
+            <Typography key={index} variant="body2" sx={{ color: entry.color }}>
+              {entry.name}:{" "}
+              {entry.dataKey === "revenue"
+                ? formatPriceCompact(entry.value)
+                : entry.value.toLocaleString()}
+            </Typography>
+          ))}
+        </Box>
+      );
+    }
+    return null;
   };
 
   return (
@@ -163,7 +195,7 @@ export function AnalyticsDashboard() {
                 </Box>
                 <Box>
                   <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                    $24,560
+                    {formatPriceCompact(24560000)} {/* 24.5M IQD */}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     {t("admin.dashboard.totalRevenue")}
@@ -323,8 +355,8 @@ export function AnalyticsDashboard() {
                 <LineChart data={salesData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
+                  <YAxis tickFormatter={(value) => formatPriceCompact(value)} />
+                  <Tooltip content={<CustomTooltip />} />
                   <Line
                     type="monotone"
                     dataKey="sales"
@@ -409,12 +441,12 @@ export function AnalyticsDashboard() {
                       {(categoryAnalytics?.analytics || [])
                         .slice(0, 5)
                         .map((category) => {
-                          let avgPrice =
+                          const avgPrice =
                             category.avg_price != null
                               ? typeof category.avg_price === "string"
-                                ? parseFloat(category.avg_price).toFixed(2)
-                                : category.avg_price.toFixed(2)
-                              : "N/A";
+                                ? parseFloat(category.avg_price)
+                                : category.avg_price
+                              : 0;
 
                           return (
                             <TableRow key={category.id}>
@@ -422,7 +454,9 @@ export function AnalyticsDashboard() {
                               <TableCell align="right">
                                 {category.total_products}
                               </TableCell>
-                              <TableCell align="right">${avgPrice}</TableCell>
+                              <TableCell align="right">
+                                {formatPrice(avgPrice)}
+                              </TableCell>
                             </TableRow>
                           );
                         })}

@@ -54,6 +54,7 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useCart } from "@/store/cart.store";
 import { productsService } from "@/services/products.service";
 import { useTranslation } from "@/hooks/useTranslation";
+import { formatPrice } from "@/utils/price";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -434,13 +435,6 @@ export default function ProductDetailPage() {
       navigator.clipboard.writeText(window.location.href);
       toast.success("Link copied to clipboard");
     }
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "IQD",
-    }).format(price);
   };
 
   if (isLoading) {

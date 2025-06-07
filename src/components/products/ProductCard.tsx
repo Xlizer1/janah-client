@@ -26,6 +26,7 @@ import {
 import { useCart } from "@/store/cart.store";
 import type { Product } from "@/types";
 import { useTranslation } from "@/hooks/useTranslation";
+import { formatPrice } from "@/utils/price";
 
 interface ProductCardProps {
   product: Product;
@@ -50,13 +51,6 @@ export function ProductCard({
     e.preventDefault();
     e.stopPropagation();
     setIsFavorite(!isFavorite);
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "IQD",
-    }).format(price);
   };
 
   const isOutOfStock = product.stock_quantity === 0;
