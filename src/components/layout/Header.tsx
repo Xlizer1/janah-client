@@ -168,10 +168,12 @@ export function Header() {
               <LanguageSwitcher />
 
               {/* Cart Button */}
-              <IconButton color="inherit" onClick={openCart}>
-                <Badge badgeContent={totalItems} color="primary">
-                  <ShoppingCart />
-                </Badge>
+              <IconButton color="inherit">
+                <Link href={"/cart"}>
+                  <Badge badgeContent={totalItems} color="primary">
+                    <ShoppingCart />
+                  </Badge>
+                </Link>
               </IconButton>
 
               {/* User Menu */}
