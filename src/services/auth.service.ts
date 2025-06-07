@@ -110,7 +110,11 @@ export const authService = {
         created_at: string;
       };
     }> => {
-      return api.post("/admin/activation-codes/generate", data);
+      return api.post("/admin/activation-codes/generate", {
+        ...data,
+        custom_code:
+          data.custom_code?.length === 0 ? undefined : data.custom_code,
+      });
     },
 
     getAllActivationCodes: async (params?: {
