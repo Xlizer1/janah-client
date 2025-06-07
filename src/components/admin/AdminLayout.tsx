@@ -37,6 +37,7 @@ import {
   ChevronRight,
   FilePresent,
   Receipt,
+  VpnKey,
 } from "@mui/icons-material";
 import { useAuth } from "@/store/auth.store";
 import { toast } from "react-toastify";
@@ -124,6 +125,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       text: t("admin.importExport"),
       icon: FilePresent,
       href: "/admin/import-export",
+    },
+    {
+      text: "Activation Codes",
+      href: "/admin/activation-codes",
+      icon: VpnKey,
     },
   ];
 

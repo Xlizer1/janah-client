@@ -63,7 +63,7 @@ export function ProductCard({
   const isLowStock = product.stock_quantity > 0 && product.stock_quantity <= 5;
 
   // Get the main image (first image) or fallback to legacy image_url
-  const mainImage = product.image_urls?.[0] || product.image_url;
+  const mainImage = product.image_url || product.image_urls?.[0];
   const hasMultipleImages = product.image_urls && product.image_urls.length > 1;
 
   return (

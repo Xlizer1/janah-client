@@ -72,7 +72,7 @@ export function CategoriesGrid() {
       <Grid container spacing={3}>
         {displayCategories.map((category) => (
           <Grid item xs={12} sm={6} md={4} key={category.id}>
-            <Link href={`/categories/${category.id}/view`}>
+            <Link href={`/products?category=${category.id}`}>
               <Card
                 sx={{
                   height: 280,

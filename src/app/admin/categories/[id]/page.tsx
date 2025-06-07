@@ -150,7 +150,7 @@ function CategoryDetailsContent() {
   };
 
   const handleShare = async () => {
-    const url = `${window.location.origin}/categories/${category.id}/view`;
+    const url = `${window.location.origin}/products?category=${category.id}`;
     try {
       await navigator.clipboard.writeText(url);
       toast.success("Category URL copied to clipboard");

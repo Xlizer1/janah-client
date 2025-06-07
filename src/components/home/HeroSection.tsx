@@ -30,7 +30,6 @@ export function HeroSection() {
         overflow: "hidden",
       }}
     >
-      {/* Background decorative elements */}
       <Box
         sx={{
           position: "absolute",
@@ -138,7 +137,7 @@ export function HeroSection() {
             </Box>
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          {/* <Grid item xs={12} md={6}>
             <Box
               sx={{
                 display: "flex",
@@ -148,7 +147,6 @@ export function HeroSection() {
                 position: "relative",
               }}
             >
-              {/* Placeholder for hero image */}
               <Box
                 sx={{
                   width: "100%",
@@ -167,7 +165,6 @@ export function HeroSection() {
                 </Typography>
               </Box>
 
-              {/* Floating stats cards */}
               <Box
                 sx={{
                   position: "absolute",
@@ -217,7 +214,7 @@ export function HeroSection() {
                 </Typography>
               </Box>
             </Box>
-          </Grid>
+          </Grid> */}
         </Grid>
       </Container>
     </Box>
