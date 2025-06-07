@@ -24,6 +24,7 @@ import {
   Visibility,
   VisibilityOff,
   PersonAdd,
+  CheckCircle,
 } from "@mui/icons-material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -35,6 +36,7 @@ import { authService } from "@/services/auth.service";
 import type { RegisterFormData } from "@/types";
 import { useTranslation } from "@/hooks/useTranslation";
 
+// Updated schema - removed phone verification requirement
 const registerSchema = yup.object({
   phone_number: yup
     .string()
@@ -64,6 +66,8 @@ export default function RegisterPage() {
   const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [registeredData, setRegisteredData] = useState<any>(null);
 
   const {
     register,
@@ -77,9 +81,10 @@ export default function RegisterPage() {
   const registerMutation = useMutation({
     mutationFn: authService.register,
     onSuccess: (data, variables) => {
-      toast.success(t("auth.registerSuccess"));
-      router.push(
-        `/auth/verify-phone?phone=${encodeURIComponent(variables.phone_number)}`
+      setRegisteredData(data);
+      setIsSuccess(true);
+      toast.success(
+        "Registration successful! You can now login with your credentials."
       );
     },
     onError: (error: any) => {
@@ -102,6 +107,101 @@ export default function RegisterPage() {
   const onSubmit = (data: RegisterFormData) => {
     registerMutation.mutate(data);
   };
+
+  if (isSuccess) {
+    return (
+      <Container maxWidth="sm" sx={{ py: 8 }}>
+        <Paper
+          elevation={3}
+          sx={{
+            p: 4,
+            borderRadius: 3,
+            background: "linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)",
+            textAlign: "center",
+          }}
+        >
+          <CheckCircle
+            sx={{
+              fontSize: 64,
+              color: "success.main",
+              mb: 2,
+            }}
+          />
+
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 700,
+              mb: 2,
+              color: "success.main",
+            }}
+          >
+            Registration Successful!
+          </Typography>
+
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ mb: 3, lineHeight: 1.6 }}
+          >
+            Your account has been created successfully. You can now login and
+            activate your account using an activation code.
+          </Typography>
+
+          <Alert severity="info" sx={{ mb: 3, textAlign: "left" }}>
+            <Typography variant="body2">
+              <strong>Next Steps:</strong>
+              <br />• Login with your credentials
+              <br />• Enter your activation code to unlock full access
+              <br />• Start shopping once activated!
+            </Typography>
+          </Alert>
+
+          <Alert severity="warning" sx={{ mb: 3, textAlign: "left" }}>
+            <Typography variant="body2">
+              <strong>Need an activation code?</strong>
+              <br />
+              Contact us at <strong>+964 773 300 2076</strong> to purchase one.
+            </Typography>
+          </Alert>
+
+          <Box sx={{ display: "flex", gap: 2, flexDirection: "column" }}>
+            <Button
+              variant="contained"
+              size="large"
+              fullWidth
+              onClick={() => router.push("/auth/login")}
+              sx={{
+                py: 1.5,
+                fontSize: "1.1rem",
+                fontWeight: 600,
+                textTransform: "none",
+                borderRadius: 2,
+              }}
+            >
+              Continue to Login
+            </Button>
+
+            <Button
+              variant="outlined"
+              size="large"
+              fullWidth
+              onClick={() => window.open("tel:+9647733002076")}
+              sx={{
+                py: 1.5,
+                fontSize: "1.1rem",
+                fontWeight: 600,
+                textTransform: "none",
+                borderRadius: 2,
+              }}
+            >
+              Contact Us for Activation Code
+            </Button>
+          </Box>
+        </Paper>
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="md" sx={{ py: 8 }}>
@@ -134,12 +234,29 @@ export default function RegisterPage() {
               WebkitTextFillColor: "transparent",
             }}
           >
-            {t("auth.register.title")}
+            Create Your Account
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            {t("auth.register.subtitle")}
+            Join Janah and start shopping today
           </Typography>
         </Box>
+
+        {/* Updated Registration Process Info */}
+        <Alert severity="info" sx={{ mb: 4 }}>
+          <Typography variant="body2">
+            <strong>New Registration Process:</strong>
+            <br />
+            1. Create your account below
+            <br />
+            2. Login with your credentials
+            <br />
+            3. Enter your activation code to unlock full access
+            <br />
+            <br />
+            <strong>Need an activation code?</strong> Contact us at{" "}
+            <strong>+964 773 300 2076</strong>
+          </Typography>
+        </Alert>
 
         {/* Registration Form */}
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -187,7 +304,7 @@ export default function RegisterPage() {
               placeholder="+964 773 300 2076"
               {...register("phone_number")}
               error={!!errors.phone_number}
-              helperText={errors.phone_number?.message || t("auth.phoneHelper")}
+              helperText={errors.phone_number?.message || "Your login username"}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -303,7 +420,7 @@ export default function RegisterPage() {
             >
               {registerMutation.isPending
                 ? t("auth.creating")
-                : t("auth.createAccount")}
+                : "Create Account"}
             </Button>
           </Box>
         </form>
@@ -340,10 +457,16 @@ export default function RegisterPage() {
           </Link>
         </Box>
 
-        {/* Info Alert */}
-        <Alert severity="info" sx={{ mt: 3 }}>
+        {/* Contact Info */}
+        <Alert severity="warning" sx={{ mt: 3 }}>
           <Typography variant="body2">
-            {t("auth.infoAlert.verification")}
+            <strong>To activate your account after registration:</strong>
+            <br />
+            📞 Call: <strong>+964 773 300 2076</strong>
+            <br />
+            ✉️ Email: <strong>support@janah.com</strong>
+            <br />
+            Purchase an activation code to unlock full shopping access.
           </Typography>
         </Alert>
       </Paper>

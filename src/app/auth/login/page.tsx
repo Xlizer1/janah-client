@@ -25,6 +25,7 @@ import {
   LockReset,
   ArrowBack,
   CheckCircle,
+  VpnKey,
 } from "@mui/icons-material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -67,8 +68,19 @@ export default function LoginPage() {
   const loginMutation = useMutation({
     mutationFn: authService.login,
     onSuccess: (data) => {
+      // Store user data
       Cookies.set("user", JSON.stringify(data.user), { expires: 7 });
 
+      // Check if user needs activation
+      if (!data.user.is_active) {
+        // User exists but not activated - store auth and redirect to activation
+        login(data);
+        router.push("/auth/activate");
+        toast.info("Please activate your account to continue");
+        return;
+      }
+
+      // User is fully activated
       login(data);
 
       if (data.user.role === "admin") {
@@ -90,10 +102,6 @@ export default function LoginPage() {
       } else if (message.includes("verify your phone")) {
         setError("phone_number", {
           message: t("auth.verifyPhoneFirst"),
-        });
-      } else if (message.includes("pending admin activation")) {
-        setError("phone_number", {
-          message: t("auth.pendingActivation"),
         });
       } else {
         toast.error(message);
@@ -141,6 +149,19 @@ export default function LoginPage() {
             {t("auth.login.subtitle")}
           </Typography>
         </Box>
+
+        {/* Login Flow Info */}
+        <Alert severity="info" sx={{ mb: 4 }}>
+          <Typography variant="body2">
+            <strong>Login Process:</strong>
+            <br />
+            • Enter your phone number and password
+            <br />
+            • If your account needs activation, you'll be redirected to enter
+            your activation code
+            <br />• Once activated, enjoy full access to the store!
+          </Typography>
+        </Alert>
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
@@ -224,7 +245,14 @@ export default function LoginPage() {
                 transition: "all 0.3s ease",
               }}
             >
-              {loginMutation.isPending ? t("auth.signingIn") : t("auth.signIn")}
+              {loginMutation.isPending ? (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <CircularProgress size={20} color="inherit" />
+                  {t("auth.signingIn")}
+                </Box>
+              ) : (
+                t("auth.signIn")
+              )}
             </Button>
           </Box>
         </form>
@@ -259,8 +287,30 @@ export default function LoginPage() {
           </Link>
         </Box>
 
-        <Alert severity="info" sx={{ mt: 3 }}>
-          <Typography variant="body2">{t("auth.infoAlert")}</Typography>
+        {/* Activation Code Info */}
+        <Alert severity="warning" sx={{ mt: 3 }}>
+          <Typography variant="body2">
+            <VpnKey
+              sx={{ fontSize: 16, mr: 1, verticalAlign: "text-bottom" }}
+            />
+            <strong>Need an activation code?</strong>
+            <br />
+            Call us at <strong>+964 773 300 2076</strong> to purchase an
+            activation code and unlock full access.
+          </Typography>
+        </Alert>
+
+        {/* Quick Access for Testing */}
+        <Alert severity="success" sx={{ mt: 2 }}>
+          <Typography variant="body2">
+            <strong>Demo Account (for testing):</strong>
+            <br />
+            Phone: <code>+964770123456</code>
+            <br />
+            Password: <code>password123</code>
+            <br />
+            <em>This account will redirect to activation screen</em>
+          </Typography>
         </Alert>
       </Paper>
     </Container>
