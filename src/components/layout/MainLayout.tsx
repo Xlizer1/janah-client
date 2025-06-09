@@ -6,26 +6,32 @@ import { CartDrawer } from "@/components/cart/CartDrawer";
 import { MobileMenu } from "./MobileMenu";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
+import { RTLProvider } from "./RTLProvider";
+
 interface MainLayoutProps {
   children: React.ReactNode;
 }
 
 export function MainLayout({ children }: MainLayoutProps) {
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <Header />
+    <RTLProvider>
+      <Box
+        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+      >
+        <Header />
 
-      <Box component="main" sx={{ flex: 1 }}>
-        {children}
+        <Box component="main" sx={{ flex: 1 }}>
+          {children}
+        </Box>
+
+        <Footer />
+
+        {/* Cart Drawer */}
+        <CartDrawer />
+
+        {/* Mobile Menu */}
+        <MobileMenu />
       </Box>
-
-      <Footer />
-
-      {/* Cart Drawer */}
-      <CartDrawer />
-
-      {/* Mobile Menu */}
-      <MobileMenu />
-    </Box>
+    </RTLProvider>
   );
 }

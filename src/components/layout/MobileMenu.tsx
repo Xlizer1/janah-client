@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -16,6 +16,7 @@ import {
   Avatar,
   IconButton,
   Collapse,
+  Skeleton,
 } from "@mui/material";
 import {
   Close,
@@ -32,9 +33,12 @@ import {
   ExpandMore,
   Star,
   Receipt,
+  Storefront,
 } from "@mui/icons-material";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/store/auth.store";
 import { useUI } from "@/store/ui.store";
+import { categoriesService } from "@/services/categories.service";
 import { toast } from "react-toastify";
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -43,7 +47,14 @@ export function MobileMenu() {
   const { t } = useTranslation();
   const { user, isAuthenticated, logout, isAdmin } = useAuth();
   const { isMobileMenuOpen, closeMobileMenu } = useUI();
-  const [categoriesOpen, setCategoriesOpen] = React.useState(false);
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
+
+  // Fetch categories dynamically
+  const { data: categoriesData, isLoading: categoriesLoading } = useQuery({
+    queryKey: ["categories", "mobile-menu"],
+    queryFn: () => categoriesService.getCategoriesWithCounts(true), // Only active categories
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
 
   const handleNavigation = (path: string) => {
     router.push(path);
@@ -61,7 +72,7 @@ export function MobileMenu() {
     closeMobileMenu();
   };
 
-  const menuItems = [
+  const staticMenuItems = [
     {
       label: t("nav.home"),
       icon: Home,
@@ -71,19 +82,6 @@ export function MobileMenu() {
       label: t("nav.products"),
       icon: ShoppingBag,
       href: "/products",
-    },
-    {
-      label: t("nav.categories"),
-      icon: Category,
-      href: "/categories",
-      hasSubmenu: true,
-      submenu: [
-        { label: t("categories.electronics"), href: "/categories/electronics" },
-        { label: t("categories.computers"), href: "/categories/computers" },
-        { label: t("categories.smartphones"), href: "/categories/smartphones" },
-        { label: t("categories.accessories"), href: "/categories/accessories" },
-        { label: t("categories.viewAll"), href: "/categories" },
-      ],
     },
     ...(isAuthenticated
       ? [
@@ -210,49 +208,138 @@ export function MobileMenu() {
 
         {/* Main Menu */}
         <List sx={{ flex: 1, py: 0 }}>
-          {menuItems.map((item) => (
-            <React.Fragment key={item.label}>
+          {/* Static Menu Items */}
+          {staticMenuItems.map((item) => (
+            <ListItem key={item.label} disablePadding>
+              <ListItemButton onClick={() => handleNavigation(item.href)}>
+                <ListItemIcon>
+                  <item.icon />
+                </ListItemIcon>
+                <ListItemText primary={item.label} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+
+          {/* Dynamic Categories Section */}
+          <ListItem disablePadding>
+            <ListItemButton onClick={() => setCategoriesOpen(!categoriesOpen)}>
+              <ListItemIcon>
+                <Category />
+              </ListItemIcon>
+              <ListItemText primary={t("nav.categories")} />
+              {categoriesLoading ? (
+                <Skeleton width={20} height={20} />
+              ) : categoriesOpen ? (
+                <ExpandLess />
+              ) : (
+                <ExpandMore />
+              )}
+            </ListItemButton>
+          </ListItem>
+
+          {/* Categories Submenu */}
+          <Collapse in={categoriesOpen} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              {/* All Categories */}
               <ListItem disablePadding>
                 <ListItemButton
-                  onClick={() =>
-                    item.hasSubmenu
-                      ? setCategoriesOpen(!categoriesOpen)
-                      : handleNavigation(item.href)
-                  }
+                  sx={{ pl: 4 }}
+                  onClick={() => handleNavigation("/categories")}
                 >
                   <ListItemIcon>
-                    <item.icon />
+                    <Storefront fontSize="small" />
                   </ListItemIcon>
-                  <ListItemText primary={item.label} />
-                  {item.hasSubmenu &&
-                    (categoriesOpen ? <ExpandLess /> : <ExpandMore />)}
+                  <ListItemText
+                    primary={t("categories.viewAll")}
+                    primaryTypographyProps={{
+                      variant: "body2",
+                      fontWeight: 600,
+                    }}
+                  />
                 </ListItemButton>
               </ListItem>
 
-              {/* Submenu */}
-              {item.hasSubmenu && (
-                <Collapse in={categoriesOpen} timeout="auto" unmountOnExit>
-                  <List component="div" disablePadding>
-                    {item.submenu?.map((subItem) => (
-                      <ListItem key={subItem.href} disablePadding>
-                        <ListItemButton
-                          sx={{ pl: 4 }}
-                          onClick={() => handleNavigation(subItem.href)}
-                        >
-                          <ListItemText
-                            primary={subItem.label}
-                            primaryTypographyProps={{
-                              variant: "body2",
-                            }}
-                          />
-                        </ListItemButton>
-                      </ListItem>
-                    ))}
-                  </List>
-                </Collapse>
+              {/* Loading State */}
+              {categoriesLoading && (
+                <>
+                  {[1, 2, 3].map((i) => (
+                    <ListItem key={i} disablePadding>
+                      <ListItemButton sx={{ pl: 4 }}>
+                        <ListItemIcon>
+                          <Skeleton width={20} height={20} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={<Skeleton width={100} height={20} />}
+                          secondary={<Skeleton width={60} height={16} />}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                </>
               )}
-            </React.Fragment>
-          ))}
+
+              {/* Dynamic Categories */}
+              {categoriesData?.categories?.map((category) => (
+                <ListItem key={category.id} disablePadding>
+                  <ListItemButton
+                    sx={{ pl: 4 }}
+                    onClick={() =>
+                      handleNavigation(`/products?category=${category.id}`)
+                    }
+                  >
+                    <ListItemIcon>
+                      {category.image_url ? (
+                        <Box
+                          component="img"
+                          src={category.image_url}
+                          alt={category.name}
+                          sx={{
+                            width: 20,
+                            height: 20,
+                            borderRadius: 0.5,
+                            objectFit: "cover",
+                          }}
+                        />
+                      ) : (
+                        <Category fontSize="small" />
+                      )}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={category.name}
+                      secondary={
+                        category.product_count
+                          ? t("categories.productsCount", {
+                              count: category.product_count,
+                            })
+                          : undefined
+                      }
+                      primaryTypographyProps={{
+                        variant: "body2",
+                      }}
+                      secondaryTypographyProps={{
+                        variant: "caption",
+                      }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+
+              {/* Error State */}
+              {!categoriesLoading && !categoriesData?.categories?.length && (
+                <ListItem disablePadding>
+                  <ListItemButton sx={{ pl: 4 }} disabled>
+                    <ListItemText
+                      primary={t("categories.noCategories")}
+                      primaryTypographyProps={{
+                        variant: "body2",
+                        color: "text.secondary",
+                      }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              )}
+            </List>
+          </Collapse>
         </List>
 
         <Divider />

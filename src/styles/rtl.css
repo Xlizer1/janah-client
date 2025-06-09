@@ -1,0 +1,294 @@
+:root {
+  --text-align-start: left;
+  --text-align-end: right;
+  --margin-start: margin-left;
+  --margin-end: margin-right;
+  --padding-start: padding-left;
+  --padding-end: padding-right;
+  --border-start: border-left;
+  --border-end: border-right;
+  --start: left;
+  --end: right;
+}
+
+[dir="rtl"] {
+  --text-align-start: right;
+  --text-align-end: left;
+  --margin-start: margin-right;
+  --margin-end: margin-left;
+  --padding-start: padding-right;
+  --padding-end: padding-left;
+  --border-start: border-right;
+  --border-end: border-left;
+  --start: right;
+  --end: left;
+}
+
+/* RTL-aware utility classes */
+.text-start {
+  text-align: var(--text-align-start);
+}
+
+.text-end {
+  text-align: var(--text-align-end);
+}
+
+.ms-auto {
+  margin-inline-start: auto;
+}
+
+.me-auto {
+  margin-inline-end: auto;
+}
+
+.ps-2 {
+  padding-inline-start: 0.5rem;
+}
+
+.pe-2 {
+  padding-inline-end: 0.5rem;
+}
+
+.ps-3 {
+  padding-inline-start: 0.75rem;
+}
+
+.pe-3 {
+  padding-inline-end: 0.75rem;
+}
+
+.ps-4 {
+  padding-inline-start: 1rem;
+}
+
+.pe-4 {
+  padding-inline-end: 1rem;
+}
+
+/* Fix for common RTL issues */
+
+/* Drawer positioning */
+[dir="rtl"] .MuiDrawer-paperAnchorLeft {
+  left: auto;
+  right: 0;
+}
+
+[dir="rtl"] .MuiDrawer-paperAnchorRight {
+  right: auto;
+  left: 0;
+}
+
+/* Menu positioning */
+[dir="rtl"] .MuiMenu-paper {
+  transform-origin: top right;
+}
+
+/* Icon button spacing */
+[dir="rtl"] .MuiIconButton-root {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* Breadcrumb separators */
+[dir="rtl"] .MuiBreadcrumbs-separator {
+  transform: scaleX(-1);
+}
+
+/* Arrow icons in RTL */
+[dir="rtl"] .arrow-icon {
+  transform: scaleX(-1);
+}
+
+/* Flex layouts that need RTL consideration */
+.flex-row-rtl {
+  display: flex;
+  flex-direction: row;
+}
+
+[dir="rtl"] .flex-row-rtl {
+  flex-direction: row-reverse;
+}
+
+/* Card actions alignment */
+[dir="rtl"] .MuiCardActions-root {
+  padding-left: 16px;
+  padding-right: 8px;
+}
+
+/* Form field alignments */
+[dir="rtl"] .MuiFormControl-root {
+  text-align: right;
+}
+
+[dir="rtl"] .MuiInputLabel-root {
+  transform-origin: top right;
+}
+
+/* Table cell alignment */
+[dir="rtl"] .MuiTableCell-root {
+  text-align: right;
+}
+
+[dir="rtl"] .MuiTableCell-head {
+  text-align: right;
+}
+
+/* Specific fixes for custom components */
+
+/* Header navigation */
+[dir="rtl"] .header-nav {
+  flex-direction: row-reverse;
+}
+
+/* Search bar */
+[dir="rtl"] .search-input {
+  text-align: right;
+  padding-right: 40px;
+  padding-left: 16px;
+}
+
+/* Product card layout */
+[dir="rtl"] .product-card-content {
+  text-align: right;
+}
+
+/* Cart items */
+[dir="rtl"] .cart-item {
+  flex-direction: row-reverse;
+}
+
+/* Footer links */
+[dir="rtl"] .footer-links {
+  text-align: right;
+}
+
+/* Mobile menu */
+[dir="rtl"] .mobile-menu {
+  right: auto;
+  left: 0;
+}
+
+/* Notification positioning */
+[dir="rtl"] .notification-container {
+  left: 16px;
+  right: auto;
+}
+
+/* Loading spinner in RTL */
+[dir="rtl"] .loading-spinner {
+  direction: ltr; /* Keep spinner direction consistent */
+}
+
+/* Admin sidebar */
+[dir="rtl"] .admin-sidebar {
+  right: auto;
+  left: 0;
+}
+
+[dir="rtl"] .admin-content {
+  margin-right: 260px;
+  margin-left: 0;
+}
+
+/* Data grid RTL support */
+[dir="rtl"] .MuiDataGrid-root {
+  direction: rtl;
+}
+
+[dir="rtl"] .MuiDataGrid-columnHeader {
+  text-align: right;
+}
+
+/* Chart RTL support */
+[dir="rtl"] .recharts-wrapper {
+  direction: ltr; /* Keep charts in LTR for consistency */
+}
+
+/* Image gallery RTL */
+[dir="rtl"] .image-gallery {
+  direction: ltr; /* Usually better to keep image order LTR */
+}
+
+/* Stepper RTL */
+[dir="rtl"] .MuiStepper-horizontal {
+  flex-direction: row-reverse;
+}
+
+/* Badge positioning */
+[dir="rtl"] .MuiBadge-badge {
+  left: auto;
+  right: 14px;
+}
+
+/* Tooltip RTL */
+[dir="rtl"] .MuiTooltip-tooltip {
+  text-align: right;
+}
+
+/* Animations that need RTL consideration */
+@keyframes slideInFromStart {
+  from {
+    transform: translateX(var(--start-direction, -100%));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromEnd {
+  from {
+    transform: translateX(var(--end-direction, 100%));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+[dir="ltr"] {
+  --start-direction: -100%;
+  --end-direction: 100%;
+}
+
+[dir="rtl"] {
+  --start-direction: 100%;
+  --end-direction: -100%;
+}
+
+/* Typography adjustments for Arabic */
+[dir="rtl"] {
+  font-family: "Cairo", "Tajawal", "Amiri", Arial, sans-serif;
+  line-height: 1.6; /* Better for Arabic text */
+}
+
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4,
+[dir="rtl"] h5,
+[dir="rtl"] h6 {
+  font-weight: 600; /* Arabic fonts often need slightly heavier weight */
+}
+
+/* Form validation messages */
+[dir="rtl"] .MuiFormHelperText-root {
+  text-align: right;
+  margin-right: 14px;
+  margin-left: 0;
+}
+
+/* Select dropdown */
+[dir="rtl"] .MuiSelect-icon {
+  right: auto;
+  left: 7px;
+}
+
+/* Checkbox and radio alignment */
+[dir="rtl"] .MuiFormControlLabel-root {
+  margin-right: 0;
+  margin-left: 16px;
+}
+
+[dir="rtl"] .MuiFormControlLabel-label {
+  padding-right: 11px;
+  padding-left: 0;
+}

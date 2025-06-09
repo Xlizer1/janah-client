@@ -32,19 +32,19 @@ import { useAuth } from "@/store/auth.store";
 import { useCart } from "@/store/cart.store";
 import { useUI } from "@/store/ui.store";
 import { SearchBar } from "@/components/search/SearchBar";
+import { CategoriesDropdown } from "./CategoriesDropdown";
 import { toast } from "react-toastify";
-
 import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
 import { useTranslation } from "@/hooks/useTranslation";
 
 export function Header() {
   const theme = useTheme();
-  const { t } = useTranslation();
+  const { t, isRTL } = useTranslation();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const router = useRouter();
 
   const { user, isAuthenticated, logout, isAdmin } = useAuth();
-  const { totalItems, openCart } = useCart();
+  const { totalItems } = useCart();
   const { toggleMobileMenu, isSearchOpen, toggleSearch } = useUI();
 
   const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(
@@ -79,18 +79,26 @@ export function Header() {
     <>
       <AppBar
         position="sticky"
-        sx={{ bgcolor: "white", color: "text.primary" }}
-        elevation={1}
+        sx={{
+          bgcolor: "white",
+          color: "text.primary",
+          boxShadow:
+            "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+        }}
+        elevation={0}
       >
         <Container maxWidth="xl">
           <Toolbar sx={{ px: { xs: 0, sm: 2 } }}>
             {/* Mobile Menu Button */}
             {isMobile && (
               <IconButton
-                edge="start"
+                edge={isRTL ? "end" : "start"}
                 color="inherit"
                 onClick={toggleMobileMenu}
-                sx={{ mr: 1 }}
+                sx={{
+                  mr: isRTL ? 0 : 1,
+                  ml: isRTL ? 1 : 0,
+                }}
               >
                 <MenuIcon />
               </IconButton>
@@ -105,7 +113,8 @@ export function Header() {
                   fontWeight: 700,
                   color: "primary.main",
                   textDecoration: "none",
-                  mr: 4,
+                  mr: isRTL ? 0 : 4,
+                  ml: isRTL ? 4 : 0,
                 }}
               >
                 Janah
@@ -114,17 +123,23 @@ export function Header() {
 
             {/* Desktop Navigation */}
             {!isMobile && (
-              <Box sx={{ display: "flex", gap: 3, mr: "auto" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2,
+                  [isRTL ? "ml" : "mr"]: "auto",
+                }}
+              >
                 <Link href="/products">
                   <Button color="inherit" sx={{ fontWeight: 500 }}>
                     {t("nav.products")}
                   </Button>
                 </Link>
-                <Link href="/categories">
-                  <Button color="inherit" sx={{ fontWeight: 500 }}>
-                    {t("nav.categories")}
-                  </Button>
-                </Link>
+
+                {/* Dynamic Categories Dropdown */}
+                <CategoriesDropdown />
+
                 {isAuthenticated && (
                   <Link href="/orders">
                     <Button color="inherit" sx={{ fontWeight: 500 }}>
@@ -169,7 +184,7 @@ export function Header() {
 
               {/* Cart Button */}
               <IconButton color="inherit">
-                <Link href={"/cart"}>
+                <Link href="/cart">
                   <Badge badgeContent={totalItems} color="primary">
                     <ShoppingCart />
                   </Badge>
@@ -195,23 +210,29 @@ export function Header() {
                     anchorEl={userMenuAnchor}
                     open={Boolean(userMenuAnchor)}
                     onClose={handleUserMenuClose}
-                    transformOrigin={{ horizontal: "right", vertical: "top" }}
-                    anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+                    transformOrigin={{
+                      horizontal: isRTL ? "left" : "right",
+                      vertical: "top",
+                    }}
+                    anchorOrigin={{
+                      horizontal: isRTL ? "left" : "right",
+                      vertical: "bottom",
+                    }}
                   >
                     <MenuItem onClick={() => handleNavigation("/profile")}>
-                      <AccountCircle sx={{ mr: 1 }} />
+                      <AccountCircle sx={{ [isRTL ? "ml" : "mr"]: 1 }} />
                       {t("nav.profile")}
                     </MenuItem>
 
                     {isAdmin && (
                       <MenuItem onClick={() => handleNavigation("/admin")}>
-                        <Dashboard sx={{ mr: 1 }} />
+                        <Dashboard sx={{ [isRTL ? "ml" : "mr"]: 1 }} />
                         {t("nav.admin")}
                       </MenuItem>
                     )}
 
                     <MenuItem onClick={handleLogout}>
-                      <Logout sx={{ mr: 1 }} />
+                      <Logout sx={{ [isRTL ? "ml" : "mr"]: 1 }} />
                       {t("nav.logout")}
                     </MenuItem>
                   </Menu>

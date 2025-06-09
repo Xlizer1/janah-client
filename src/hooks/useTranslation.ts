@@ -9,12 +9,60 @@ export const useTranslation = () => {
     setMounted(true);
   }, []);
 
-  const changeLanguage = (language: "en" | "ar") => {
+  const changeLanguage = async (language: "en" | "ar") => {
     if (typeof window === "undefined") return;
 
-    i18n.changeLanguage(language);
-    document.dir = language === "ar" ? "rtl" : "ltr";
-    document.documentElement.lang = language;
+    try {
+      // Change i18n language
+      await i18n.changeLanguage(language);
+
+      // Update document direction and lang
+      const isRTL = language === "ar";
+      document.dir = isRTL ? "rtl" : "ltr";
+      document.documentElement.dir = isRTL ? "rtl" : "ltr";
+      document.documentElement.lang = language;
+
+      // Update CSS custom properties for RTL-aware styling
+      document.documentElement.style.setProperty(
+        "--text-align-start",
+        isRTL ? "right" : "left"
+      );
+      document.documentElement.style.setProperty(
+        "--text-align-end",
+        isRTL ? "left" : "right"
+      );
+      document.documentElement.style.setProperty(
+        "--margin-start",
+        isRTL ? "margin-right" : "margin-left"
+      );
+      document.documentElement.style.setProperty(
+        "--margin-end",
+        isRTL ? "margin-left" : "margin-right"
+      );
+      document.documentElement.style.setProperty(
+        "--padding-start",
+        isRTL ? "padding-right" : "padding-left"
+      );
+      document.documentElement.style.setProperty(
+        "--padding-end",
+        isRTL ? "padding-left" : "padding-right"
+      );
+
+      // Force theme re-evaluation by triggering a storage event
+      localStorage.setItem("i18nextLng", language);
+      window.dispatchEvent(
+        new StorageEvent("storage", {
+          key: "i18nextLng",
+          newValue: language,
+        })
+      );
+
+      // Trigger page refresh to ensure all components update
+      // This is optional but ensures complete RTL switching
+      // window.location.reload();
+    } catch (error) {
+      console.error("Error changing language:", error);
+    }
   };
 
   // Return safe defaults during SSR
@@ -26,6 +74,6 @@ export const useTranslation = () => {
     changeLanguage,
     currentLanguage,
     isRTL,
-    mounted, // Expose mounted state for components that need it
+    mounted,
   };
 };
