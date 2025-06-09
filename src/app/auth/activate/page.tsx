@@ -24,17 +24,6 @@ import Link from "next/link";
 import { authService } from "@/services/auth.service";
 import { useTranslation } from "@/hooks/useTranslation";
 
-const activationSchema = yup.object({
-  phone_number: yup
-    .string()
-    .required("Phone number is required")
-    .matches(/^\+?[1-9]\d{1,14}$/, "Please enter a valid phone number"),
-  activation_code: yup
-    .string()
-    .required("Activation code is required")
-    .min(8, "Activation code must be at least 8 characters"),
-});
-
 interface ActivationFormData {
   phone_number: string;
   activation_code: string;
@@ -46,6 +35,17 @@ function ActivatePageContent() {
   const searchParams = useSearchParams();
   const phoneFromUrl = searchParams.get("phone") || "";
   const [isSuccess, setIsSuccess] = useState(false);
+
+  const activationSchema = yup.object({
+    phone_number: yup
+      .string()
+      .required(t("validation.required"))
+      .matches(/^\+?[1-9]\d{1,14}$/, t("validation.phone.invalid")),
+    activation_code: yup
+      .string()
+      .required(t("validation.required"))
+      .min(8, t("auth.activation.codeMinLength")),
+  });
 
   const {
     register,
@@ -71,29 +71,29 @@ function ActivatePageContent() {
     mutationFn: authService.activateAccount,
     onSuccess: (data) => {
       setIsSuccess(true);
-      toast.success("Account activated successfully!");
+      toast.success(t("auth.activation.success"));
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message || "Activation failed";
+      const message =
+        error.response?.data?.message || t("auth.activation.failed");
 
       if (
         message.includes("Invalid or expired") ||
         message.includes("not found")
       ) {
         setError("activation_code", {
-          message: "Invalid or expired activation code",
+          message: t("auth.activation.codeInvalid"),
         });
       } else if (message.includes("already used")) {
         setError("activation_code", {
-          message: "This activation code has already been used",
+          message: t("auth.activation.codeUsed"),
         });
       } else if (message.includes("User not found")) {
         setError("phone_number", {
-          message: "No account found with this phone number",
+          message: t("auth.activation.userNotFound"),
         });
       } else if (message.includes("already activated")) {
-        // User is already activated, redirect to login
-        toast.info("Account is already activated. You can now login.");
+        toast.info(t("auth.activation.alreadyActivated"));
         router.push("/auth/login");
         return;
       } else {
@@ -138,7 +138,7 @@ function ActivatePageContent() {
               color: "success.main",
             }}
           >
-            Account Activated!
+            {t("auth.activation.complete")}
           </Typography>
 
           <Typography
@@ -146,8 +146,7 @@ function ActivatePageContent() {
             color="text.secondary"
             sx={{ mb: 4, lineHeight: 1.6 }}
           >
-            Welcome to Janah! Your account has been successfully activated. You
-            now have full access to our store.
+            {t("auth.activation.welcome")}
           </Typography>
 
           <Button
@@ -163,7 +162,7 @@ function ActivatePageContent() {
               borderRadius: 2,
             }}
           >
-            Continue to Login
+            {t("auth.continueToLogin")}
           </Button>
         </Paper>
       </Container>
@@ -187,7 +186,7 @@ function ActivatePageContent() {
               startIcon={<ArrowBack />}
               sx={{ textTransform: "none", color: "text.secondary" }}
             >
-              Back to Login
+              {t("auth.backToLogin")}
             </Button>
           </Link>
         </Box>
@@ -213,24 +212,23 @@ function ActivatePageContent() {
               WebkitTextFillColor: "transparent",
             }}
           >
-            Activate Your Account
+            {t("auth.activation.title")}
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-            Enter your phone number and activation code to unlock full access to
-            Janah
+            {t("auth.activation.subtitle")}
           </Typography>
         </Box>
 
         {/* Activation Info */}
         <Alert severity="info" sx={{ mb: 4 }}>
           <Typography variant="body2">
-            <strong>How to get an activation code:</strong>
+            <strong>{t("auth.activation.howToGet")}</strong>
             <br />
-            📞 Call: <strong>+964 773 300 2076</strong>
+            📞 {t("auth.activation.call")}: <strong>+964 773 300 2076</strong>
             <br />
-            ✉️ Email: <strong>support@janah.com</strong>
+            ✉️ {t("auth.activation.email")}: <strong>support@janah.com</strong>
             <br />
-            Purchase an activation code to unlock full shopping access.
+            {t("auth.activation.purchase")}
           </Typography>
         </Alert>
 
@@ -239,13 +237,12 @@ function ActivatePageContent() {
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
             <TextField
               fullWidth
-              label="Phone Number"
+              label={t("auth.phone")}
               placeholder="+964 773 300 2076"
               {...register("phone_number")}
               error={!!errors.phone_number}
               helperText={
-                errors.phone_number?.message ||
-                "Enter the phone number you registered with"
+                errors.phone_number?.message || t("auth.activation.phoneHelper")
               }
               InputProps={{
                 startAdornment: (
@@ -253,7 +250,7 @@ function ActivatePageContent() {
                     <Phone color="action" />
                   </InputAdornment>
                 ),
-                readOnly: !!phoneFromUrl, // Make readonly if phone came from URL
+                readOnly: !!phoneFromUrl,
               }}
               sx={{
                 "& .MuiInputBase-input": {
@@ -264,13 +261,13 @@ function ActivatePageContent() {
 
             <TextField
               fullWidth
-              label="Activation Code"
-              placeholder="Enter your activation code"
+              label={t("auth.activation.code")}
+              placeholder={t("auth.activation.codePlaceholder")}
               {...register("activation_code")}
               error={!!errors.activation_code}
               helperText={
                 errors.activation_code?.message ||
-                "Example: JANAH-2024-ABC123 or PREMIUM-XYZ789"
+                t("auth.activation.codeExample")
               }
               InputProps={{
                 startAdornment: (
@@ -313,10 +310,10 @@ function ActivatePageContent() {
               {activationMutation.isPending ? (
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <CircularProgress size={20} color="inherit" />
-                  Activating...
+                  {t("auth.activation.activating")}
                 </Box>
               ) : (
-                "Activate Account"
+                t("auth.activation.activate")
               )}
             </Button>
           </Box>
@@ -325,17 +322,16 @@ function ActivatePageContent() {
         {/* Help */}
         <Alert severity="warning" sx={{ mt: 3 }}>
           <Typography variant="body2">
-            <strong>Don't have an activation code?</strong>
+            <strong>{t("auth.activation.needCode")}</strong>
             <br />
-            Contact our sales team to purchase an activation code and start
-            shopping today!
+            {t("auth.activation.contact")}
           </Typography>
         </Alert>
 
         {/* Already have account */}
         <Box sx={{ textAlign: "center", mt: 3 }}>
           <Typography variant="body2" color="text.secondary">
-            Account already activated?{" "}
+            {t("auth.activation.alreadyActivated")}?{" "}
             <Link href="/auth/login">
               <Typography
                 component="span"
@@ -346,7 +342,7 @@ function ActivatePageContent() {
                   "&:hover": { textDecoration: "underline" },
                 }}
               >
-                Login here
+                {t("auth.activation.loginHere")}
               </Typography>
             </Link>
           </Typography>

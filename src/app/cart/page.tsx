@@ -83,9 +83,8 @@ export default function CartPage() {
   };
 
   const handleCheckout = () => {
-    // Validate that all items have selling prices
     if (!validateSellingPrices()) {
-      alert("Please enter selling prices for all items before checkout.");
+      alert(t("cart.sellingPrice.required"));
       return;
     }
 
@@ -106,21 +105,21 @@ export default function CartPage() {
         >
           <Link href="/">
             <Typography color="text.secondary" sx={{ cursor: "pointer" }}>
-              Products
+              {t("nav.products")}
             </Typography>
           </Link>
-          <Typography color="primary.main">Cart</Typography>
+          <Typography color="primary.main">{t("cart.title")}</Typography>
         </Breadcrumbs>
 
         {/* Page Header */}
         <Box sx={{ mb: 4 }}>
           <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-            Shopping Cart
+            {t("cart.title")}
           </Typography>
           <Typography variant="body1" color="text.secondary">
             {totalItems > 0
-              ? `${totalItems} items in cart`
-              : "Your cart is empty"}
+              ? t("cart.itemsInCart", { count: totalItems })
+              : t("cart.empty")}
           </Typography>
         </Box>
 
@@ -135,14 +134,14 @@ export default function CartPage() {
               }}
             />
             <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
-              Your cart is empty
+              {t("cart.empty")}
             </Typography>
             <Typography
               variant="body1"
               color="text.secondary"
               sx={{ mb: 4, maxWidth: 400, mx: "auto" }}
             >
-              Add some products to get started with your wholesale order
+              {t("cart.emptySubtitle")}
             </Typography>
             <Button
               variant="contained"
@@ -150,7 +149,7 @@ export default function CartPage() {
               onClick={() => router.push("/products")}
               sx={{ px: 4 }}
             >
-              Continue Shopping
+              {t("cart.continueShopping")}
             </Button>
           </Box>
         ) : (
@@ -170,7 +169,7 @@ export default function CartPage() {
                   }}
                 >
                   <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                    Cart Items ({totalItems})
+                    {t("cart.cartItems")} ({totalItems})
                   </Typography>
                   <Button
                     variant="text"
@@ -178,16 +177,15 @@ export default function CartPage() {
                     onClick={clearCart}
                     sx={{ textTransform: "none" }}
                   >
-                    Clear Cart
+                    {t("cart.clearCart")}
                   </Button>
                 </Box>
 
                 {/* Info Alert */}
                 <Alert severity="info" sx={{ m: 3, mb: 0 }}>
                   <Typography variant="body2">
-                    <strong>Wholesale Pricing:</strong> Please enter the price
-                    you plan to sell each item at. This helps us understand your
-                    business model and provide better support.
+                    <strong>{t("wholesale.pricing")}:</strong>{" "}
+                    {t("wholesale.pricing.help")}
                   </Typography>
                 </Alert>
 
@@ -227,7 +225,7 @@ export default function CartPage() {
                             />
                           ) : (
                             <Typography variant="body2" color="text.secondary">
-                              No Image
+                              {t("products.noImageAvailable")}
                             </Typography>
                           )}
                         </Box>
@@ -262,7 +260,8 @@ export default function CartPage() {
                               color="text.secondary"
                               sx={{ mb: 1 }}
                             >
-                              Category: {item.product.category_name}
+                              {t("common.category")}:{" "}
+                              {item.product.category_name}
                             </Typography>
                           )}
 
@@ -271,7 +270,8 @@ export default function CartPage() {
                             color="primary.main"
                             sx={{ fontWeight: 700, mb: 2 }}
                           >
-                            Purchase Price: {formatPrice(item.product.price)}
+                            {t("cart.purchasePrice")}:{" "}
+                            {formatPrice(item.product.price)}
                           </Typography>
 
                           {/* Quantity Controls */}
@@ -348,7 +348,8 @@ export default function CartPage() {
                             </Box>
 
                             <Typography variant="body2" color="text.secondary">
-                              Purchase Total: {formatPrice(item.subtotal)}
+                              {t("cart.purchaseTotal")}:{" "}
+                              {formatPrice(item.subtotal)}
                             </Typography>
                           </Box>
 
@@ -356,7 +357,7 @@ export default function CartPage() {
                           <Box sx={{ maxWidth: 300 }}>
                             <FormControl fullWidth size="small">
                               <TextField
-                                label="Your Selling Price"
+                                label={t("wholesale.sellingPrice")}
                                 type="number"
                                 value={item.selling_price || ""}
                                 onChange={(e) =>
@@ -368,7 +369,7 @@ export default function CartPage() {
                                 InputProps={{
                                   startAdornment: (
                                     <InputAdornment position="start">
-                                      IQD
+                                      {t("units.iqd")}
                                     </InputAdornment>
                                   ),
                                   endAdornment: (
@@ -377,15 +378,19 @@ export default function CartPage() {
                                     </InputAdornment>
                                   ),
                                 }}
-                                placeholder="Enter selling price"
+                                placeholder={t(
+                                  "wholesale.sellingPrice.placeholder"
+                                )}
                                 helperText={
                                   item.selling_price &&
                                   item.selling_price > item.product.price
-                                    ? `Profit margin: ${calculateProfitMargin(
-                                        item.product.price,
-                                        item.selling_price
-                                      )}%`
-                                    : "Enter the price you'll sell this item for"
+                                    ? t("wholesale.profitMargin", {
+                                        margin: calculateProfitMargin(
+                                          item.product.price,
+                                          item.selling_price
+                                        ),
+                                      })
+                                    : t("wholesale.sellingPrice.help")
                                 }
                                 sx={{ mt: 1 }}
                               />
@@ -418,7 +423,7 @@ export default function CartPage() {
                   }
                   onClick={() => router.push("/products")}
                 >
-                  Continue Shopping
+                  {t("cart.continueShopping")}
                 </Button>
               </Box>
             </Grid>
@@ -429,7 +434,7 @@ export default function CartPage() {
                 {/* Summary Card */}
                 <Paper sx={{ p: 3, mb: 3, borderRadius: 2 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-                    Order Summary
+                    {t("cart.orderSummary")}
                   </Typography>
 
                   <Box
@@ -440,7 +445,8 @@ export default function CartPage() {
                     }}
                   >
                     <Typography>
-                      Purchase Total ({totalItems} items):
+                      {t("cart.purchaseTotal")} ({totalItems} {t("cart.items")}
+                      ):
                     </Typography>
                     <Typography>{formatPrice(totalPrice)}</Typography>
                   </Box>
@@ -452,8 +458,10 @@ export default function CartPage() {
                       mb: 1,
                     }}
                   >
-                    <Typography>Shipping:</Typography>
-                    <Typography color="success.main">Free</Typography>
+                    <Typography>{t("common.shipping")}:</Typography>
+                    <Typography color="success.main">
+                      {t("common.free")}
+                    </Typography>
                   </Box>
 
                   <Divider sx={{ my: 2 }} />
@@ -466,7 +474,7 @@ export default function CartPage() {
                     }}
                   >
                     <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                      Total to Pay:
+                      {t("cart.totalToPay")}:
                     </Typography>
                     <Typography
                       variant="h6"
@@ -481,8 +489,7 @@ export default function CartPage() {
                   {!validateSellingPrices() && (
                     <Alert severity="warning" sx={{ mb: 2 }}>
                       <Typography variant="body2">
-                        Please enter selling prices for all items to proceed
-                        with checkout.
+                        {t("cart.sellingPrice.validation")}
                       </Typography>
                     </Alert>
                   )}
@@ -502,8 +509,8 @@ export default function CartPage() {
                     }}
                   >
                     {isAuthenticated
-                      ? "Proceed to Checkout"
-                      : "Sign In to Checkout"}
+                      ? t("cart.proceedToCheckout")
+                      : t("cart.signInToCheckout")}
                   </Button>
                 </Paper>
 
@@ -514,7 +521,7 @@ export default function CartPage() {
                       variant="subtitle1"
                       sx={{ fontWeight: 600, mb: 2 }}
                     >
-                      Wholesale Benefits
+                      {t("cart.benefits.title")}
                     </Typography>
 
                     <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
@@ -524,10 +531,10 @@ export default function CartPage() {
                       />
                       <Box>
                         <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          Free Delivery
+                          {t("cart.freeDelivery")}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          On all wholesale orders
+                          {t("cart.freeDelivery.subtitle")}
                         </Typography>
                       </Box>
                     </Box>
@@ -539,10 +546,10 @@ export default function CartPage() {
                       />
                       <Box>
                         <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          Profit Tracking
+                          {t("wholesale.tracking")}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          Monitor your margins
+                          {t("wholesale.tracking.subtitle")}
                         </Typography>
                       </Box>
                     </Box>
@@ -551,10 +558,10 @@ export default function CartPage() {
                       <Security color="primary" sx={{ mr: 2, fontSize: 20 }} />
                       <Box>
                         <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          Business Support
+                          {t("wholesale.business.support")}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          Dedicated account manager
+                          {t("wholesale.business.support.subtitle")}
                         </Typography>
                       </Box>
                     </Box>

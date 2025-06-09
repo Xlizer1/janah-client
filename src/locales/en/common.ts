@@ -1211,6 +1211,114 @@ const enTranslations = {
   // Admin Brand and Navigation
   "admin.brandName": "Janah Admin",
   "admin.activationCodes": "Activation Codes",
+  "cart.purchasePrice": "Purchase Price",
+  "cart.purchaseTotal": "Purchase Total",
+  "cart.totalToPay": "Total to Pay",
+  "cart.emptySubtitle.wholesale":
+    "Add some products to get started with your wholesale order",
+  "cart.freeDelivery.wholesale": "On all wholesale orders",
+  "cart.signInToCheckout": "Sign In to Checkout",
+
+  // Checkout keys
+  "checkout.backToCart": "Back to Cart",
+  "checkout.reviewOrder": "Review Your Order",
+  "checkout.sellingPriceWarning":
+    "Please go back to your cart and enter selling prices for all items before proceeding with checkout.",
+  "checkout.deliveringTo": "Delivering to:",
+  "checkout.deliveryAddress.required": "Delivery Address *",
+  "checkout.deliveryAddress.placeholder":
+    "Enter your complete delivery address...",
+  "checkout.deliveryNotes.optional": "Delivery Notes (Optional)",
+  "checkout.deliveryNotes.placeholder":
+    "Any special instructions for delivery...",
+  "checkout.addressInfo":
+    "Please provide a detailed address including street name, building number, and any landmarks.",
+  "checkout.continueToDelivery": "Continue to Delivery",
+  "checkout.continueToPayment": "Continue to Payment",
+  "checkout.selectPaymentMethod": "Select Payment Method",
+  "checkout.cashOnDelivery.subtitle": "Pay when your order is delivered",
+  "checkout.cashOnDelivery.info":
+    "You'll pay in cash when the driver delivers your order. Please have the exact amount ready.",
+  "checkout.orderConfirmation": "Order Confirmation",
+  "checkout.deliveryInformation": "Delivery Information",
+  "checkout.reviewWarning":
+    "Please review your order carefully. Once placed, changes may not be possible.",
+
+  // Product detail keys
+  "products.notFound": "Product not found",
+  "products.notFound.subtitle":
+    "The product you're looking for doesn't exist or has been removed.",
+  "products.noImages": "No Images Available",
+  "products.imageCounter": "{{current}} of {{total}}",
+  "products.zoom": "Zoom",
+  "products.fullSize": "Full size",
+  "products.code": "Product Code",
+  "products.fromReviews": "from reviews",
+  "products.stockRemaining": "Only {{count}} items remaining",
+  "products.stockAvailable": "{{count}} items available",
+  "products.imagesCount": "{{count}} Images",
+  "products.wishlist.add": "Add to Wishlist",
+  "products.wishlist.remove": "Remove from Wishlist",
+  "products.freeShippingInfo": "Free shipping on orders over 50,000 IQD",
+  "products.warrantyInfo": "2-year warranty included",
+  "products.returnInfo": "30-day return policy",
+  "products.noDescription": "No description available for this product.",
+  "products.imageCount":
+    "{{count}} product image{{count, plural, one {} other {s}}}",
+  "products.reviewsPlaceholder": "Customer reviews will be displayed here.",
+  "products.shippingPlaceholder":
+    "Shipping information and delivery options will be displayed here.",
+  "products.loadError": "Failed to load products. Please try again.",
+
+  // Profile keys
+  "profile.information": "Profile Information",
+  "profile.phoneVerified": "Phone Verified",
+  "profile.phoneNotVerified": "Phone Not Verified",
+  "profile.accountActive": "Account Active",
+  "profile.administrator": "Administrator",
+  "profile.pendingWarning":
+    "Your account is pending admin approval. Some features may be limited until your account is activated.",
+  "profile.notProvided": "Not provided",
+  "profile.startShopping": "Start Shopping",
+  "profile.changePassword.subtitle": "Update your account password",
+  "profile.twoFactor.subtitle": "Add an extra layer of security",
+  "profile.emailNotifications.subtitle": "Manage your notification preferences",
+  "profile.changingPassword": "Changing...",
+
+  // Search keys
+  "search.noQuery": "No search query provided",
+  "search.noQuery.subtitle":
+    "Please enter a search term to find products and categories.",
+  "search.error": "Failed to search. Please try again.",
+  "search.productsFound": "products found",
+  "search.relevance": "Relevance",
+  "search.noProducts": "No products found",
+  "search.noProducts.help":
+    "Try searching for different keywords or check the categories tab.",
+  "search.noCategories": "No categories found",
+  "search.noCategories.help":
+    "Try searching for different keywords or check the products tab.",
+
+  // Category keys
+  "categories.notFound": "Category not found",
+  "categories.notFound.subtitle":
+    "The category you're looking for doesn't exist or has been removed.",
+  "categories.browse": "Browse Categories",
+  "categories.available": "Categories Available",
+  "categories.browseOther": "Browse Other Categories",
+  "categories.exploreMore": "Explore More Categories",
+  "categories.browseAll": "Browse all categories",
+  "categories.showingResults": "Showing {{count}} results",
+  "categories.totalProducts": "Total Products",
+
+  // Common UI strings
+  "common.items": "items",
+  "common.products": "products",
+  "common.saveChanges": "Save Changes",
+  "common.saving": "Saving...",
+
+  // Wholesale specific
+  "wholesale.benefits.title": "Wholesale Benefits",
 };
 
 export default enTranslations;

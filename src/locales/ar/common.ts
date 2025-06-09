@@ -1195,6 +1195,109 @@ const arTranslations = {
   // العلامة التجارية للمشرف والتنقل
   "admin.brandName": "جناح المشرف",
   "admin.activationCodes": "رموز التفعيل",
+
+  "cart.purchasePrice": "سعر الشراء",
+  "cart.purchaseTotal": "إجمالي الشراء",
+  "cart.totalToPay": "المجموع المطلوب دفعه",
+  "cart.emptySubtitle.wholesale": "أضف بعض المنتجات لبدء طلب الجملة الخاص بك",
+  "cart.freeDelivery.wholesale": "على جميع طلبات الجملة",
+  "cart.signInToCheckout": "سجل الدخول للدفع",
+
+  // Checkout keys
+  "checkout.backToCart": "العودة للسلة",
+  "checkout.reviewOrder": "مراجعة طلبك",
+  "checkout.sellingPriceWarning":
+    "يرجى العودة إلى سلتك وإدخال أسعار البيع لجميع العناصر قبل المتابعة للدفع.",
+  "checkout.deliveringTo": "التوصيل إلى:",
+  "checkout.deliveryAddress.required": "عنوان التوصيل *",
+  "checkout.deliveryAddress.placeholder": "أدخل عنوان التوصيل الكامل...",
+  "checkout.deliveryNotes.optional": "ملاحظات التوصيل (اختيارية)",
+  "checkout.deliveryNotes.placeholder": "أي تعليمات خاصة للتوصيل...",
+  "checkout.addressInfo":
+    "يرجى تقديم عنوان مفصل يتضمن اسم الشارع ورقم المبنى وأي معالم.",
+  "checkout.continueToDelivery": "المتابعة للتوصيل",
+  "checkout.continueToPayment": "المتابعة للدفع",
+  "checkout.selectPaymentMethod": "اختر طريقة الدفع",
+  "checkout.cashOnDelivery.subtitle": "ادفع عند توصيل طلبك",
+  "checkout.cashOnDelivery.info":
+    "ستدفع نقداً عندما يسلم السائق طلبك. يرجى تجهيز المبلغ المطلوب.",
+  "checkout.orderConfirmation": "تأكيد الطلب",
+  "checkout.deliveryInformation": "معلومات التوصيل",
+  "checkout.reviewWarning":
+    "يرجى مراجعة طلبك بعناية. بمجرد الإرسال، قد لا تكون التغييرات ممكنة.",
+
+  // Product detail keys
+  "products.notFound": "المنتج غير موجود",
+  "products.notFound.subtitle": "المنتج الذي تبحث عنه غير موجود أو تم حذفه.",
+  "products.noImages": "لا توجد صور متاحة",
+  "products.imageCounter": "{{current}} من {{total}}",
+  "products.zoom": "تكبير",
+  "products.fullSize": "الحجم الكامل",
+  "products.code": "رمز المنتج",
+  "products.fromReviews": "من المراجعات",
+  "products.stockRemaining": "{{count}} عناصر متبقية فقط",
+  "products.stockAvailable": "{{count}} عنصر متاح",
+  "products.imagesCount": "{{count}} صورة",
+  "products.wishlist.add": "أضف للمفضلة",
+  "products.wishlist.remove": "إزالة من المفضلة",
+  "products.freeShippingInfo": "شحن مجاني للطلبات أكثر من 50,000 دينار عراقي",
+  "products.warrantyInfo": "ضمان لمدة عامين مُتضمّن",
+  "products.returnInfo": "سياسة إرجاع لمدة 30 يوماً",
+  "products.noDescription": "لا يوجد وصف متاح لهذا المنتج.",
+  "products.imageCount": "{{count}} صورة منتج",
+  "products.reviewsPlaceholder": "ستظهر مراجعات العملاء هنا.",
+  "products.shippingPlaceholder": "ستظهر معلومات الشحن وخيارات التوصيل هنا.",
+  "products.loadError": "فشل في تحميل المنتجات. يرجى المحاولة مرة أخرى.",
+
+  // Profile keys
+  "profile.information": "معلومات الملف الشخصي",
+  "profile.phoneVerified": "هاتف محقق",
+  "profile.phoneNotVerified": "هاتف غير محقق",
+  "profile.accountActive": "حساب نشط",
+  "profile.administrator": "مشرف",
+  "profile.pendingWarning":
+    "حسابك في انتظار موافقة المشرف. قد تكون بعض الميزات محدودة حتى يتم تفعيل حسابك.",
+  "profile.notProvided": "غير مقدم",
+  "profile.startShopping": "ابدأ التسوق",
+  "profile.changePassword.subtitle": "حدث كلمة مرور حسابك",
+  "profile.twoFactor.subtitle": "أضف طبقة أمان إضافية",
+  "profile.emailNotifications.subtitle": "إدارة تفضيلات الإشعارات",
+  "profile.changingPassword": "جاري التغيير...",
+
+  // Search keys
+  "search.noQuery": "لم يتم تقديم استعلام بحث",
+  "search.noQuery.subtitle":
+    "يرجى إدخال مصطلح بحث للعثور على المنتجات والفئات.",
+  "search.error": "فشل البحث. يرجى المحاولة مرة أخرى.",
+  "search.productsFound": "منتجات موجودة",
+  "search.relevance": "الصلة",
+  "search.noProducts": "لم يتم العثور على منتجات",
+  "search.noProducts.help":
+    "جرب البحث عن كلمات مفتاحية مختلفة أو تحقق من تبويب الفئات.",
+  "search.noCategories": "لم يتم العثور على فئات",
+  "search.noCategories.help":
+    "جرب البحث عن كلمات مفتاحية مختلفة أو تحقق من تبويب المنتجات.",
+
+  // Category keys
+  "categories.notFound": "الفئة غير موجودة",
+  "categories.notFound.subtitle":
+    "الفئة التي تبحث عنها غير موجودة أو تم حذفها.",
+  "categories.browse": "تصفح الفئات",
+  "categories.available": "الفئات المتاحة",
+  "categories.browseOther": "تصفح فئات أخرى",
+  "categories.exploreMore": "استكشف المزيد من الفئات",
+  "categories.browseAll": "تصفح جميع الفئات",
+  "categories.showingResults": "عرض {{count}} نتيجة",
+  "categories.totalProducts": "إجمالي المنتجات",
+
+  // Common UI strings
+  "common.items": "عناصر",
+  "common.products": "منتجات",
+  "common.saveChanges": "حفظ التغييرات",
+  "common.saving": "جاري الحفظ...",
+
+  // Wholesale specific
+  "wholesale.benefits.title": "فوائد البيع بالجملة",
 };
 
 export default arTranslations;
