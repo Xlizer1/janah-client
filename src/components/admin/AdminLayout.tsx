@@ -127,7 +127,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       href: "/admin/import-export",
     },
     {
-      text: "Activation Codes",
+      text: t("admin.activationCodes"),
       href: "/admin/activation-codes",
       icon: VpnKey,
     },
@@ -172,6 +172,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           case "pending":
             label = t("admin.users.pending.title");
             break;
+          case "activation-codes":
+            label = t("admin.activationCodes");
+            break;
           default:
             // Keep the default capitalized label for dynamic routes
             break;
@@ -194,7 +197,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           variant="h5"
           sx={{ fontWeight: 700, color: "primary.main" }}
         >
-          Janah Admin
+          {t("admin.brandName")}
         </Typography>
       </Box>
 
@@ -268,6 +271,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           color: "text.primary",
           boxShadow: 1,
         }}
+        elevation={0}
       >
         <Toolbar>
           <IconButton

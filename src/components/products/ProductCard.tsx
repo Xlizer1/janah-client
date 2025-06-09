@@ -116,7 +116,9 @@ export function ProductCard({
                   color: "text.secondary",
                 }}
               >
-                <Typography variant="body2">No Image</Typography>
+                <Typography variant="body2">
+                  {t("admin.products.noImage")}
+                </Typography>
               </Box>
             )}
           </CardMedia>
@@ -158,7 +160,7 @@ export function ProductCard({
           >
             {product.is_featured && (
               <Chip
-                label="Featured"
+                label={t("products.featured")}
                 size="small"
                 sx={{
                   bgcolor: "#fbbf24",
@@ -171,7 +173,7 @@ export function ProductCard({
 
             {isOutOfStock && (
               <Chip
-                label="Out of Stock"
+                label={t("products.outOfStock")}
                 size="small"
                 color="error"
                 sx={{ fontWeight: 600, fontSize: "0.75rem" }}
@@ -180,7 +182,7 @@ export function ProductCard({
 
             {isLowStock && !isOutOfStock && (
               <Chip
-                label="Low Stock"
+                label={t("products.lowStock")}
                 size="small"
                 sx={{
                   bgcolor: "#f59e0b",
@@ -242,7 +244,7 @@ export function ProductCard({
                   textTransform: "none",
                 }}
               >
-                Add to Cart
+                {t("products.addToCart")}
               </Button>
 
               <IconButton
@@ -315,7 +317,7 @@ export function ProductCard({
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
             <Rating value={4.5} size="small" readOnly precision={0.5} />
             <Typography variant="caption" color="text.secondary">
-              (124)
+              ({t("productCard.reviewsCount", "124")})
             </Typography>
           </Box>
 
@@ -357,8 +359,11 @@ export function ProductCard({
 
               <Typography variant="caption" color="text.secondary">
                 {product.stock_quantity > 0
-                  ? `${product.stock_quantity} in stock`
-                  : "Out of stock"}
+                  ? t("productCard.stockCount", {
+                      count: product.stock_quantity,
+                      defaultValue: `${product.stock_quantity} in stock`,
+                    })
+                  : t("products.outOfStock")}
               </Typography>
             </Box>
 
@@ -376,7 +381,9 @@ export function ProductCard({
                 textTransform: "none",
               }}
             >
-              {isOutOfStock ? "Out of Stock" : "Add to Cart"}
+              {isOutOfStock
+                ? t("products.outOfStock")
+                : t("products.addToCart")}
             </Button>
           </Box>
         </CardContent>

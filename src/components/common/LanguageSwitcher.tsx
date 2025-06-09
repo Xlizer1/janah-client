@@ -4,7 +4,7 @@ import { Language, Check } from "@mui/icons-material";
 import { useTranslation } from "@/hooks/useTranslation";
 
 export function LanguageSwitcher() {
-  const { changeLanguage, currentLanguage } = useTranslation();
+  const { changeLanguage, currentLanguage, t } = useTranslation();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -21,8 +21,16 @@ export function LanguageSwitcher() {
   };
 
   const languages = [
-    { code: "en", name: "English", nativeName: "English" },
-    { code: "ar", name: "Arabic", nativeName: "العربية" },
+    {
+      code: "en",
+      name: t("language.english", "English"),
+      nativeName: "English",
+    },
+    {
+      code: "ar",
+      name: t("language.arabic", "Arabic"),
+      nativeName: "العربية",
+    },
   ];
 
   return (

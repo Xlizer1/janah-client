@@ -102,7 +102,7 @@ export function ProductFilters({
               setPriceRange([0, 1000]);
             }}
           >
-            Clear All Filters
+            {t("products.filters.clearAll")}
           </Button>
         </Box>
       )}
@@ -113,7 +113,7 @@ export function ProductFilters({
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <CategoryIcon fontSize="small" />
             <Typography variant="subtitle1" fontWeight={600}>
-              Categories
+              {t("nav.categories")}
             </Typography>
           </Box>
         </AccordionSummary>
@@ -124,7 +124,7 @@ export function ProductFilters({
                 selected={!filters.category_id}
                 onClick={() => handleCategoryChange(undefined)}
               >
-                <ListItemText primary="All Categories" />
+                <ListItemText primary={t("products.allCategories")} />
               </ListItemButton>
             </ListItem>
             {categories.map((category) => (
@@ -137,7 +137,9 @@ export function ProductFilters({
                     primary={category.name}
                     secondary={
                       category.product_count
-                        ? `${category.product_count} products`
+                        ? t("categories.productsCount", {
+                            count: category.product_count,
+                          })
                         : undefined
                     }
                   />
@@ -154,7 +156,7 @@ export function ProductFilters({
       <Accordion defaultExpanded>
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Typography variant="subtitle1" fontWeight={600}>
-            Price Range
+            {t("products.priceRange")}
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
@@ -167,14 +169,14 @@ export function ProductFilters({
               min={0}
               max={1000}
               step={10}
-              valueLabelFormat={(value) => `$${value}`}
+              valueLabelFormat={(value) => `${value} IQD`}
               sx={{ mb: 2 }}
             />
 
             <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
               <TextField
                 size="small"
-                label="Min"
+                label={t("products.filters.minPrice")}
                 type="number"
                 value={priceRange[0]}
                 onChange={(e) => {
@@ -188,7 +190,7 @@ export function ProductFilters({
               />
               <TextField
                 size="small"
-                label="Max"
+                label={t("products.filters.maxPrice")}
                 type="number"
                 value={priceRange[1]}
                 onChange={(e) => {
@@ -208,9 +210,9 @@ export function ProductFilters({
             {(filters.min_price || filters.max_price) && (
               <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                 <Chip
-                  label={`$${filters.min_price || 0} - $${
+                  label={`${filters.min_price || 0} IQD - ${
                     filters.max_price || 1000
-                  }`}
+                  } IQD`}
                   onDelete={clearPriceFilter}
                   size="small"
                   color="primary"
@@ -230,7 +232,7 @@ export function ProductFilters({
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Star fontSize="small" />
             <Typography variant="subtitle1" fontWeight={600}>
-              Product Type
+              {t("products.filters.productType")}
             </Typography>
           </Box>
         </AccordionSummary>
@@ -258,17 +260,17 @@ export function ProductFilters({
               <FormControlLabel
                 value="all"
                 control={<Radio />}
-                label="All Products"
+                label={t("products.filters.allProducts")}
               />
               <FormControlLabel
                 value="featured"
                 control={<Radio />}
-                label="Featured Only"
+                label={t("products.filters.featuredOnly")}
               />
               <FormControlLabel
                 value="regular"
                 control={<Radio />}
-                label="Regular Products"
+                label={t("products.filters.regularProducts")}
               />
             </RadioGroup>
           </FormControl>
@@ -280,7 +282,7 @@ export function ProductFilters({
       {/* Quick Filters */}
       <Box>
         <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
-          Quick Filters
+          {t("products.quickFilters")}
         </Typography>
 
         <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
@@ -293,7 +295,7 @@ export function ProductFilters({
                 }
               />
             }
-            label="Featured Products"
+            label={t("products.featured")}
           />
 
           <FormControlLabel
@@ -308,7 +310,7 @@ export function ProductFilters({
                 }}
               />
             }
-            label="Under 50,000 IQD"
+            label={t("products.filters.under50k")}
           />
 
           <FormControlLabel
@@ -323,7 +325,7 @@ export function ProductFilters({
                 }}
               />
             }
-            label="100,000 IQD - 50,000 IQD"
+            label={t("products.filters.range100to500")}
           />
         </Box>
       </Box>

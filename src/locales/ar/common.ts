@@ -977,6 +977,224 @@ const arTranslations = {
   "auth.success": "تم تسجيل الخروج بنجاح",
   "auth.error": "فشل تسجيل الخروج",
   "auth.welcomeBack": "مرحبا بعودتك",
+  // أضف هذه المفاتيح إلى الترجمات العربية الموجودة
+
+  // تفاصيل المنتجات والمواصفات
+  "products.noImageAvailable": "لا توجد صورة متاحة",
+  "products.warranty": "الضمان",
+  "products.warranty.included": "ضمان لمدة عامين مُتضمّن",
+  "products.returns": "الإرجاع",
+  "products.returns.policy": "سياسة إرجاع لمدة 30 يوماً",
+  "products.shipping.free": "شحن مجاني للطلبات أكثر من 50,000 دينار عراقي",
+  "products.rating": "التقييم",
+  "products.weight.kg": "كغ",
+  "products.dimensions.format": "الطول × العرض × الارتفاع (سم)",
+  "products.images.multiple": "صور متعددة متاحة",
+  "products.images.count": "{{count}} صورة",
+  "products.priceHistory": "تاريخ الأسعار",
+  "products.availability": "التوفر",
+  "products.brandNew": "جديد كلياً",
+  "products.condition": "الحالة",
+
+  // ميزات الجملة والأعمال
+  "wholesale.title": "ميزات البيع بالجملة",
+  "wholesale.pricing": "تسعير الجملة",
+  "wholesale.pricing.help":
+    "يرجى إدخال السعر الذي تخطط لبيع كل عنصر به. هذا يساعدنا على فهم نموذج عملك وتقديم دعم أفضل.",
+  "wholesale.sellingPrice": "سعر البيع الخاص بك",
+  "wholesale.sellingPrice.placeholder": "أدخل سعر البيع",
+  "wholesale.sellingPrice.help": "أدخل السعر الذي ستبيع به هذا العنصر",
+  "wholesale.profitMargin": "هامش الربح: {{margin}}%",
+  "wholesale.profitCalculation": "الربح لكل عنصر: {{profit}}",
+  "wholesale.revenue": "الإيرادات",
+  "wholesale.revenue.potential": "الإيرادات المحتملة: {{revenue}}",
+  "wholesale.revenue.total": "إجمالي الإيرادات: {{revenue}}",
+  "wholesale.profit.estimated": "الربح المقدر: {{profit}}",
+  "wholesale.margin.average": "متوسط الهامش: {{margin}}%",
+  "wholesale.analytics": "تحليلات طلبات الجملة",
+  "wholesale.business.support": "دعم الأعمال",
+  "wholesale.business.support.subtitle": "مدير حساب مخصص",
+  "wholesale.tracking": "تتبع الأرباح",
+  "wholesale.tracking.subtitle": "راقب هوامشك",
+
+  // تحسينات عربة التسوق
+  "cart.sellingPrice.required":
+    "يرجى إدخال أسعار البيع لجميع العناصر قبل إتمام الطلب",
+  "cart.sellingPrice.validation":
+    "يرجى إدخال أسعار البيع لجميع العناصر في عربة التسوق",
+  "cart.wholesale.info":
+    "تسعير الجملة: يرجى إدخال السعر الذي تخطط لبيع كل عنصر به",
+  "cart.items.withSellingPrice": "العناصر مع سعر البيع: {{count}}/{{total}}",
+  "cart.benefits.title": "فوائد البيع بالجملة",
+
+  // رسائل الخطأ والتحقق
+  "validation.required": "هذا الحقل مطلوب",
+  "validation.email.invalid": "يرجى إدخال عنوان بريد إلكتروني صحيح",
+  "validation.phone.invalid": "يرجى إدخال رقم هاتف صحيح",
+  "validation.password.minLength":
+    "يجب أن تكون كلمة المرور {{length}} أحرف على الأقل",
+  "validation.password.mismatch": "كلمات المرور غير متطابقة",
+  "validation.price.positive": "يجب أن يكون السعر أكبر من 0",
+  "validation.quantity.positive": "يجب أن تكون الكمية أكبر من 0",
+  "validation.url.invalid": "يرجى إدخال رابط صحيح",
+
+  // رسائل التحميل والحالة
+  "loading.products": "جاري تحميل المنتجات...",
+  "loading.categories": "جاري تحميل الفئات...",
+  "loading.orders": "جاري تحميل الطلبات...",
+  "loading.users": "جاري تحميل المستخدمين...",
+  "loading.saving": "جاري الحفظ...",
+  "loading.updating": "جاري التحديث...",
+  "loading.deleting": "جاري الحذف...",
+  "loading.uploading": "جاري الرفع...",
+  "loading.processing": "جاري المعالجة...",
+
+  // رسائل النجاح
+  "success.product.created": "تم إنشاء المنتج بنجاح",
+  "success.product.updated": "تم تحديث المنتج بنجاح",
+  "success.product.deleted": "تم حذف المنتج بنجاح",
+  "success.category.created": "تم إنشاء الفئة بنجاح",
+  "success.category.updated": "تم تحديث الفئة بنجاح",
+  "success.category.deleted": "تم حذف الفئة بنجاح",
+  "success.order.placed": "تم إرسال الطلب بنجاح",
+  "success.order.updated": "تم تحديث الطلب بنجاح",
+  "success.profile.updated": "تم تحديث الملف الشخصي بنجاح",
+  "success.password.changed": "تم تغيير كلمة المرور بنجاح",
+
+  // رسائل الخطأ
+  "error.generic": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+  "error.network": "خطأ في الشبكة. يرجى التحقق من اتصالك.",
+  "error.unauthorized": "غير مصرح لك بتنفيذ هذا الإجراء.",
+  "error.forbidden": "تم رفض الوصول.",
+  "error.notFound": "المورد المطلوب غير موجود.",
+  "error.validation": "يرجى التحقق من إدخالك والمحاولة مرة أخرى.",
+  "error.server": "خطأ في الخادم. يرجى المحاولة مرة أخرى لاحقاً.",
+  "error.upload.failed": "فشل الرفع. يرجى المحاولة مرة أخرى.",
+  "error.upload.size": "حجم الملف كبير جداً. الحد الأقصى {{size}} ميجابايت.",
+  "error.upload.type": "نوع ملف غير صحيح. يرجى اختيار {{types}}.",
+
+  // رفع الملفات
+  "upload.dragDrop": "اسحب وأفلت الملفات هنا، أو انقر للاختيار",
+  "upload.selectFiles": "اختر الملفات",
+  "upload.maxSize": "الحد الأقصى لحجم الملف: {{size}} ميجابايت",
+  "upload.supportedFormats": "التنسيقات المدعومة: {{formats}}",
+  "upload.multipleSupported": "اختيار ملفات متعددة مدعوم",
+  "upload.maxFiles": "الحد الأقصى {{count}} ملف",
+  "upload.removeFile": "إزالة الملف",
+  "upload.replaceFile": "استبدال الملف",
+
+  // الإشعارات
+  "notification.welcome": "مرحباً بك في جناح!",
+  "notification.orderConfirmed": "تم تأكيد طلبك",
+  "notification.orderShipped": "تم شحن طلبك",
+  "notification.orderDelivered": "تم تسليم طلبك",
+  "notification.lowStock": "تنبيه مخزون منخفض لـ {{product}}",
+  "notification.newUser": "تسجيل مستخدم جديد: {{name}}",
+
+  // الوقت والتواريخ
+  "time.ago": "منذ {{time}}",
+  "time.justNow": "الآن",
+  "time.minutes": "منذ {{count}} دقيقة",
+  "time.hours": "منذ {{count}} ساعة",
+  "time.days": "منذ {{count}} يوم",
+  "time.weeks": "منذ {{count}} أسبوع",
+  "time.months": "منذ {{count}} شهر",
+
+  // الوحدات والقياسات
+  "units.pieces": "قطعة",
+  "units.items": "عنصر",
+  "units.kg": "كغ",
+  "units.cm": "سم",
+  "units.iqd": "د.ع",
+  "units.percent": "%",
+
+  // معرض الصور
+  "gallery.mainImage": "الصورة الرئيسية",
+  "gallery.viewLarger": "عرض أكبر",
+  "gallery.previousImage": "الصورة السابقة",
+  "gallery.nextImage": "الصورة التالية",
+  "gallery.imageCounter": "{{current}} من {{total}}",
+  "gallery.noImages": "لا توجد صور متاحة",
+
+  // تحسينات البحث
+  "search.noResultsFor": 'لم يتم العثور على نتائج لـ "{{query}}"',
+  "search.showingResults": "عرض {{count}} نتيجة",
+  "search.didYouMean": "هل تقصد: {{suggestion}}؟",
+  "search.searchHistory": "تاريخ البحث",
+  "search.clearHistory": "مسح التاريخ",
+  "search.savedSearches": "عمليات البحث المحفوظة",
+
+  // إدارة الطلبات للمشرف
+  "admin.orders.title": "إدارة الطلبات",
+  "admin.orders.subtitle": "إدارة طلبات العملاء والتتبع",
+  "admin.orders.analytics": "تحليلات الطلبات",
+  "admin.orders.updateStatus": "تحديث حالة الطلب",
+  "admin.orders.statusHistory": "تاريخ الحالة",
+  "admin.orders.customerInfo": "معلومات العميل",
+  "admin.orders.orderTimeline": "المخطط الزمني للطلب",
+  "admin.orders.orderItems": "عناصر الطلب",
+  "admin.orders.wholesaleInfo": "معلومات الجملة",
+
+  // إدارة المخزون
+  "inventory.lowStock": "مخزون منخفض",
+  "inventory.outOfStock": "نفد من المخزون",
+  "inventory.inStock": "متوفر",
+  "inventory.restockAlert": "تنبيه إعادة التخزين",
+  "inventory.stockLevel": "مستوى المخزون",
+  "inventory.reorderPoint": "نقطة إعادة الطلب",
+  "inventory.lastRestocked": "آخر إعادة تخزين",
+
+  // ميزات الأعمال
+  "business.dashboard": "لوحة تحكم الأعمال",
+  "business.analytics": "تحليلات الأعمال",
+  "business.reports": "التقارير",
+  "business.insights": "الرؤى",
+  "business.performance": "الأداء",
+  "business.growth": "النمو",
+
+  // أسماء اللغات
+  "language.english": "الإنجليزية",
+  "language.arabic": "العربية",
+
+  // مصطلحات البحث الشائعة
+  "search.popular.iPhone15": "آيفون 15",
+  "search.popular.macbookAir": "ماك بوك إير",
+  "search.popular.samsungGalaxy": "سامسونغ غالاكسي",
+  "search.popular.airpodsPro": "إيربودز برو",
+  "search.popular.gamingLaptop": "لابتوب ألعاب",
+
+  // بطاقة المنتج
+  "productCard.reviewsCount": "{{count}} مراجعة",
+  "productCard.stockCount": "{{count}} متوفر",
+
+  // إعدادات المشرف - العملات
+  "admin.settings.currencies.usd": "USD - الدولار الأمريكي",
+  "admin.settings.currencies.eur": "EUR - اليورو",
+  "admin.settings.currencies.iqd": "IQD - الدينار العراقي",
+
+  // إعدادات المشرف - المناطق الزمنية
+  "admin.settings.timezones.baghdad": "آسيا/بغداد (GMT+3)",
+  "admin.settings.timezones.utc": "UTC (GMT+0)",
+  "admin.settings.timezones.newYork": "أمريكا/نيويورك (GMT-5)",
+
+  // إعدادات المشرف - افتراضية
+  "admin.settings.defaultSiteName": "جناح للتجارة الإلكترونية",
+  "admin.settings.defaultSiteDescription": "منصة تجارة إلكترونية حديثة",
+
+  // مرشحات المنتجات
+  "products.filters.clearAll": "مسح جميع المرشحات",
+  "products.filters.productType": "نوع المنتج",
+  "products.filters.allProducts": "جميع المنتجات",
+  "products.filters.featuredOnly": "المميزة فقط",
+  "products.filters.regularProducts": "المنتجات العادية",
+  "products.filters.minPrice": "أقل سعر",
+  "products.filters.maxPrice": "أعلى سعر",
+  "products.filters.under50k": "أقل من 50,000 دينار",
+  "products.filters.range100to500": "100,000 - 500,000 دينار",
+
+  // العلامة التجارية للمشرف والتنقل
+  "admin.brandName": "جناح المشرف",
+  "admin.activationCodes": "رموز التفعيل",
 };
 
 export default arTranslations;

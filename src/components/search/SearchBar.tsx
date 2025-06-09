@@ -37,12 +37,13 @@ export function SearchBar() {
     enabled: debouncedQuery.length >= 2,
   });
 
+  // Use translation keys for popular searches
   const popularSearches = [
-    "iPhone 15",
-    "MacBook Air",
-    "Samsung Galaxy",
-    "AirPods Pro",
-    "Gaming Laptop",
+    t("search.popular.iPhone15", "iPhone 15"),
+    t("search.popular.macbookAir", "MacBook Air"),
+    t("search.popular.samsungGalaxy", "Samsung Galaxy"),
+    t("search.popular.airpodsPro", "AirPods Pro"),
+    t("search.popular.gamingLaptop", "Gaming Laptop"),
   ];
 
   const handleSearch = (searchTerm: string) => {
@@ -82,7 +83,7 @@ export function SearchBar() {
       <form onSubmit={handleSubmit}>
         <TextField
           fullWidth
-          placeholder="Search products..."
+          placeholder={t("search.searchProducts")}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setIsFocused(true)}
@@ -133,7 +134,7 @@ export function SearchBar() {
               <>
                 <Box sx={{ p: 2, pb: 1 }}>
                   <Typography variant="subtitle2" color="text.secondary">
-                    Suggestions
+                    {t("search.suggestions")}
                   </Typography>
                 </Box>
                 <List dense>
@@ -184,8 +185,8 @@ export function SearchBar() {
                 >
                   <TrendingUp fontSize="small" />
                   {debouncedQuery.length >= 2
-                    ? "No suggestions found. Try these popular searches:"
-                    : "Popular Searches"}
+                    ? t("search.noSuggestions")
+                    : t("search.popularSearches")}
                 </Typography>
               </Box>
               <List dense>
@@ -215,7 +216,7 @@ export function SearchBar() {
             <Box sx={{ p: 3, textAlign: "center" }}>
               <CircularProgress size={24} />
               <Typography variant="body2" sx={{ mt: 1 }}>
-                Searching...
+                {t("search.searching")}
               </Typography>
             </Box>
           )}

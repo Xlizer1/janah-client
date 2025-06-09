@@ -993,6 +993,224 @@ const enTranslations = {
   "auth.success": "Logged out successfully",
   "auth.error": "Logout failed",
   "auth.welcomeBack": "Welcome back",
+  // Add these keys to your existing English translations
+
+  // Product Details & Specifications
+  "products.noImageAvailable": "No Image Available",
+  "products.warranty": "Warranty",
+  "products.warranty.included": "2-year warranty included",
+  "products.returns": "Returns",
+  "products.returns.policy": "30-day return policy",
+  "products.shipping.free": "Free shipping on orders over 50,000 IQD",
+  "products.rating": "Rating",
+  "products.weight.kg": "kg",
+  "products.dimensions.format": "L × W × H (cm)",
+  "products.images.multiple": "Multiple images available",
+  "products.images.count": "{{count}} images",
+  "products.priceHistory": "Price History",
+  "products.availability": "Availability",
+  "products.brandNew": "Brand New",
+  "products.condition": "Condition",
+
+  // Wholesale & Business Features
+  "wholesale.title": "Wholesale Features",
+  "wholesale.pricing": "Wholesale Pricing",
+  "wholesale.pricing.help":
+    "Please enter the price you plan to sell each item at. This helps us understand your business model and provide better support.",
+  "wholesale.sellingPrice": "Your Selling Price",
+  "wholesale.sellingPrice.placeholder": "Enter selling price",
+  "wholesale.sellingPrice.help": "Enter the price you'll sell this item for",
+  "wholesale.profitMargin": "Profit margin: {{margin}}%",
+  "wholesale.profitCalculation": "Profit per item: {{profit}}",
+  "wholesale.revenue": "Revenue",
+  "wholesale.revenue.potential": "Potential Revenue: {{revenue}}",
+  "wholesale.revenue.total": "Total Revenue: {{revenue}}",
+  "wholesale.profit.estimated": "Estimated Profit: {{profit}}",
+  "wholesale.margin.average": "Average Margin: {{margin}}%",
+  "wholesale.analytics": "Wholesale Order Analytics",
+  "wholesale.business.support": "Business Support",
+  "wholesale.business.support.subtitle": "Dedicated account manager",
+  "wholesale.tracking": "Profit Tracking",
+  "wholesale.tracking.subtitle": "Monitor your margins",
+
+  // Cart Enhancements
+  "cart.sellingPrice.required":
+    "Please enter selling prices for all items before checkout",
+  "cart.sellingPrice.validation":
+    "Please enter selling prices for all items in your cart",
+  "cart.wholesale.info":
+    "Wholesale Pricing: Please enter the price you plan to sell each item at",
+  "cart.items.withSellingPrice":
+    "Items with selling price: {{count}}/{{total}}",
+  "cart.benefits.title": "Wholesale Benefits",
+
+  // Error Messages & Validation
+  "validation.required": "This field is required",
+  "validation.email.invalid": "Please enter a valid email address",
+  "validation.phone.invalid": "Please enter a valid phone number",
+  "validation.password.minLength":
+    "Password must be at least {{length}} characters",
+  "validation.password.mismatch": "Passwords do not match",
+  "validation.price.positive": "Price must be greater than 0",
+  "validation.quantity.positive": "Quantity must be greater than 0",
+  "validation.url.invalid": "Please enter a valid URL",
+
+  // Loading & Status Messages
+  "loading.products": "Loading products...",
+  "loading.categories": "Loading categories...",
+  "loading.orders": "Loading orders...",
+  "loading.users": "Loading users...",
+  "loading.saving": "Saving...",
+  "loading.updating": "Updating...",
+  "loading.deleting": "Deleting...",
+  "loading.uploading": "Uploading...",
+  "loading.processing": "Processing...",
+
+  // Success Messages
+  "success.product.created": "Product created successfully",
+  "success.product.updated": "Product updated successfully",
+  "success.product.deleted": "Product deleted successfully",
+  "success.category.created": "Category created successfully",
+  "success.category.updated": "Category updated successfully",
+  "success.category.deleted": "Category deleted successfully",
+  "success.order.placed": "Order placed successfully",
+  "success.order.updated": "Order updated successfully",
+  "success.profile.updated": "Profile updated successfully",
+  "success.password.changed": "Password changed successfully",
+
+  // Error Messages
+  "error.generic": "An error occurred. Please try again.",
+  "error.network": "Network error. Please check your connection.",
+  "error.unauthorized": "You are not authorized to perform this action.",
+  "error.forbidden": "Access denied.",
+  "error.notFound": "The requested resource was not found.",
+  "error.validation": "Please check your input and try again.",
+  "error.server": "Server error. Please try again later.",
+  "error.upload.failed": "Upload failed. Please try again.",
+  "error.upload.size": "File size is too large. Maximum size is {{size}}MB.",
+  "error.upload.type": "Invalid file type. Please select {{types}}.",
+
+  // File Upload
+  "upload.dragDrop": "Drag and drop files here, or click to select",
+  "upload.selectFiles": "Select Files",
+  "upload.maxSize": "Maximum file size: {{size}}MB",
+  "upload.supportedFormats": "Supported formats: {{formats}}",
+  "upload.multipleSupported": "Multiple file selection supported",
+  "upload.maxFiles": "Maximum {{count}} files",
+  "upload.removeFile": "Remove file",
+  "upload.replaceFile": "Replace file",
+
+  // Notifications
+  "notification.welcome": "Welcome to Janah!",
+  "notification.orderConfirmed": "Your order has been confirmed",
+  "notification.orderShipped": "Your order has been shipped",
+  "notification.orderDelivered": "Your order has been delivered",
+  "notification.lowStock": "Low stock alert for {{product}}",
+  "notification.newUser": "New user registration: {{name}}",
+
+  // Time & Dates
+  "time.ago": "{{time}} ago",
+  "time.justNow": "Just now",
+  "time.minutes": "{{count}} minute{{count, plural, one {} other {s}}} ago",
+  "time.hours": "{{count}} hour{{count, plural, one {} other {s}}} ago",
+  "time.days": "{{count}} day{{count, plural, one {} other {s}}} ago",
+  "time.weeks": "{{count}} week{{count, plural, one {} other {s}}} ago",
+  "time.months": "{{count}} month{{count, plural, one {} other {s}}} ago",
+
+  // Units & Measurements
+  "units.pieces": "pieces",
+  "units.items": "items",
+  "units.kg": "kg",
+  "units.cm": "cm",
+  "units.iqd": "IQD",
+  "units.percent": "%",
+
+  // Image Gallery
+  "gallery.mainImage": "Main Image",
+  "gallery.viewLarger": "View Larger",
+  "gallery.previousImage": "Previous Image",
+  "gallery.nextImage": "Next Image",
+  "gallery.imageCounter": "{{current}} of {{total}}",
+  "gallery.noImages": "No images available",
+
+  // Search Enhancements
+  "search.noResultsFor": 'No results found for "{{query}}"',
+  "search.showingResults": "Showing {{count}} results",
+  "search.didYouMean": "Did you mean: {{suggestion}}?",
+  "search.searchHistory": "Search History",
+  "search.clearHistory": "Clear History",
+  "search.savedSearches": "Saved Searches",
+
+  // Admin Order Management
+  "admin.orders.title": "Order Management",
+  "admin.orders.subtitle": "Manage customer orders and tracking",
+  "admin.orders.analytics": "Order Analytics",
+  "admin.orders.updateStatus": "Update Order Status",
+  "admin.orders.statusHistory": "Status History",
+  "admin.orders.customerInfo": "Customer Information",
+  "admin.orders.orderTimeline": "Order Timeline",
+  "admin.orders.orderItems": "Order Items",
+  "admin.orders.wholesaleInfo": "Wholesale Information",
+
+  // Inventory Management
+  "inventory.lowStock": "Low Stock",
+  "inventory.outOfStock": "Out of Stock",
+  "inventory.inStock": "In Stock",
+  "inventory.restockAlert": "Restock Alert",
+  "inventory.stockLevel": "Stock Level",
+  "inventory.reorderPoint": "Reorder Point",
+  "inventory.lastRestocked": "Last Restocked",
+
+  // Business Features
+  "business.dashboard": "Business Dashboard",
+  "business.analytics": "Business Analytics",
+  "business.reports": "Reports",
+  "business.insights": "Insights",
+  "business.performance": "Performance",
+  "business.growth": "Growth",
+  // Language names
+  "language.english": "English",
+  "language.arabic": "Arabic",
+
+  // Search popular terms
+  "search.popular.iPhone15": "iPhone 15",
+  "search.popular.macbookAir": "MacBook Air",
+  "search.popular.samsungGalaxy": "Samsung Galaxy",
+  "search.popular.airpodsPro": "AirPods Pro",
+  "search.popular.gamingLaptop": "Gaming Laptop",
+
+  // Product Card
+  "productCard.reviewsCount": "{{count}} reviews",
+  "productCard.stockCount": "{{count}} in stock",
+
+  // Admin Settings - Currencies
+  "admin.settings.currencies.usd": "USD - US Dollar",
+  "admin.settings.currencies.eur": "EUR - Euro",
+  "admin.settings.currencies.iqd": "IQD - Iraqi Dinar",
+
+  // Admin Settings - Timezones
+  "admin.settings.timezones.baghdad": "Asia/Baghdad (GMT+3)",
+  "admin.settings.timezones.utc": "UTC (GMT+0)",
+  "admin.settings.timezones.newYork": "America/New_York (GMT-5)",
+
+  // Admin Settings - Defaults
+  "admin.settings.defaultSiteName": "Janah E-commerce",
+  "admin.settings.defaultSiteDescription": "Modern e-commerce platform",
+
+  // Product Filters
+  "products.filters.clearAll": "Clear All Filters",
+  "products.filters.productType": "Product Type",
+  "products.filters.allProducts": "All Products",
+  "products.filters.featuredOnly": "Featured Only",
+  "products.filters.regularProducts": "Regular Products",
+  "products.filters.minPrice": "Min Price",
+  "products.filters.maxPrice": "Max Price",
+  "products.filters.under50k": "Under 50,000 IQD",
+  "products.filters.range100to500": "100,000 - 500,000 IQD",
+
+  // Admin Brand and Navigation
+  "admin.brandName": "Janah Admin",
+  "admin.activationCodes": "Activation Codes",
 };
 
 export default enTranslations;
