@@ -35,33 +35,9 @@ export function Footer() {
   };
 
   const footerLinks = {
-    products: [
-      { label: "All Products", href: "/products" },
-      { label: "Electronics", href: "/categories/electronics" },
-      { label: "Computers", href: "/categories/computers" },
-      { label: "Smartphones", href: "/categories/smartphones" },
-      { label: "Accessories", href: "/categories/accessories" },
-    ],
-    company: [
-      { label: "About Us", href: "/about" },
-      { label: "Our Story", href: "/story" },
-      { label: "Careers", href: "/careers" },
-      { label: "Press", href: "/press" },
-      { label: "Blog", href: "/blog" },
-    ],
-    support: [
-      { label: "Help Center", href: "/help" },
-      { label: "Contact Us", href: "/contact" },
-      { label: "Returns", href: "/returns" },
-      { label: "Shipping Info", href: "/shipping" },
-      { label: "Size Guide", href: "/size-guide" },
-    ],
     legal: [
-      { label: "Privacy Policy", href: "/privacy" },
-      { label: "Terms of Service", href: "/terms" },
-      { label: "Cookie Policy", href: "/cookies" },
-      { label: "Refund Policy", href: "/refunds" },
-      { label: "Security", href: "/security" },
+      { label: t("footer.links.terms"), href: "/terms" },
+      // { label: t("footer.links.privacyPolicy"), href: "/privacy" },
     ],
   };
 
@@ -85,8 +61,8 @@ export function Footer() {
       }}
     >
       <Container maxWidth="xl">
-        {/* <Grid container spacing={4}>
-          <Grid item xs={12} md={4}>
+        {/* <Grid container spacing={4}> */}
+        {/* <Grid item xs={12} md={4}>
             <Typography
               variant="h4"
               sx={{
@@ -161,128 +137,44 @@ export function Footer() {
                 </IconButton>
               ))}
             </Box>
-          </Grid>
+          </Grid> */}
 
-          <Grid item xs={12} md={8}>
+        {/* <Grid item xs={12} md={8}>
             <Grid container spacing={4}>
-              <Grid item xs={6} sm={3}>
-                <Typography
-                  variant="h6"
-                  sx={{ fontWeight: 600, mb: 2, fontSize: "1rem" }}
-                >
-                  Products
-                </Typography>
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                  {footerLinks.products.map((link) => (
-                    <Link key={link.href} href={link.href}>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          opacity: 0.8,
-                          cursor: "pointer",
-                          "&:hover": {
-                            opacity: 1,
-                            color: "primary.light",
-                          },
-                          transition: "all 0.2s ease",
-                        }}
-                      >
-                        {link.label}
-                      </Typography>
-                    </Link>
-                  ))}
-                </Box>
-              </Grid>
-
-              <Grid item xs={6} sm={3}>
-                <Typography
-                  variant="h6"
-                  sx={{ fontWeight: 600, mb: 2, fontSize: "1rem" }}
-                >
-                  Company
-                </Typography>
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                  {footerLinks.company.map((link) => (
-                    <Link key={link.href} href={link.href}>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          opacity: 0.8,
-                          cursor: "pointer",
-                          "&:hover": {
-                            opacity: 1,
-                            color: "primary.light",
-                          },
-                          transition: "all 0.2s ease",
-                        }}
-                      >
-                        {link.label}
-                      </Typography>
-                    </Link>
-                  ))}
-                </Box>
-              </Grid>
-
-              <Grid item xs={6} sm={3}>
-                <Typography
-                  variant="h6"
-                  sx={{ fontWeight: 600, mb: 2, fontSize: "1rem" }}
-                >
-                  Support
-                </Typography>
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                  {footerLinks.support.map((link) => (
-                    <Link key={link.href} href={link.href}>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          opacity: 0.8,
-                          cursor: "pointer",
-                          "&:hover": {
-                            opacity: 1,
-                            color: "primary.light",
-                          },
-                          transition: "all 0.2s ease",
-                        }}
-                      >
-                        {link.label}
-                      </Typography>
-                    </Link>
-                  ))}
-                </Box>
-              </Grid>
-
-              <Grid item xs={6} sm={3}>
-                <Typography
-                  variant="h6"
-                  sx={{ fontWeight: 600, mb: 2, fontSize: "1rem" }}
-                >
-                  Legal
-                </Typography>
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                  {footerLinks.legal.map((link) => (
-                    <Link key={link.href} href={link.href}>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          opacity: 0.8,
-                          cursor: "pointer",
-                          "&:hover": {
-                            opacity: 1,
-                            color: "primary.light",
-                          },
-                          transition: "all 0.2s ease",
-                        }}
-                      >
-                        {link.label}
-                      </Typography>
-                    </Link>
-                  ))}
-                </Box>
-              </Grid>
+              <Grid item xs={6} sm={3}> */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 1,
+            mb: 2,
+          }}
+        >
+          {footerLinks.legal.map((link) => (
+            <Link key={link.href} href={link.href}>
+              <Typography
+                variant="body2"
+                sx={{
+                  opacity: 0.8,
+                  cursor: "pointer",
+                  "&:hover": {
+                    opacity: 1,
+                    color: "primary.light",
+                  },
+                  transition: "all 0.2s ease",
+                }}
+              >
+                {link.label}
+              </Typography>
+            </Link>
+          ))}
+        </Box>
+        {/* </Grid>
             </Grid>
-          </Grid>
-        </Grid> */}
+          </Grid> */}
+        {/* </Grid> */}
 
         {/* <Divider sx={{ my: 4, borderColor: "rgba(255,255,255,0.1)" }} /> */}
 

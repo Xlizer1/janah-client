@@ -738,17 +738,17 @@ export function AdminSettings() {
                     <List>
                       {[
                         {
-                          date: "2024-01-15 02:00",
+                          date: "2025-01-15 02:00",
                           size: "45.2 MB",
                           type: t("admin.settings.automatic"),
                         },
                         {
-                          date: "2024-01-14 02:00",
+                          date: "2025-01-14 02:00",
                           size: "44.8 MB",
                           type: t("admin.settings.automatic"),
                         },
                         {
-                          date: "2024-01-13 14:30",
+                          date: "2025-01-13 14:30",
                           size: "44.5 MB",
                           type: t("admin.settings.manual"),
                         },

@@ -103,7 +103,7 @@
               "_postman_previewlanguage": "json",
               "header": [],
               "cookie": [],
-              "body": "{\n  \"status\": true,\n  \"message\": \"Registration successful. Please contact an administrator to get an activation code.\",\n  \"data\": {\n    \"user\": {\n      \"id\": 1,\n      \"phone_number\": \"+9647701234567\",\n      \"first_name\": \"John\",\n      \"last_name\": \"Doe\",\n      \"email\": \"john.doe@example.com\",\n      \"is_active\": false,\n      \"role\": \"user\",\n      \"created_at\": \"2024-01-15T10:30:00.000Z\"\n    },\n    \"next_step\": \"get_activation_code\"\n  }\n}"
+              "body": "{\n  \"status\": true,\n  \"message\": \"Registration successful. Please contact an administrator to get an activation code.\",\n  \"data\": {\n    \"user\": {\n      \"id\": 1,\n      \"phone_number\": \"+9647701234567\",\n      \"first_name\": \"John\",\n      \"last_name\": \"Doe\",\n      \"email\": \"john.doe@example.com\",\n      \"is_active\": false,\n      \"role\": \"user\",\n      \"created_at\": \"2025-01-15T10:30:00.000Z\"\n    },\n    \"next_step\": \"get_activation_code\"\n  }\n}"
             }
           ]
         },
@@ -141,7 +141,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"phone_number\": \"+9647701234567\",\n  \"activation_code\": \"JANAH-2024-123\"\n}"
+                  "raw": "{\n  \"phone_number\": \"+9647701234567\",\n  \"activation_code\": \"JANAH-2025-123\"\n}"
                 },
                 "url": {
                   "raw": "{{baseUrl}}/api/{{apiVersion}}/auth/activate",
@@ -154,7 +154,7 @@
               "_postman_previewlanguage": "json",
               "header": [],
               "cookie": [],
-              "body": "{\n  \"status\": true,\n  \"message\": \"Account activated successfully! You can now login.\",\n  \"data\": {\n    \"user\": {\n      \"id\": 1,\n      \"phone_number\": \"+9647701234567\",\n      \"first_name\": \"John\",\n      \"last_name\": \"Doe\",\n      \"email\": \"john.doe@example.com\",\n      \"is_active\": true,\n      \"role\": \"user\",\n      \"activation_code_used\": \"JANAH-2024-123\",\n      \"activation_method\": \"activation_code\",\n      \"activated_at\": \"2024-01-15T10:35:00.000Z\"\n    },\n    \"next_step\": \"login\"\n  }\n}"
+              "body": "{\n  \"status\": true,\n  \"message\": \"Account activated successfully! You can now login.\",\n  \"data\": {\n    \"user\": {\n      \"id\": 1,\n      \"phone_number\": \"+9647701234567\",\n      \"first_name\": \"John\",\n      \"last_name\": \"Doe\",\n      \"email\": \"john.doe@example.com\",\n      \"is_active\": true,\n      \"role\": \"user\",\n      \"activation_code_used\": \"JANAH-2025-123\",\n      \"activation_method\": \"activation_code\",\n      \"activated_at\": \"2025-01-15T10:35:00.000Z\"\n    },\n    \"next_step\": \"login\"\n  }\n}"
             }
           ]
         },
@@ -266,7 +266,7 @@
               "_postman_previewlanguage": "json",
               "header": [],
               "cookie": [],
-              "body": "{\n  \"status\": true,\n  \"message\": \"Profile retrieved successfully\",\n  \"data\": {\n    \"user\": {\n      \"id\": 1,\n      \"phone_number\": \"+9647701234567\",\n      \"first_name\": \"John\",\n      \"last_name\": \"Doe\",\n      \"email\": \"john.doe@example.com\",\n      \"is_active\": true,\n      \"role\": \"user\",\n      \"profile_picture\": \"http://localhost:8000/uploads/users/profile_123.jpg\",\n      \"created_at\": \"2024-01-15T10:30:00.000Z\"\n    }\n  }\n}"
+              "body": "{\n  \"status\": true,\n  \"message\": \"Profile retrieved successfully\",\n  \"data\": {\n    \"user\": {\n      \"id\": 1,\n      \"phone_number\": \"+9647701234567\",\n      \"first_name\": \"John\",\n      \"last_name\": \"Doe\",\n      \"email\": \"john.doe@example.com\",\n      \"is_active\": true,\n      \"role\": \"user\",\n      \"profile_picture\": \"http://localhost:8000/uploads/users/profile_123.jpg\",\n      \"created_at\": \"2025-01-15T10:30:00.000Z\"\n    }\n  }\n}"
             }
           ]
         },
@@ -479,7 +479,7 @@
               "_postman_previewlanguage": "json",
               "header": [],
               "cookie": [],
-              "body": "{\n  \"status\": true,\n  \"message\": \"Users retrieved successfully\",\n  \"data\": {\n    \"users\": [\n      {\n        \"id\": 1,\n        \"phone_number\": \"+9647701234567\",\n        \"first_name\": \"John\",\n        \"last_name\": \"Doe\",\n        \"email\": \"john.doe@example.com\",\n        \"is_active\": true,\n        \"role\": \"user\",\n        \"activation_method\": \"activation_code\",\n        \"created_at\": \"2024-01-15T10:30:00.000Z\"\n      }\n    ],\n    \"pagination\": {\n      \"page\": 1,\n      \"limit\": 10,\n      \"total\": 1,\n      \"totalPages\": 1\n    }\n  }\n}"
+              "body": "{\n  \"status\": true,\n  \"message\": \"Users retrieved successfully\",\n  \"data\": {\n    \"users\": [\n      {\n        \"id\": 1,\n        \"phone_number\": \"+9647701234567\",\n        \"first_name\": \"John\",\n        \"last_name\": \"Doe\",\n        \"email\": \"john.doe@example.com\",\n        \"is_active\": true,\n        \"role\": \"user\",\n        \"activation_method\": \"activation_code\",\n        \"created_at\": \"2025-01-15T10:30:00.000Z\"\n      }\n    ],\n    \"pagination\": {\n      \"page\": 1,\n      \"limit\": 10,\n      \"total\": 1,\n      \"totalPages\": 1\n    }\n  }\n}"
             }
           ]
         },
@@ -773,7 +773,7 @@
               "_postman_previewlanguage": "json",
               "header": [],
               "cookie": [],
-              "body": "{\n  \"status\": true,\n  \"message\": \"Activation code generated successfully\",\n  \"data\": {\n    \"activation_code\": {\n      \"id\": 1,\n      \"code\": \"JANAH-2024-123\",\n      \"created_by\": 1,\n      \"expires_at\": \"2024-02-14T10:30:00.000Z\",\n      \"notes\": \"Generated for new user registration\",\n      \"is_active\": true,\n      \"used_by\": null,\n      \"used_at\": null,\n      \"created_at\": \"2024-01-15T10:30:00.000Z\"\n    }\n  }\n}"
+              "body": "{\n  \"status\": true,\n  \"message\": \"Activation code generated successfully\",\n  \"data\": {\n    \"activation_code\": {\n      \"id\": 1,\n      \"code\": \"JANAH-2025-123\",\n      \"created_by\": 1,\n      \"expires_at\": \"2025-02-14T10:30:00.000Z\",\n      \"notes\": \"Generated for new user registration\",\n      \"is_active\": true,\n      \"used_by\": null,\n      \"used_at\": null,\n      \"created_at\": \"2025-01-15T10:30:00.000Z\"\n    }\n  }\n}"
             }
           ]
         },
@@ -955,7 +955,7 @@
               "_postman_previewlanguage": "json",
               "header": [],
               "cookie": [],
-              "body": "{\n  \"status\": true,\n  \"message\": \"Service is healthy\",\n  \"data\": {\n    \"status\": \"healthy\",\n    \"timestamp\": \"2024-01-15T10:30:00.000Z\",\n    \"uptime\": 3600,\n    \"environment\": \"development\",\n    \"version\": \"1.0.0\",\n    \"database\": \"connected\",\n    \"services\": {\n      \"api\": \"running\",\n      \"database\": \"connected\",\n      \"twilio\": \"configured\"\n    }\n  }\n}"
+              "body": "{\n  \"status\": true,\n  \"message\": \"Service is healthy\",\n  \"data\": {\n    \"status\": \"healthy\",\n    \"timestamp\": \"2025-01-15T10:30:00.000Z\",\n    \"uptime\": 3600,\n    \"environment\": \"development\",\n    \"version\": \"1.0.0\",\n    \"database\": \"connected\",\n    \"services\": {\n      \"api\": \"running\",\n      \"database\": \"connected\",\n      \"twilio\": \"configured\"\n    }\n  }\n}"
             }
           ]
         },

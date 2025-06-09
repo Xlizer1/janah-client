@@ -229,14 +229,14 @@ function ProductDetailsContent() {
       id: 1,
       action: "Stock updated",
       details: `Stock changed from 45 to ${product.stock_quantity}`,
-      timestamp: "2024-01-15T10:30:00Z",
+      timestamp: "2025-01-15T10:30:00Z",
       user: "Admin User",
     },
     {
       id: 2,
       action: "Price updated",
       details: `Price changed to ${formatPrice(product.price)}`,
-      timestamp: "2024-01-14T15:20:00Z",
+      timestamp: "2025-01-14T15:20:00Z",
       user: "Admin User",
     },
     {
