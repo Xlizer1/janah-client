@@ -218,6 +218,20 @@ export function getPriceFormatOptions(locale: string): PriceFormatOptions {
   };
 }
 
+export function formatPriceCompact(price: number): string {
+  if (price === 0) return "0 IQD";
+
+  if (price >= 1000000) {
+    return `${(price / 1000000).toFixed(1)}M IQD`;
+  }
+
+  if (price >= 1000) {
+    return `${(price / 1000).toFixed(1)}K IQD`;
+  }
+
+  return formatPrice(price);
+}
+
 /**
  * Legacy function for backward compatibility
  */
