@@ -514,7 +514,7 @@ export default function CheckoutPage() {
                       <Typography>Items ({totalItems}):</Typography>
                       <Typography>{formatPrice(totalPrice)}</Typography>
                     </Box>
-                    <Box
+                    {/* <Box
                       sx={{
                         display: "flex",
                         justifyContent: "space-between",
@@ -523,7 +523,7 @@ export default function CheckoutPage() {
                     >
                       <Typography>Shipping:</Typography>
                       <Typography color="success.main">Free</Typography>
-                    </Box>
+                    </Box> */}
                     <Divider sx={{ my: 1 }} />
                     <Box
                       sx={{
@@ -675,7 +675,7 @@ export default function CheckoutPage() {
                 <Typography>{formatPrice(totalPrice)}</Typography>
               </Box>
 
-              <Box
+              {/* <Box
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
@@ -684,7 +684,7 @@ export default function CheckoutPage() {
               >
                 <Typography>Shipping:</Typography>
                 <Typography color="success.main">Free</Typography>
-              </Box>
+              </Box> */}
 
               <Divider sx={{ my: 2 }} />
 
@@ -704,20 +704,20 @@ export default function CheckoutPage() {
               </Box>
 
               {/* Delivery Info */}
-              <Box
+              {/* <Box
                 sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}
               >
                 <LocalShipping color="primary" />
                 <Typography variant="body2" color="text.secondary">
                   Free delivery within 1-3 business days
                 </Typography>
-              </Box>
+              </Box> */}
 
-              <Alert severity="info">
+              {/* <Alert severity="info">
                 <Typography variant="caption">
                   You'll receive SMS updates about your order status.
                 </Typography>
-              </Alert>
+              </Alert> */}
             </Paper>
           </Grid>
         </Grid>

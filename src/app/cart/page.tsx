@@ -515,7 +515,7 @@ export default function CartPage() {
                 </Paper>
 
                 {/* Wholesale Benefits */}
-                <Card>
+                {/* <Card>
                   <CardContent>
                     <Typography
                       variant="subtitle1"
@@ -566,7 +566,7 @@ export default function CartPage() {
                       </Box>
                     </Box>
                   </CardContent>
-                </Card>
+                </Card> */}
               </Box>
             </Grid>
           </Grid>
