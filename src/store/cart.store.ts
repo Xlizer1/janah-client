@@ -6,7 +6,6 @@ import type { Product, CartItem } from "@/types";
 interface CartState {
   items: CartItem[];
   isOpen: boolean;
-
   totalItems: number;
   totalPrice: number;
 
@@ -30,19 +29,20 @@ interface CartState {
   }>;
 }
 
+// Helper function to calculate totals
+const calculateTotals = (items: CartItem[]) => {
+  const totalItems = items.reduce((total, item) => total + item.quantity, 0);
+  const totalPrice = items.reduce((total, item) => total + item.subtotal, 0);
+  return { totalItems, totalPrice };
+};
+
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
       isOpen: false,
-
-      get totalItems() {
-        return get().items.reduce((total, item) => total + item.quantity, 0);
-      },
-
-      get totalPrice() {
-        return get().items.reduce((total, item) => total + item.subtotal, 0);
-      },
+      totalItems: 0,
+      totalPrice: 0,
 
       addItem: (product: Product, quantity = 1, selling_price?: number) => {
         const { items } = get();
@@ -58,17 +58,22 @@ export const useCartStore = create<CartState>()(
             return;
           }
 
+          const updatedItems = items.map((item) =>
+            item.product.id === product.id
+              ? {
+                  ...item,
+                  quantity: newQuantity,
+                  subtotal: newQuantity * product.price,
+                  selling_price: selling_price || item.selling_price,
+                }
+              : item
+          );
+
+          const totals = calculateTotals(updatedItems);
+
           set({
-            items: items.map((item) =>
-              item.product.id === product.id
-                ? {
-                    ...item,
-                    quantity: newQuantity,
-                    subtotal: newQuantity * product.price,
-                    selling_price: selling_price || item.selling_price,
-                  }
-                : item
-            ),
+            items: updatedItems,
+            ...totals,
           });
 
           toast.success(`Updated ${product.name} quantity`);
@@ -85,8 +90,12 @@ export const useCartStore = create<CartState>()(
             selling_price: selling_price,
           };
 
+          const updatedItems = [...items, newItem];
+          const totals = calculateTotals(updatedItems);
+
           set({
-            items: [...items, newItem],
+            items: updatedItems,
+            ...totals,
           });
 
           toast.success(`Added ${product.name} to cart`);
@@ -97,8 +106,14 @@ export const useCartStore = create<CartState>()(
         const { items } = get();
         const item = items.find((item) => item.product.id === productId);
 
+        const updatedItems = items.filter(
+          (item) => item.product.id !== productId
+        );
+        const totals = calculateTotals(updatedItems);
+
         set({
-          items: items.filter((item) => item.product.id !== productId),
+          items: updatedItems,
+          ...totals,
         });
 
         if (item) {
@@ -122,31 +137,38 @@ export const useCartStore = create<CartState>()(
           return;
         }
 
+        const updatedItems = items.map((item) =>
+          item.product.id === productId
+            ? {
+                ...item,
+                quantity,
+                subtotal: quantity * item.product.price,
+              }
+            : item
+        );
+
+        const totals = calculateTotals(updatedItems);
+
         set({
-          items: items.map((item) =>
-            item.product.id === productId
-              ? {
-                  ...item,
-                  quantity,
-                  subtotal: quantity * item.product.price,
-                }
-              : item
-          ),
+          items: updatedItems,
+          ...totals,
         });
       },
 
       updateSellingPrice: (productId: number, selling_price: number) => {
         const { items } = get();
 
+        const updatedItems = items.map((item) =>
+          item.product.id === productId
+            ? {
+                ...item,
+                selling_price,
+              }
+            : item
+        );
+
         set({
-          items: items.map((item) =>
-            item.product.id === productId
-              ? {
-                  ...item,
-                  selling_price,
-                }
-              : item
-          ),
+          items: updatedItems,
         });
       },
 
@@ -170,7 +192,11 @@ export const useCartStore = create<CartState>()(
       },
 
       clearCart: () => {
-        set({ items: [] });
+        set({
+          items: [],
+          totalItems: 0,
+          totalPrice: 0,
+        });
         toast.success("Cart cleared");
       },
 
@@ -191,6 +217,14 @@ export const useCartStore = create<CartState>()(
       partialize: (state) => ({
         items: state.items,
       }),
+      // Rehydrate totals when loading from storage
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          const totals = calculateTotals(state.items);
+          state.totalItems = totals.totalItems;
+          state.totalPrice = totals.totalPrice;
+        }
+      },
     }
   )
 );
