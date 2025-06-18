@@ -92,6 +92,31 @@ export const authService = {
 
   // Admin methods for activation code management
   admin: {
+    bulkGenerateActivationCode: async (data: {
+      quantity: number;
+      format?: "JANAH" | "PREMIUM" | "TRIAL" | "CUSTOM";
+      expires_in_days?: number;
+      notes?: string;
+      prefix?: string;
+    }): Promise<{
+      activation_code: {
+        id: number;
+        code: string;
+        created_by: number;
+        expires_at: string;
+        notes?: string;
+        is_active: boolean;
+        used_by?: number;
+        used_at?: string;
+        created_at: string;
+      };
+    }> => {
+      return api.post("/admin/activation-codes/generate-bulk", {
+        ...data,
+        prefix: "EVENT",
+      });
+    },
+
     generateActivationCode: async (data: {
       format?: "JANAH" | "PREMIUM" | "TRIAL" | "CUSTOM";
       expires_in_days?: number;

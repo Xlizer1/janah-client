@@ -966,6 +966,7 @@ const enTranslations = {
   "admin.users.noUsersToDisplay": "No users to display",
   "admin.users.viewPendingUsers": "View Pending Users ({{count}})",
   "admin.users.confirmActivation": "Confirm User Activation",
+  "admin.codes.quantity": "Number of codes to generate",
 
   "cart.itemsCount": "{{count}} item{{count, plural, one {} other {s}}}",
   "cart.viewCart": "View Cart",

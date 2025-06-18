@@ -61,24 +61,26 @@ import { authService } from "@/services/auth.service";
 import { useTranslation } from "@/hooks/useTranslation";
 
 const generateCodeSchema = yup.object({
+  quantity: yup.number().required(),
   format: yup.string().oneOf(["JANAH", "PREMIUM", "TRIAL", "CUSTOM"] as const),
   expires_in_days: yup
     .number()
     .min(1, "Must be at least 1 day")
     .max(365, "Cannot exceed 365 days"),
   notes: yup.string().max(500, "Notes cannot exceed 500 characters"),
-  custom_code: yup.string().when("format", {
-    is: "CUSTOM",
-    then: (schema) => schema.required("Custom code is required"),
-    otherwise: (schema) => schema.optional(),
-  }),
+  // custom_code: yup.string().when("format", {
+  //   is: "CUSTOM",
+  //   then: (schema) => schema.required("Custom code is required"),
+  //   otherwise: (schema) => schema.optional(),
+  // }),
 });
 
 interface GenerateCodeFormData {
+  quantity: number;
   format: "JANAH" | "PREMIUM" | "TRIAL" | "CUSTOM";
   expires_in_days: number;
   notes?: string;
-  custom_code?: string;
+  // custom_code?: string;
 }
 
 function AdminGuard({ children }: { children: React.ReactNode }) {
@@ -125,10 +127,11 @@ function ActivationCodesContent() {
   } = useForm<GenerateCodeFormData>({
     resolver: yupResolver(generateCodeSchema) as Resolver<GenerateCodeFormData>,
     defaultValues: {
+      quantity: 5,
       format: "JANAH",
       expires_in_days: 30,
       notes: "",
-      custom_code: "",
+      // custom_code: "",
     },
   });
 
@@ -150,7 +153,7 @@ function ActivationCodesContent() {
   });
 
   const generateCodeMutation = useMutation({
-    mutationFn: authService.admin.generateActivationCode,
+    mutationFn: authService.admin.bulkGenerateActivationCode,
     onSuccess: () => {
       toast.success("Activation code generated successfully!");
       setGenerateDialogOpen(false);
@@ -523,6 +526,18 @@ function ActivationCodesContent() {
             <Box
               sx={{ display: "flex", flexDirection: "column", gap: 3, pt: 1 }}
             >
+              <TextField
+                fullWidth
+                type="number"
+                label={t("admin.codes.quantity")}
+                {...register("quantity")}
+                error={!!errors.quantity}
+                helperText={
+                  errors.quantity?.message || t("admin.codes.quantity")
+                }
+                inputProps={{ min: 1, max: 365 }}
+              />
+
               <FormControl fullWidth>
                 <InputLabel>Code Format</InputLabel>
                 <Select
@@ -537,7 +552,7 @@ function ActivationCodesContent() {
                 </Select>
               </FormControl>
 
-              {format === "CUSTOM" && (
+              {/*{format === "CUSTOM" && (
                 <TextField
                   fullWidth
                   label="Custom Code"
@@ -548,7 +563,7 @@ function ActivationCodesContent() {
                     "Enter your custom activation code"
                   }
                 />
-              )}
+              )} */}
 
               <TextField
                 fullWidth

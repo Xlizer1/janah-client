@@ -952,6 +952,7 @@ const arTranslations = {
   "admin.users.activationNotification": "سيتلقى المستخدم إشعار SMS.",
   "admin.users.confirmActivationButton": "تأكيد التفعيل",
   "admin.users.confirmDeactivationButton": "تأكيد إلغاء التفعيل",
+  "admin.codes.quantity": "Number of codes to generate",
 
   "cart.itemsCount": "{{count}} عنصر",
   "cart.viewCart": "عرض السلة",
